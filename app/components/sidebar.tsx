@@ -7,7 +7,6 @@ import SettingsIcon from "../icons/settings.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
-import ClearIcon from "../icons/clear.svg";
 
 import Locale from "../locales";
 
@@ -131,6 +130,7 @@ export function SideBar(props: { className?: string }) {
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
                 chatStore.newSession();
+                navigate(Path.Chat);
             }}
             shadow
           />

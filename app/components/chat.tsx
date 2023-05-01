@@ -110,8 +110,6 @@ function exportMessages(messages: Message[], topic: string) {
 export function SessionConfigModel(props: { onClose: () => void }) {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
-  const maskStore = useMaskStore();
-  const navigate = useNavigate();
 
   return (
     <div className="modal-mask">
@@ -125,7 +123,8 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             bordered
             text={Locale.Chat.Config.Reset}
             onClick={() =>
-              confirm(Locale.Memory.ResetConfirm) && chatStore.resetSession()
+              // confirm(Locale.Memory.ResetConfirm) &&
+                chatStore.resetSession()
             }
           />,
         ]}

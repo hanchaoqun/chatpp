@@ -179,9 +179,8 @@ export function Settings() {
             <IconButton
               icon={<ClearIcon />}
               onClick={() => {
-                if (confirm(Locale.Settings.Actions.ConfirmClearAll)) {
-                  chatStore.clearAllData();
-                }
+                // confirm(Locale.Settings.Actions.ConfirmClearAll) &&
+                  chatStore.clearAllData()
               }}
               bordered
               title={Locale.Settings.Actions.ClearAll}
@@ -191,9 +190,8 @@ export function Settings() {
             <IconButton
               icon={<ResetIcon />}
               onClick={() => {
-                if (confirm(Locale.Settings.Actions.ConfirmResetAll)) {
-                  resetConfig();
-                }
+                // confirm(Locale.Settings.Actions.ConfirmResetAll) &&
+                  resetConfig()
               }}
               bordered
               title={Locale.Settings.Actions.ResetAll}

@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
               icon={<ResetIcon />}
               text="Clear All Data"
               onClick={() =>
-                confirm(Locale.Settings.Actions.ConfirmClearAll) &&
+                //confirm(Locale.Settings.Actions.ConfirmClearAll) &&
                 this.clearAndSaveData()
               }
               bordered
