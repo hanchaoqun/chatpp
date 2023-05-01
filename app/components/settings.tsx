@@ -313,19 +313,6 @@ export function Settings() {
               }
             ></input>
           </ListItem>
-          <ListItem
-            title={Locale.Settings.Prompt.List}
-            subTitle={Locale.Settings.Prompt.ListCount(
-              builtinCount,
-              customCount,
-            )}
-          >
-            <IconButton
-              icon={<EditIcon />}
-              text={Locale.Settings.Prompt.Edit}
-              onClick={() => setShowPromptModal(true)}
-            />
-          </ListItem>
         </List>
         <List>
           <ModelConfigList
@@ -345,3 +332,19 @@ export function Settings() {
     </ErrorBoundary>
   );
 }
+
+/*
+<ListItem
+  title={Locale.Settings.Prompt.List}
+  subTitle={Locale.Settings.Prompt.ListCount(
+    builtinCount,
+    customCount,
+  )}
+>
+  <IconButton
+    icon={<EditIcon />}
+    text={Locale.Settings.Prompt.Edit}
+    onClick={() => setShowPromptModal(true)}
+  />
+</ListItem>
+*/
