@@ -6,6 +6,7 @@ import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
 import ExportIcon from "../icons/share.svg";
 import SettingsIcon from "../icons/settings.svg";
+import LeftIcon from "../icons/left.svg";
 import CopyIcon from "../icons/copy.svg";
 import DownloadIcon from "../icons/download.svg";
 import LoadingIcon from "../icons/three-dots.svg";
@@ -575,10 +576,18 @@ export function Chat() {
           </div>
           <div className={"window-action-button" + " " + styles.mobile}>
             <IconButton
-              icon={<SettingsIcon />}
+              icon={<LeftIcon />}
               bordered
               title={Locale.Chat.Actions.ChatList}
               onClick={() => navigate(Path.Home)}
+            />
+          </div>
+          <div className={"window-action-button" + " " + styles.mobile}>
+            <IconButton
+                icon={<SettingsIcon />}
+                bordered
+                title={Locale.Settings.Title}
+                onClick={() => navigate(Path.Settings)}
             />
           </div>
           <div className="window-action-button">
