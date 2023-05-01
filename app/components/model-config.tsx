@@ -56,7 +56,7 @@ export function ModelConfigList(props: {
           type="number"
           min={100}
           max={32000}
-          width="80"
+          width="120"
           value={props.modelConfig.max_tokens}
           onChange={(e) =>
             props.updateConfig(
@@ -115,7 +115,7 @@ export function ModelConfigList(props: {
           type="number"
           min={500}
           max={4000}
-          width="80"
+          width="120"
           value={props.modelConfig.compressMessageLengthThreshold}
           onChange={(e) =>
             props.updateConfig(
