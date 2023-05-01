@@ -747,7 +747,7 @@ export function Chat() {
                 }
               }, 100);
             }}
-            autoFocus
+            //autoFocus
             rows={inputRows}
           />
           <IconButton

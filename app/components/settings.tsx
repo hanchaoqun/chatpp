@@ -200,7 +200,7 @@ export function Settings() {
           <div className="window-action-button">
             <IconButton
               icon={<CloseIcon />}
-              onClick={() => navigate(Path.Chat)}
+              onClick={() => navigate(Path.Home)}
               bordered
               title={Locale.Settings.Actions.Close}
             />
