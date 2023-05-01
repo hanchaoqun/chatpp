@@ -57,6 +57,8 @@ export function ModelConfigList(props: {
           min={100}
           max={32000}
           width="180px"
+          className={"flex-grow:1"}
+          size={8}
           value={props.modelConfig.max_tokens}
           onChange={(e) =>
             props.updateConfig(
@@ -116,6 +118,8 @@ export function ModelConfigList(props: {
           min={500}
           max={8000}
           width="180px"
+          size={8}
+          className={"flex-grow:1"}
           value={props.modelConfig.compressMessageLengthThreshold}
           onChange={(e) =>
             props.updateConfig(
