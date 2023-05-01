@@ -30,23 +30,22 @@ export async function GET(req: NextRequest) {
   return makeRequest(req);
 }
 
-
 // export const runtime = "edge";
 
 export const config = {
   runtime: "edge",
   /**
    * https://vercel.com/docs/concepts/edge-network/regions#region-list
-   * disable hongkong
+   * disable hongkong : hkg1
    * only for vercel
    */
   regions: [
     "arn1",
     "bom1",
-    "bru1",
+    // "bru1",
     "cdg1",
     "cle1",
-    "cpt1a",
+    "cpt1",
     "dub1",
     "fra1",
     "gru1",
@@ -61,3 +60,4 @@ export const config = {
     "syd1"
   ]
 }
+
