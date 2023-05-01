@@ -3,7 +3,6 @@ import { memo, useState, useRef, useEffect, useLayoutEffect } from "react";
 
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
-import RenameIcon from "../icons/rename.svg";
 import ExportIcon from "../icons/share.svg";
 import SettingsIcon from "../icons/settings.svg";
 import LeftIcon from "../icons/left.svg";
@@ -118,16 +117,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
         title={Locale.Context.Edit}
         onClose={() => props.onClose()}
         actions={[
-          <IconButton
-            key="reset"
-            icon={<ResetIcon />}
-            bordered
-            text={Locale.Chat.Config.Reset}
-            onClick={() =>
-              // confirm(Locale.Memory.ResetConfirm) &&
-                chatStore.resetSession()
-            }
-          />,
+
         ]}
       >
         <MaskConfig

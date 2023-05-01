@@ -178,9 +178,9 @@ export function Settings() {
           <div className="window-action-button">
             <IconButton
               icon={<ClearIcon />}
-              onClick={() => {
+              onClick={() => { chatStore.clearAllData()
                 // confirm(Locale.Settings.Actions.ConfirmClearAll) &&
-                  chatStore.clearAllData()
+                  // chatStore.clearAllData()
               }}
               bordered
               title={Locale.Settings.Actions.ClearAll}
@@ -189,9 +189,9 @@ export function Settings() {
           <div className="window-action-button">
             <IconButton
               icon={<ResetIcon />}
-              onClick={() => {
+              onClick={() => { resetConfig()
                 // confirm(Locale.Settings.Actions.ConfirmResetAll) &&
-                  resetConfig()
+                  //resetConfig()
               }}
               bordered
               title={Locale.Settings.Actions.ResetAll}
