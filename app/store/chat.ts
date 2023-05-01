@@ -201,7 +201,7 @@ export const useChatStore = create<ChatStore>()(
         const deletedSession = get().currentSession();
         const index = i ?? get().currentSessionIndex;
         const isLastSession = get().sessions.length === 1;
-        if (!isMobileScreen() || true) { // confirm(Locale.Home.DeleteChat)
+        if (!isMobileScreen() || true) {
           get().removeSession(index);
 
           showToast(
