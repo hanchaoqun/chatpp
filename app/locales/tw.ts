@@ -51,7 +51,7 @@ const tw: LocaleType = {
     ResetConfirm: "重設後將清除目前對話記錄以及歷史記憶，確認重設？",
   },
   Home: {
-    NewChat: "新的對話",
+    NewChat: "新增對話",
     DeleteChat: "確定要刪除選取的對話嗎？",
     DeleteToast: "已刪除對話",
     Revert: "撤銷",
@@ -161,7 +161,7 @@ const tw: LocaleType = {
     },
   },
   Store: {
-    DefaultTopic: "新的對話",
+    DefaultTopic: "未命名主題",
     BotHello: "請問需要我的協助嗎？",
     Error: "出錯了，請稍後再嘗試",
     Prompt: {

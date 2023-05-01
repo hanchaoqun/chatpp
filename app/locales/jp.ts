@@ -167,7 +167,7 @@ const jp: LocaleType = {
     },
   },
   Store: {
-    DefaultTopic: "新しいチャット",
+    DefaultTopic: "無題のトピック",
     BotHello: "何かお手伝いできることはありますか",
     Error: "エラーが発生しました。しばらくしてからやり直してください。",
     Prompt: {

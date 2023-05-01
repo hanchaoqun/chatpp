@@ -166,7 +166,7 @@ const it: LocaleType = {
     },
   },
   Store: {
-    DefaultTopic: "Nuova conversazione",
+    DefaultTopic: "Argomento senza titolo",
     BotHello: "Ciao, come posso aiutarti oggi?",
     Error: "Qualcosa è andato storto, riprova più tardi.",
     Prompt: {

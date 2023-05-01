@@ -167,7 +167,7 @@ const tr: LocaleType = {
     },
   },
   Store: {
-    DefaultTopic: "Yeni Konuşma",
+    DefaultTopic: "Başlıksız Konu",
     BotHello: "Merhaba! Size bugün nasıl yardımcı olabilirim?",
     Error: "Bir şeyler yanlış gitti. Lütfen daha sonra tekrar deneyiniz.",
     Prompt: {

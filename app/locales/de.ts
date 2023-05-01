@@ -167,7 +167,7 @@ const de: LocaleType = {
     },
   },
   Store: {
-    DefaultTopic: "Neues Gespräch",
+    DefaultTopic: "Unbetiteltes Thema",
     BotHello: "Hallo! Wie kann ich Ihnen heute helfen?",
     Error:
       "Etwas ist schief gelaufen, bitte versuchen Sie es später noch einmal.",
