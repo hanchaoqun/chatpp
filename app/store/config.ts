@@ -20,7 +20,7 @@ export const DEFAULT_CONFIG = {
   submitKey: SubmitKey.CtrlEnter as SubmitKey,
   avatar: "",
   fontSize: 14,
-  theme: Theme.Dark as Theme,
+  theme: Theme.Light as Theme,
   tightBorder: false,
   sendPreviewBubble: false,
   sidebarWidth: 300,
