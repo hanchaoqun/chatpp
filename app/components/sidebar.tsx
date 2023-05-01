@@ -130,7 +130,7 @@ export function SideBar(props: { className?: string }) {
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
                 chatStore.newSession();
-                navigate(Path.Chat);
+                //navigate(Path.Chat);
             }}
             shadow
           />
