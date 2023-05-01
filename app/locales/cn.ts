@@ -126,7 +126,7 @@ const cn = {
     },
     CompressThreshold: {
       Title: "历史消息长度压缩阈值",
-      SubTitle: "当未压缩的历史消息超过该值时，将进行压缩",
+      SubTitle: "历史消息个数超过该值时，将进行压缩",
     },
     Token: {
       Title: "API Key",

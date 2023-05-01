@@ -128,7 +128,7 @@ const en: LocaleType = {
     CompressThreshold: {
       Title: "History Compression Threshold",
       SubTitle:
-        "Will compress if uncompressed messages length exceeds the value",
+        "Will compress if uncompressed messages count exceeds",
     },
     Token: {
       Title: "API Key",

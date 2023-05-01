@@ -125,7 +125,7 @@ const tw: LocaleType = {
     },
     CompressThreshold: {
       Title: "歷史訊息長度壓縮閾值",
-      SubTitle: "當未壓縮的歷史訊息超過該值時，將進行壓縮",
+      SubTitle: "當歷史訊息个数超過該值時，將進行壓縮",
     },
     Token: {
       Title: "API Key",
