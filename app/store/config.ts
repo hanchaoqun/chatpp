@@ -11,7 +11,6 @@ export enum SubmitKey {
 }
 
 export enum Theme {
-  Auto = "auto",
   Dark = "dark",
   Light = "light",
 }
@@ -19,11 +18,11 @@ export enum Theme {
 export const DEFAULT_CONFIG = {
   sendBotMessages: true as boolean,
   submitKey: SubmitKey.CtrlEnter as SubmitKey,
-  avatar: "1f603",
+  avatar: "",
   fontSize: 14,
-  theme: Theme.Auto as Theme,
+  theme: Theme.Dark as Theme,
   tightBorder: false,
-  sendPreviewBubble: true,
+  sendPreviewBubble: false,
   sidebarWidth: 300,
 
   disablePromptHint: false,

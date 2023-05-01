@@ -1,9 +1,8 @@
-import styles from "./settings.module.scss";
 import { ALL_MODELS, ModalConfigValidator, ModelConfig } from "../store";
 
 import Locale from "../locales";
 import { InputRange } from "./input-range";
-import { List, ListItem } from "./ui-lib";
+import { ListItem } from "./ui-lib";
 
 export function ModelConfigList(props: {
   modelConfig: ModelConfig;

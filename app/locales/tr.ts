@@ -11,7 +11,7 @@ const tr: LocaleType = {
     ChatItemCount: (count: number) => `${count} mesaj`,
   },
   Chat: {
-    SubTitle: (count: number) => `ChatGPT tarafından ${count} mesaj`,
+    SubTitle: (model, count) => `${model} tarafından ${count} mesaj`,
     Actions: {
       ChatList: "Sohbet Listesine Git",
       CompressedHistory: "Sıkıştırılmış Geçmiş Bellek Komutu",

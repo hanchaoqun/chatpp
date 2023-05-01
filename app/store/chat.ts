@@ -207,17 +207,8 @@ export const useChatStore = create<ChatStore>()(
           showToast(
             Locale.Home.DeleteToast,
             {
-              text: Locale.Home.Revert,
-              onClick() {
-                set((state) => ({
-                  sessions: state.sessions
-                    .slice(0, index)
-                    .concat([deletedSession])
-                    .concat(
-                      state.sessions.slice(index + Number(isLastSession)),
-                    ),
-                }));
-              },
+              text: "",
+              onClick() {},
             },
             5000,
           );

@@ -21,8 +21,6 @@
 
 # debug
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
@@ -36,7 +34,7 @@ yarn-error.log*
 next-env.d.ts
 dev
 
-public/prompts.json
+# public/prompts.json
 
 .vscode
 .idea

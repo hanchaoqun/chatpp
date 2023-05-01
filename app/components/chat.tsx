@@ -5,19 +5,17 @@ import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
 import ExportIcon from "../icons/share.svg";
-import ReturnIcon from "../icons/return.svg";
+import SettingsIcon from "../icons/settings.svg";
 import CopyIcon from "../icons/copy.svg";
 import DownloadIcon from "../icons/download.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import PromptIcon from "../icons/prompt.svg";
-import MaskIcon from "../icons/mask.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
-import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 
@@ -129,18 +127,6 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             onClick={() =>
               confirm(Locale.Memory.ResetConfirm) && chatStore.resetSession()
             }
-          />,
-          <IconButton
-            key="copy"
-            icon={<CopyIcon />}
-            bordered
-            text={Locale.Chat.Config.SaveAs}
-            onClick={() => {
-              navigate(Path.Masks);
-              setTimeout(() => {
-                maskStore.create(session.mask);
-              }, 500);
-            }}
           />,
         ]}
       >
@@ -281,7 +267,7 @@ export function ChatActions(props: {
   // switch themes
   const theme = config.theme;
   function nextTheme() {
-    const themes = [Theme.Auto, Theme.Light, Theme.Dark];
+    const themes = [Theme.Light, Theme.Dark];
     const themeIndex = themes.indexOf(theme);
     const nextIndex = (themeIndex + 1) % themes.length;
     const nextTheme = themes[nextIndex];
@@ -323,9 +309,7 @@ export function ChatActions(props: {
         className={`${chatStyle["chat-input-action"]} clickable`}
         onClick={nextTheme}
       >
-        {theme === Theme.Auto ? (
-          <AutoIcon />
-        ) : theme === Theme.Light ? (
+        {theme === Theme.Light ? (
           <LightIcon />
         ) : theme === Theme.Dark ? (
           <DarkIcon />
@@ -339,14 +323,6 @@ export function ChatActions(props: {
         <PromptIcon />
       </div>
 
-      <div
-        className={`${chatStyle["chat-input-action"]} clickable`}
-        onClick={() => {
-          navigate(Path.Masks);
-        }}
-      >
-        <MaskIcon />
-      </div>
     </div>
   );
 }
@@ -587,23 +563,23 @@ export function Chat() {
             {!session.topic ? DEFAULT_TOPIC : session.topic}
           </div>
           <div className="window-header-sub-title">
-            {Locale.Chat.SubTitle(session.messages.length)}
+            {Locale.Chat.SubTitle(session.mask.modelConfig.model, session.messages.length)}
           </div>
         </div>
         <div className="window-actions">
+          <div className="window-action-button">
+            <IconButton
+                icon={<RenameIcon />}
+                bordered
+                onClick={renameSession}
+            />
+          </div>
           <div className={"window-action-button" + " " + styles.mobile}>
             <IconButton
-              icon={<ReturnIcon />}
+              icon={<SettingsIcon />}
               bordered
               title={Locale.Chat.Actions.ChatList}
               onClick={() => navigate(Path.Home)}
-            />
-          </div>
-          <div className="window-action-button">
-            <IconButton
-              icon={<RenameIcon />}
-              bordered
-              onClick={renameSession}
             />
           </div>
           <div className="window-action-button">

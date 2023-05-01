@@ -1,5 +1,4 @@
 import styles from "./ui-lib.module.scss";
-import LoadingIcon from "../icons/three-dots.svg";
 import CloseIcon from "../icons/close.svg";
 import EyeIcon from "../icons/eye.svg";
 import EyeOffIcon from "../icons/eye-off.svg";
@@ -7,31 +6,6 @@ import EyeOffIcon from "../icons/eye-off.svg";
 import { createRoot } from "react-dom/client";
 import React, { HTMLProps, useEffect, useState } from "react";
 import { IconButton } from "./button";
-
-export function Popover(props: {
-  children: JSX.Element;
-  content: JSX.Element;
-  open?: boolean;
-  onClose?: () => void;
-}) {
-  return (
-    <div className={styles.popover}>
-      {props.children}
-      {props.open && (
-        <div className={styles["popover-content"]}>
-          <div className={styles["popover-mask"]} onClick={props.onClose}></div>
-          {props.content}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export function Card(props: { children: JSX.Element[]; className?: string }) {
-  return (
-    <div className={styles.card + " " + props.className}>{props.children}</div>
-  );
-}
 
 export function ListItem(props: {
   title: string;
@@ -66,22 +40,6 @@ export function List(props: {
     | undefined;
 }) {
   return <div className={styles.list}>{props.children}</div>;
-}
-
-export function Loading() {
-  return (
-    <div
-      style={{
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <LoadingIcon />
-    </div>
-  );
 }
 
 interface ModalProps {

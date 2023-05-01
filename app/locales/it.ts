@@ -11,7 +11,7 @@ const it: LocaleType = {
     ChatItemCount: (count: number) => `${count} messaggi`,
   },
   Chat: {
-    SubTitle: (count: number) => `${count} messaggi con ChatGPT`,
+    SubTitle: (model, count) => `${count} messaggi con ${model}`,
     Actions: {
       ChatList: "Vai alla Chat List",
       CompressedHistory: "Prompt di memoria della cronologia compressa",
