@@ -567,13 +567,6 @@ export function Chat() {
           </div>
         </div>
         <div className="window-actions">
-          <div className="window-action-button">
-            <IconButton
-                icon={<RenameIcon />}
-                bordered
-                onClick={renameSession}
-            />
-          </div>
           <div className={"window-action-button" + " " + styles.mobile}>
             <IconButton
               icon={<LeftIcon />}
@@ -771,3 +764,13 @@ export function Chat() {
     </div>
   );
 }
+
+/*
+          <div className="window-action-button">
+            <IconButton
+                icon={<RenameIcon />}
+                bordered
+                onClick={renameSession}
+            />
+          </div>
+ */
