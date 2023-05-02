@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG = {
     presence_penalty: 0,
     sendMemory: true,
     historyMessageCount: 10,
-    compressMessageLengthThreshold: 2000,
+    compressMessageLengthThreshold: 4000,
   },
 };
 
