@@ -4,7 +4,7 @@ const cn = {
   WIP: "该功能仍在开发中……",
   Error: {
     Unauthorized:
-      "现在是未授权状态，请点[[设置]]按钮输入访问密码。微信关注公众号获取最新密码。\n![gzh](/gzh.png)",
+      "现在是未授权状态，请点**设置**按钮输入访问密码。微信关注公众号获取最新密码。\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,
@@ -126,7 +126,7 @@ const cn = {
     },
     CompressThreshold: {
       Title: "历史消息长度压缩阈值",
-      SubTitle: "历史消息个数超过该值时进行压缩",
+      SubTitle: "历史消息字数超过该值时进行压缩",
     },
     Token: {
       Title: "API Key",
