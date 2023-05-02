@@ -347,10 +347,7 @@ export const useChatStore = create<ChatStore>()(
           shortTermMemoryMessageIndex,
           longTermMemoryMessageIndex,
         );
-        const threshold = Math.max(
-          config.modelConfig.compressMessageLengthThreshold,
-          config.modelConfig.max_tokens - usrMsgLength,
-        );
+        const threshold = config.modelConfig.compressMessageLengthThreshold;
 
         // get recent messages as many as possible
         const reversedRecentMessages = [];
