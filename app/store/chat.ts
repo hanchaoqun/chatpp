@@ -500,7 +500,7 @@ export const useChatStore = create<ChatStore>()(
             newSession.topic = oldSession.topic;
             newSession.messages = [...oldSession.messages];
             newSession.mask.modelConfig.sendMemory = true;
-            newSession.mask.modelConfig.historyMessageCount = 5;
+            newSession.mask.modelConfig.historyMessageCount = 10;
             newSession.mask.modelConfig.compressMessageLengthThreshold = 2000;
             newState.sessions.push(newSession);
           }
