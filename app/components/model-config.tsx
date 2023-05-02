@@ -52,14 +52,11 @@ export function ModelConfigList(props: {
         title={Locale.Settings.MaxTokens.Title}
         subTitle={Locale.Settings.MaxTokens.SubTitle}
       >
-        <input
-          type="number"
-          min={100}
-          max={32000}
-          width="180px"
-          className={"flex-grow:1"}
-          size={8}
-          value={props.modelConfig.max_tokens}
+        <InputRange
+          min="1000"
+          max="32000" // lets limit it to 1000-32000
+          step="500"
+          value={props.modelConfig.max_tokens?.toFixed(4000)}
           onChange={(e) =>
             props.updateConfig(
               (config) =>
@@ -68,7 +65,7 @@ export function ModelConfigList(props: {
                 )),
             )
           }
-        ></input>
+        ></InputRange>
       </ListItem>
       <ListItem
         title={Locale.Settings.PresencePenlty.Title}
@@ -113,14 +110,11 @@ export function ModelConfigList(props: {
         title={Locale.Settings.CompressThreshold.Title}
         subTitle={Locale.Settings.CompressThreshold.SubTitle}
       >
-        <input
-          type="number"
-          min={500}
-          max={8000}
-          width="180px"
-          size={8}
-          className={"flex-grow:1"}
-          value={props.modelConfig.compressMessageLengthThreshold}
+        <InputRange
+          min="1000"
+          max="32000" // lets limit it to 1000-32000
+          step="500"
+          value={props.modelConfig.compressMessageLengthThreshold?.toFixed(4000)}
           onChange={(e) =>
             props.updateConfig(
               (config) =>
@@ -128,7 +122,7 @@ export function ModelConfigList(props: {
                   e.currentTarget.valueAsNumber),
             )
           }
-        ></input>
+        ></InputRange>
       </ListItem>
       <ListItem title={Locale.Memory.Title} subTitle={Locale.Memory.Send}>
         <input
