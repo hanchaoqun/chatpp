@@ -56,7 +56,7 @@ export function ModelConfigList(props: {
           min="1000"
           max="32000" // lets limit it to 1000-32000
           step="500"
-          value={props.modelConfig.max_tokens?.toFixed(4000)}
+          value={props.modelConfig.max_tokens}
           onChange={(e) =>
             props.updateConfig(
               (config) =>
@@ -114,7 +114,7 @@ export function ModelConfigList(props: {
           min="1000"
           max="32000" // lets limit it to 1000-32000
           step="500"
-          value={props.modelConfig.compressMessageLengthThreshold?.toFixed(4000)}
+          value={props.modelConfig.compressMessageLengthThreshold}
           onChange={(e) =>
             props.updateConfig(
               (config) =>
