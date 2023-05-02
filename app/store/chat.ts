@@ -100,7 +100,7 @@ interface ChatStore {
     updater: (message?: Message) => void,
   ) => void;
   resetSession: () => void;
-  getMessagesWithMemory: () => Message[];
+  getMessagesWithMemory: (usrMsgLength?: number) => Message[];
   getMemoryPrompt: () => Message;
 
   clearAllData: () => void;
@@ -251,7 +251,8 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // get recent messages
-        const recentMessages = get().getMessagesWithMemory();
+        const usrMsgLength = content.length;
+        const recentMessages = get().getMessagesWithMemory(usrMsgLength);
         const sendMessages = recentMessages.concat(userMessage);
         const sessionIndex = get().currentSessionIndex;
         const messageIndex = get().currentSession().messages.length + 1;
@@ -318,7 +319,7 @@ export const useChatStore = create<ChatStore>()(
         } as Message;
       },
 
-      getMessagesWithMemory() {
+      getMessagesWithMemory(usrMsgLength?: number) {
         const session = get().currentSession();
         const config = useAppConfig.getState();
         const messages = session.messages.filter((msg) => !msg.isError);
@@ -346,7 +347,10 @@ export const useChatStore = create<ChatStore>()(
           shortTermMemoryMessageIndex,
           longTermMemoryMessageIndex,
         );
-        const threshold = config.modelConfig.compressMessageLengthThreshold;
+        const threshold = Math.max(
+          config.modelConfig.compressMessageLengthThreshold,
+          config.modelConfig.max_tokens - usrMsgLength,
+        );
 
         // get recent messages as many as possible
         const reversedRecentMessages = [];
