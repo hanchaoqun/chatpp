@@ -137,7 +137,7 @@ export const useAppConfig = create<ChatConfigStore>()(
 
         const state = persistedState as ChatConfig;
         state.modelConfig.sendMemory = true;
-        state.modelConfig.historyMessageCount = 4;
+        state.modelConfig.historyMessageCount = 10;
         state.modelConfig.compressMessageLengthThreshold = 2000;
         state.dontShowMaskSplashScreen = false;
 
