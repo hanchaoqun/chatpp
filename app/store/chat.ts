@@ -14,6 +14,7 @@ import { showToast } from "../components/ui-lib";
 import { DEFAULT_CONFIG, ModelConfig, ModelType, useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
 import { StoreKey } from "../constant";
+import { countTokens } from "../tokens";
 
 export type Message = ChatCompletionResponseMessage & {
   date: string;
@@ -100,6 +101,8 @@ interface ChatStore {
     updater: (message?: Message) => void,
   ) => void;
   resetSession: () => void;
+  getMessagesTokens: (message: Message) => number;
+  getMessagesByLimit: (messages: Message[], maxTokens: number) => Message[];
   getMessagesWithMemory: (usrMsgLength?: number) => Message[];
   getMemoryPrompt: () => Message;
 
@@ -306,6 +309,24 @@ export const useChatStore = create<ChatStore>()(
         });
       },
 
+      getMessagesTokens(message: Message) {
+        return countTokens(message.content);
+      },
+
+      getMessagesByLimit(messages: Message[], maxTokens: number) {
+        let cleanMessages : Message[] = [];
+        let sumTokens = 0;
+        for (let i = messages.length - 1; i >=0; i--) {
+          const tks = get().getMessagesTokens(messages[i]);
+          if (sumTokens + tks > maxTokens) {
+            break;
+          }
+          cleanMessages.unshift(messages[i]);
+          sumTokens = sumTokens + tks;
+        }
+        return cleanMessages;
+      },
+
       getMemoryPrompt() {
         const session = get().currentSession();
 
@@ -327,14 +348,15 @@ export const useChatStore = create<ChatStore>()(
 
         const context = session.mask.context.slice();
 
+        let maxTokens = config.modelConfig.max_tokens - (usrMsgLength? usrMsgLength : 0);
+
+        const needMemory = session.mask.modelConfig.sendMemory &&
+            session.memoryPrompt &&
+            session.memoryPrompt.length > 0;
+
         // long term memory
-        if (
-          session.mask.modelConfig.sendMemory &&
-          session.memoryPrompt &&
-          session.memoryPrompt.length > 0
-        ) {
-          const memoryPrompt = get().getMemoryPrompt();
-          context.push(memoryPrompt);
+        if (needMemory) {
+          maxTokens = maxTokens - session.memoryPrompt.length;
         }
 
         // get short term and unmemoried long term memory
@@ -343,30 +365,25 @@ export const useChatStore = create<ChatStore>()(
           n - config.modelConfig.historyMessageCount,
         );
         const longTermMemoryMessageIndex = session.lastSummarizeIndex;
-        const oldestIndex = Math.max(
+
+        // need some overlap for taking memory as much as possible
+        const oldestIndex = Math.min(
           shortTermMemoryMessageIndex,
           longTermMemoryMessageIndex,
         );
-        const threshold = Math.max(
-          config.modelConfig.compressMessageLengthThreshold,
-          usrMsgLength? (config.modelConfig.max_tokens - usrMsgLength) : 0,
-        );
 
-        // get recent messages as many as possible
-        const reversedRecentMessages = [];
-        for (
-          let i = n - 1, count = 0;
-          i >= oldestIndex && count < threshold;
-          i -= 1
-        ) {
-          const msg = messages[i];
-          if (!msg || msg.isError) continue;
-          count += msg.content.length;
-          reversedRecentMessages.push(msg);
+        let recentMessages = messages.slice(oldestIndex,);
+
+        // get history as much as possible
+        recentMessages = get().getMessagesByLimit(recentMessages, maxTokens);
+
+        if (needMemory) {
+          const memoryPrompt = get().getMemoryPrompt();
+          context.push(memoryPrompt);
         }
 
         // concat
-        const recentMessages = context.concat(reversedRecentMessages.reverse());
+        recentMessages = context.concat(recentMessages);
 
         return recentMessages;
       },
@@ -414,17 +431,24 @@ export const useChatStore = create<ChatStore>()(
           session.lastSummarizeIndex,
         );
 
-        const historyMsgLength = countMessages(toBeSummarizedMsgs);
-
-        if (historyMsgLength > config?.modelConfig?.max_tokens ?? 4000) {
+        let historyMsgLength = countMessages(toBeSummarizedMsgs);
+        const maxTokens = config?.modelConfig?.max_tokens ?? 4000;
+        if (historyMsgLength > maxTokens) {
           const n = toBeSummarizedMsgs.length;
           toBeSummarizedMsgs = toBeSummarizedMsgs.slice(
             Math.max(0, n - config.modelConfig.historyMessageCount),
           );
+          historyMsgLength = countMessages(toBeSummarizedMsgs);
+          if (historyMsgLength > maxTokens) {
+            toBeSummarizedMsgs = get().getMessagesByLimit(toBeSummarizedMsgs, maxTokens);
+          }
         }
 
         // add memory prompt
-        toBeSummarizedMsgs.unshift(get().getMemoryPrompt());
+        const memoryPrompt = get().getMemoryPrompt();
+        if (memoryPrompt.content.length > 0) {
+           toBeSummarizedMsgs.unshift(memoryPrompt);
+        }
 
         const lastSummarizeIndex = session.messages.length;
 
@@ -440,27 +464,15 @@ export const useChatStore = create<ChatStore>()(
             config.modelConfig.compressMessageLengthThreshold &&
           session.mask.modelConfig.sendMemory
         ) {
-          requestChatStream(
-            toBeSummarizedMsgs.concat({
-              role: "system",
-              content: Locale.Store.Prompt.Summarize,
-              date: "",
-            }),
-            {
-              filterBot: false,
-              model: "gpt-3.5-turbo",
-              onMessage(message, done) {
-                session.memoryPrompt = message;
-                if (done) {
-                  console.log("[Memory] ", session.memoryPrompt);
-                  session.lastSummarizeIndex = lastSummarizeIndex;
-                }
-              },
-              onError(error) {
-                console.error("[Summarize] ", error);
-              },
-            },
-          );
+          requestWithPrompt(toBeSummarizedMsgs, Locale.Store.Prompt.Summarize, {
+            model: "gpt-3.5-turbo",
+          }).then((res) => {
+            if (res && trimTopic(res).length > 0) {
+              session.memoryPrompt = trimTopic(res);
+              console.log("[Memory] ", session.memoryPrompt);
+              session.lastSummarizeIndex = lastSummarizeIndex;
+            }
+          });
         }
       },
 

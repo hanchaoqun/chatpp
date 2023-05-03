@@ -625,6 +625,10 @@ export function Chat() {
             !isUser &&
             i > 0 &&
             !(message.preview || message.content.length === 0);
+          const showActionsUsr =
+              isUser &&
+              i > 0 &&
+              !(message.preview || message.content.length < 5);
           const showTyping = message.preview || message.streaming;
 
           return (
@@ -648,6 +652,16 @@ export function Chat() {
                   </div>
                 )}
                 <div className={styles["chat-message-item"]}>
+                  {showActionsUsr && (
+                      <div className={styles["chat-message-top-actions-usr"]}>
+                        <div
+                            className={styles["chat-message-top-action-usr"]}
+                            onClick={() => copyToClipboard(message.content)}
+                        >
+                          {Locale.Chat.Actions.Copy}
+                        </div>
+                      </div>
+                  )}
                   {showActions && (
                     <div className={styles["chat-message-top-actions"]}>
                       {message.streaming ? (

@@ -371,6 +371,11 @@
       right: 10px;
       pointer-events: all;
     }
+    .chat-message-top-actions-usr {
+      opacity: 1;
+      right: 10px;
+      pointer-events: all;
+    }
   }
 }
 
@@ -428,6 +433,36 @@
 
     &:not(:first-child) {
       margin-right: 10px;
+    }
+  }
+}
+
+
+.chat-message-top-actions-usr {
+  font-size: 12px;
+  position: absolute;
+  right: 100px;
+  top: -26px;
+  left: 10px;
+  transition: all ease 0.3s;
+  opacity: 0;
+  pointer-events: none;
+
+  display: flex;
+  flex-direction: row;
+
+  .chat-message-top-action-usr {
+    opacity: 0.5;
+    color: var(--black);
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:not(:last-child) {
+      margin-left: 10px;
     }
   }
 }
