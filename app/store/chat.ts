@@ -342,7 +342,8 @@ export const useChatStore = create<ChatStore>()(
 
       getMessagesWithMemory(usrMsgLength?: number) {
         const session = get().currentSession();
-        const config = useAppConfig.getState();
+        // Or use useAppConfig.getState(); ??
+        const config = session.mask;
         const messages = session.messages.filter((msg) => !msg.isError);
         const n = messages.length;
 
@@ -426,7 +427,8 @@ export const useChatStore = create<ChatStore>()(
           });
         }
 
-        const config = useAppConfig.getState();
+        // Or use useAppConfig.getState() ??
+        const config = session.mask;
         let toBeSummarizedMsgs = session.messages.slice(
           session.lastSummarizeIndex,
         );
