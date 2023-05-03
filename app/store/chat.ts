@@ -18,6 +18,7 @@ import { countTokens } from "../tokens";
 
 export type Message = ChatCompletionResponseMessage & {
   date: string;
+  tokens: number;
   streaming?: boolean;
   isError?: boolean;
   id?: number;
@@ -29,6 +30,7 @@ export function createMessage(override: Partial<Message>): Message {
     id: Date.now(),
     date: new Date().toLocaleString(),
     role: "user",
+    tokens: 0,
     content: "",
     ...override,
   };
@@ -310,7 +312,10 @@ export const useChatStore = create<ChatStore>()(
       },
 
       getMessagesTokens(message: Message) {
-        return countTokens(message.content);
+        if (message.tokens === 0 && message.content.length > 0) {
+          message.tokens = countTokens(message.content);
+        }
+        return message.tokens;
       },
 
       getMessagesByLimit(messages: Message[], maxTokens: number) {
@@ -368,10 +373,14 @@ export const useChatStore = create<ChatStore>()(
         const longTermMemoryMessageIndex = session.lastSummarizeIndex;
 
         // need some overlap for taking memory as much as possible
-        const oldestIndex = Math.min(
-          shortTermMemoryMessageIndex,
-          longTermMemoryMessageIndex,
-        );
+        let oldestIndex = shortTermMemoryMessageIndex;
+        
+        if (needMemory) {
+          oldestIndex = Math.min(
+            shortTermMemoryMessageIndex,
+            longTermMemoryMessageIndex,
+          );
+        }
 
         let recentMessages = messages.slice(oldestIndex,);
 
