@@ -342,6 +342,7 @@ export const useChatStore = create<ChatStore>()(
               ? Locale.Store.Prompt.History(session.memoryPrompt)
               : "",
           date: "",
+          tokens: session.memoryPrompt.length,
         } as Message;
       },
 
