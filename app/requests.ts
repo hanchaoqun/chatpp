@@ -240,6 +240,7 @@ export async function requestWithPrompt(
       role: "user",
       content: prompt,
       date: new Date().toLocaleString(),
+      tokens: 0,
     },
   ]);
 
