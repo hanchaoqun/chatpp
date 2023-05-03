@@ -129,6 +129,7 @@ export function ContextPrompts(props: {
                 role: "system",
                 content: "",
                 date: "",
+                tokens: 0,
               })
             }
           />
