@@ -44,6 +44,7 @@ const makeRequestParam = (
     model: modelConfig.model,
     temperature: modelConfig.temperature,
     presence_penalty: modelConfig.presence_penalty,
+    user: "chatpp",
   };
 };
 
