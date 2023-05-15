@@ -37,7 +37,7 @@ export default function LoginPage() {
                 <input
                     className={styles.input}
                     type="text"
-                    placeholder="邮箱或手机号"
+                    placeholder="邮箱"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
