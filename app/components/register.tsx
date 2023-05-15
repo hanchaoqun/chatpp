@@ -48,7 +48,7 @@ export default function Register() {
         const result = await accessStore.sendVerifyCode(email);
         if (result.error) {
             if (result.exists) {
-                setErrorMsg("该邮箱已注册");
+                setErrorMsg("该邮箱已注册，请返回进行登录");
             } else if (result.expire > 0) {
                 setErrorMsg(`没看到邮件，可能在垃圾箱？或者 ${result.expire} 秒后重试`);
             } else {
