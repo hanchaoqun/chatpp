@@ -28,6 +28,7 @@ async function success(accessCode: string, status: number, count: number) {
   return NextResponse.json(
       {
         error: false,
+        accessType: serverConfig.accessType,
         accessCode,
         count,
       },

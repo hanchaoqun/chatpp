@@ -170,6 +170,10 @@ export const useAccessStore = create<AccessControlStore>()(
                 if (!res.error && !!res.accessCode) {
                     const count = res.count ?? 0;
                     get().updateUserCount(count);
+                    // need login
+                    if (!res.accessType || res.accessType != AccessType.Account) {
+                        get().updateCode("");
+                    }
                 }
               } catch (e) {
               }

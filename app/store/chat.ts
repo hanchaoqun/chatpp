@@ -292,7 +292,11 @@ export const useChatStore = create<ChatStore>()(
             if (statusCode === 401) {
               const accessStore = useAccessStore.getState();
               await accessStore.fetchUserCount();
-              botMessage.content = accessStore.isNoFee()? Locale.Error.NoFee : Locale.Error.Unauthorized;
+              if (accessStore.isAuthorized() && accessStore.isNoFee()) {
+                botMessage.content = Locale.Error.NoFee;
+              } else {
+                botMessage.content = Locale.Error.Unauthorized;
+              }
             } else if (!error.message.includes("aborted")) {
               botMessage.content += "\n\n" + Locale.Store.Error;
             }
