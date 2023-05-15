@@ -50,7 +50,7 @@ export default function Register() {
             if (result.exists) {
                 setErrorMsg("该邮箱已注册");
             } else if (result.expire > 0) {
-                setErrorMsg(`请等待且检查邮箱邮件，或者 ${result.expire} 秒后重试`);
+                setErrorMsg(`没看到邮件，可能在垃圾箱？或者 ${result.expire} 秒后重试`);
             } else {
                 setErrorMsg(`发送失败，请检查邮箱或网络`);
             }
