@@ -71,7 +71,7 @@ export const useAccessStore = create<AccessControlStore>()(
         openid: "",
         nickname: "",
       },
-      accessType: AccessType.Code,
+      accessType: AccessType.Account,
       username: "",
       userCount: 0,
 
