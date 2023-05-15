@@ -1,10 +1,27 @@
 import { createParser } from "eventsource-parser";
 import { NextRequest } from "next/server";
 import { requestOpenai } from "../common";
+import { decCount } from "../../account/server";
+import { getServerSideConfig } from "../../config/server";
+
+const serverConfig = getServerSideConfig();
+
+async function decAccountCount(model: string, accessCode: string) {
+  let count = 0;
+  if (model && model.startsWith("gpt-4")) {
+    count = await decCount(accessCode, serverConfig.decGpt4UserCount)??0;
+  } else {
+    count = await decCount(accessCode)??0;
+  }
+  console.log("[Auth] Count:", accessCode, count, model);
+}
 
 async function createStream(req: NextRequest) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
+
+  const model = req.headers.get("model");
+  const accessCode = req.headers.get("access-code");
 
   const res = await requestOpenai(req);
 
@@ -16,6 +33,8 @@ async function createStream(req: NextRequest) {
     console.log("[Stream] error ", content);
     return "```json\n" + content + "```";
   }
+
+  await decAccountCount(model??"", accessCode??"");
 
   const stream = new ReadableStream({
     async start(controller) {

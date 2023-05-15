@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessType, getServerSideConfig } from "./app/config/server";
-import { queryCount, decCount } from "./app/account/server";
+import { queryCount } from "./app/account/server";
 import md5 from "spark-md5";
 
 export const config = {
@@ -31,19 +31,8 @@ async function codeAuth(req: NextRequest, accessCode: string) {
 }
 
 async function accountAuth(req: NextRequest, accessCode: string) {
-  const { pathname } = req.nextUrl;
-  let count = 0;
-  if (pathname === "/api/chat-stream") {
-    const model = req.headers.get("model");
-    if (model && model.startsWith("gpt-4")) {
-      count = await decCount(accessCode, serverConfig.decGpt4UserCount)??0;
-    } else {
-      count = await decCount(accessCode)??0;
-    }
-  } else {
-    count = await queryCount(accessCode)??0;
-  }
-  console.log("[Auth] Count:", count);
+  let count = await queryCount(accessCode)??0;
+  console.log("[Auth] Count:", accessCode, count);
   if (count > 0) {
     return true;
   }
