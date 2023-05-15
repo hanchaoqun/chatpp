@@ -5,7 +5,9 @@ const en: LocaleType = {
   WIP: "Coming Soon...",
   Error: {
     Unauthorized:
-      "Unauthorized access, please enter access code in settings page.",
+      "Unauthorized state, please refresh the page or re-login. If the problem persists, try clearing the browser cache.",
+    NoFee:
+      "Your remaining number of free conversation times is not enough. Please **recharge** and try again. To get help, please scan the following QR code using WeChat:\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messages`,

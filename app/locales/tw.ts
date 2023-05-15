@@ -4,7 +4,8 @@ import type { LocaleType } from "./index";
 const tw: LocaleType = {
   WIP: "該功能仍在開發中……",
   Error: {
-    Unauthorized: "目前您的狀態是未授權，請前往設定頁面輸入授權碼。",
+    Unauthorized: "未授權狀態，請重新整理頁面或重新登入。如問題持續發生，請嘗試清空瀏覽器快取。",
+    NoFee: "你的對話次數不足，請在**充值**後再試一次。\n如需協助，請使用WeChat掃描以下QR Code：\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 條對話`,

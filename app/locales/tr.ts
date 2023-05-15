@@ -5,7 +5,9 @@ const tr: LocaleType = {
   WIP: "Çalışma devam ediyor...",
   Error: {
     Unauthorized:
-      "Yetkisiz erişim, lütfen erişim kodunu ayarlar sayfasından giriniz.",
+      "Yetkisiz durum, lütfen sayfayı yenileyin veya yeniden giriş yapın. Sorun devam ederse, tarayıcı önbelleğini temizlemeyi deneyin.",
+    NoFee:
+      "Kalan ücretsiz konuşma süreniz yetersiz. Lütfen **yükleme yapın** ve tekrar deneyin.\n Yardıma ihtiyacınız varsa, lütfen WeChat'i kullanarak aşağıdaki QR kodunu tarayın:\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} mesaj`,

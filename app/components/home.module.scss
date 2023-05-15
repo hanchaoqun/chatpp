@@ -123,14 +123,14 @@
 
 .sidebar-header {
   position: relative;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
 
 .sidebar-logo {
   position: absolute;
   right: 0;
-  bottom: 18px;
+  bottom: 5px;
 }
 
 .sidebar-title {
@@ -143,6 +143,21 @@
   font-size: 12px;
   font-weight: normal;
   animation: slide-in ease 0.3s;
+}
+
+.sidebar-userinfo {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 5px;
+  padding-bottom: 15px;
+}
+
+.sidebar-userinfo-actions {
+  display: inline-flex;
+}
+
+.sidebar-userinfo-action:not(:last-child) {
+  margin-right: 15px;
 }
 
 .sidebar-body {
@@ -301,6 +316,21 @@
       align-items: center;
 
       .sidebar-action {
+        margin-right: 0;
+        margin-top: 15px;
+      }
+    }
+  }
+
+  .sidebar-userinfo {
+    flex-direction: column-reverse;
+    align-items: center;
+
+    .sidebar-userinfo-actions {
+      flex-direction: column-reverse;
+      align-items: center;
+
+      .sidebar-userinfo-action {
         margin-right: 0;
         margin-top: 15px;
       }

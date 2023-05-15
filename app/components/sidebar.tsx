@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import styles from "./home.module.scss";
 
@@ -7,6 +7,9 @@ import SettingsIcon from "../icons/settings.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
+import LogoutIcon from "../icons/logout.svg";
+import PayIcon from "../icons/pay.svg";
+import { AccessType, useAccessStore } from "../store";
 
 import Locale from "../locales";
 
@@ -22,6 +25,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -75,18 +79,34 @@ function useDragSideBar() {
   };
 }
 
+
 export function SideBar(props: { className?: string }) {
+
   const chatStore = useChatStore();
+  const accessStore = useAccessStore();
+  const username = accessStore.username;
+  const userCount = accessStore.userCount;
+  const router = useRouter();
+
+  const getAccessType = useMemo(
+    () => accessStore.getAccessType(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // drag side bar
   const { onDragMouseDown, shouldNarrow } = useDragSideBar();
   const navigate = useNavigate();
 
+  const logout = function () {
+    accessStore.updateCode("");
+    router.push("/login");
+  }
+
   return (
     <div
-      className={`${styles.sidebar} ${props.className} ${
-        shouldNarrow && styles["narrow-sidebar"]
-      }`}
+      className={`${styles.sidebar} ${props.className} ${shouldNarrow && styles["narrow-sidebar"]
+        }`}
     >
       <div className={styles["sidebar-header"]}>
         <div className={styles["sidebar-title"]}>ChatGPT</div>
@@ -98,6 +118,32 @@ export function SideBar(props: { className?: string }) {
         </div>
       </div>
 
+      {getAccessType == AccessType.Account ? (
+        <div className={styles["sidebar-userinfo"]}>
+          <div className={styles["sidebar-userinfo-actions"]}>
+            <div className={styles["sidebar-userinfo-action"]}>
+              <IconButton
+                reverse={true}
+                icon={<LogoutIcon />}
+                text={shouldNarrow ? undefined : (username ? username : "未登录")}
+                onClick={() => { logout() }}
+                shadow
+              />
+            </div>
+          </div>
+          <div className={styles["sidebar-userinfo-action"]}>
+            <IconButton
+              reverse={true}
+              icon={<PayIcon />}
+              text={shouldNarrow ? undefined : "剩余 [" + userCount + "] 次"}
+              onClick={() => { accessStore.fetchUserCount(); }}
+              shadow
+            />
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
 
       <div
         className={styles["sidebar-body"]}
@@ -114,8 +160,8 @@ export function SideBar(props: { className?: string }) {
         <div className={styles["sidebar-actions"]}>
           <div className={styles["sidebar-action"] + " " + styles.mobile}>
             <IconButton
-                icon={<CloseIcon />}
-                onClick={() => navigate(Path.Chat)}
+              icon={<CloseIcon />}
+              onClick={() => navigate(Path.Chat)}
             />
           </div>
           <div className={styles["sidebar-action"]}>
@@ -129,8 +175,8 @@ export function SideBar(props: { className?: string }) {
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
-                chatStore.newSession();
-                //navigate(Path.Chat);
+              chatStore.newSession();
+              //navigate(Path.Chat);
             }}
             shadow
           />
@@ -141,6 +187,6 @@ export function SideBar(props: { className?: string }) {
         className={styles["sidebar-drag"]}
         onMouseDown={(e) => onDragMouseDown(e as any)}
       ></div>
-    </div>
+    </div >
   );
 }

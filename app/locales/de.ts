@@ -5,7 +5,9 @@ const de: LocaleType = {
   WIP: "In Bearbeitung...",
   Error: {
     Unauthorized:
-      "Unbefugter Zugriff, bitte geben Sie den Zugangscode auf der Einstellungsseite ein.",
+      "Unbefugter Zugriff: Bitte aktualisieren Sie die Seite oder melden Sie sich erneut an. Wenn das Problem weiterhin besteht, versuchen Sie bitte, den Browser-Cache zu leeren.",
+    NoFee:
+      "Ihre verbleibende Anzahl von kostenlosen Gesprächen ist nicht ausreichend. Bitte laden Sie Guthaben auf und versuchen Sie es erneut.\nWenn Sie Hilfe benötigen, scannen Sie bitte den folgenden QR-Code mit WeChat:\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} Nachrichten`,

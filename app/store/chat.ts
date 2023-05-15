@@ -16,6 +16,8 @@ import { createEmptyMask, Mask } from "./mask";
 import { StoreKey } from "../constant";
 import { countTokens } from "../tokens";
 
+import { useAccessStore, AccessType } from "./access";
+
 export type Message = ChatCompletionResponseMessage & {
   date: string;
   tokens: number;
@@ -213,7 +215,7 @@ export const useChatStore = create<ChatStore>()(
             Locale.Home.DeleteToast,
             {
               text: "",
-              onClick() {},
+              onClick() { },
             },
             5000,
           );
@@ -286,9 +288,11 @@ export const useChatStore = create<ChatStore>()(
               set(() => ({}));
             }
           },
-          onError(error, statusCode) {
+          async onError(error, statusCode) {
             if (statusCode === 401) {
-              botMessage.content = Locale.Error.Unauthorized;
+              const accessStore = useAccessStore.getState();
+              await accessStore.fetchUserCount();
+              botMessage.content = accessStore.isNoFee()? Locale.Error.NoFee : Locale.Error.Unauthorized;
             } else if (!error.message.includes("aborted")) {
               botMessage.content += "\n\n" + Locale.Store.Error;
             }
@@ -319,9 +323,9 @@ export const useChatStore = create<ChatStore>()(
       },
 
       getMessagesByLimit(messages: Message[], maxTokens: number) {
-        let cleanMessages : Message[] = [];
+        let cleanMessages: Message[] = [];
         let sumTokens = 0;
-        for (let i = messages.length - 1; i >=0; i--) {
+        for (let i = messages.length - 1; i >= 0; i--) {
           const tks = get().getMessagesTokens(messages[i]);
           if (sumTokens + tks > maxTokens) {
             break;
@@ -342,7 +346,6 @@ export const useChatStore = create<ChatStore>()(
               ? Locale.Store.Prompt.History(session.memoryPrompt)
               : "",
           date: "",
-          tokens: session.memoryPrompt.length,
         } as Message;
       },
 
@@ -355,11 +358,11 @@ export const useChatStore = create<ChatStore>()(
 
         const context = session.mask.context.slice();
 
-        let maxTokens = config.modelConfig.max_tokens - (usrMsgLength? usrMsgLength : 0);
+        let maxTokens = config.modelConfig.max_tokens - (usrMsgLength ? usrMsgLength : 0);
 
         const needMemory = session.mask.modelConfig.sendMemory &&
-            session.memoryPrompt &&
-            session.memoryPrompt.length > 0;
+          session.memoryPrompt &&
+          session.memoryPrompt.length > 0;
 
         // long term memory
         if (needMemory) {
@@ -375,7 +378,7 @@ export const useChatStore = create<ChatStore>()(
 
         // need some overlap for taking memory as much as possible
         let oldestIndex = shortTermMemoryMessageIndex;
-        
+
         if (needMemory) {
           oldestIndex = Math.min(
             shortTermMemoryMessageIndex,
@@ -459,7 +462,7 @@ export const useChatStore = create<ChatStore>()(
         // add memory prompt
         const memoryPrompt = get().getMemoryPrompt();
         if (memoryPrompt.content.length > 0) {
-           toBeSummarizedMsgs.unshift(memoryPrompt);
+          toBeSummarizedMsgs.unshift(memoryPrompt);
         }
 
         const lastSummarizeIndex = session.messages.length;
@@ -473,7 +476,7 @@ export const useChatStore = create<ChatStore>()(
 
         if (
           historyMsgLength >
-            config.modelConfig.compressMessageLengthThreshold &&
+          config.modelConfig.compressMessageLengthThreshold &&
           session.mask.modelConfig.sendMemory
         ) {
           requestWithPrompt(toBeSummarizedMsgs, Locale.Store.Prompt.Summarize, {

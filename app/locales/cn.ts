@@ -4,13 +4,15 @@ const cn = {
   WIP: "该功能仍在开发中……",
   Error: {
     Unauthorized:
-      "现在是未授权状态，请点**设置**按钮输入访问密码。微信关注公众号获取最新密码。\n![gzh](/gzh.png)",
+      "未授权状态，请刷新页面或重新登录，如仍有问题请尝试清空浏览器缓存。",
+    NoFee:
+      "您的剩余对话次数不足，请**充值**后重试。\n如需帮助请微信扫描：\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,
   },
   Chat: {
-    SubTitle: (model:string, count: number) => `与 ${model} 的 ${count} 条对话`,
+    SubTitle: (model: string, count: number) => `与 ${model} 的 ${count} 条对话`,
     Actions: {
       ChatList: "查看消息列表",
       CompressedHistory: "查看压缩后的历史 Prompt",

@@ -17,6 +17,7 @@ import {
   SubmitKey,
   useChatStore,
   Theme,
+  AccessType,
   useAccessStore,
   useAppConfig,
 } from "../store";
@@ -139,8 +140,13 @@ export function Settings() {
 
 
   const accessStore = useAccessStore();
-  const enabledAccessControl = useMemo(
-    () => accessStore.enabledAccessControl(),
+  const isNeedAccessCode = useMemo(
+    () => accessStore.isNeedAccessCode(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+  const getAccessType = useMemo(
+    () => accessStore.getAccessType(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -196,22 +202,22 @@ export function Settings() {
 
       <div className={styles["settings"]}>
         <List>
-          {enabledAccessControl ? (
-              <ListItem
-                  title={Locale.Settings.AccessCode.Title}
-                  subTitle={Locale.Settings.AccessCode.SubTitle}
-              >
-                <PasswordInput
-                    value={accessStore.accessCode}
-                    type="text"
-                    placeholder={Locale.Settings.AccessCode.Placeholder}
-                    onChange={(e) => {
-                      accessStore.updateCode(e.currentTarget.value);
-                    }}
-                />
-              </ListItem>
+          {getAccessType == AccessType.Code ? (
+            <ListItem
+              title={Locale.Settings.AccessCode.Title}
+              subTitle={Locale.Settings.AccessCode.SubTitle}
+            >
+              <PasswordInput
+                value={accessStore.accessCode}
+                type="text"
+                placeholder={Locale.Settings.AccessCode.Placeholder}
+                onChange={(e) => {
+                  accessStore.updateCode(e.currentTarget.value);
+                }}
+              />
+            </ListItem>
           ) : (
-              <></>
+            <></>
           )}
         </List>
 

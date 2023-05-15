@@ -1,0 +1,28 @@
+/* 设置按钮的位置 */
+button {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 24px;
+}
+
+/* 定义按钮的样式 */
+button {
+  background-color: #1AAD19;
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  padding: 16px 64px;
+  border-radius: 32px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+/* 定义按钮的交互样式 */
+button:hover {
+  background-color: #159215;
+  cursor: pointer;
+}
+
+button:active {
+  background-color: #0F6C0F;
+}

@@ -5,7 +5,9 @@ const it: LocaleType = {
   WIP: "Work in progress...",
   Error: {
     Unauthorized:
-      "Accesso non autorizzato, inserire il codice di accesso nella pagina delle impostazioni.",
+      "Stato non autorizzato, aggiornare la pagina o accedere nuovamente. Se il problema persiste, provare a cancellare la cache del browser.",
+    NoFee:
+      "Il tuo numero rimanente di tempi di conversazione gratuiti non è sufficiente. Si prega di **ricaricare** e riprovare.\n Per ottenere aiuto, scansionare il seguente codice QR utilizzando WeChat:\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messaggi`,

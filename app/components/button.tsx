@@ -12,6 +12,7 @@ export function IconButton(props: {
   className?: string;
   title?: string;
   disabled?: boolean;
+  reverse?: boolean;
 }) {
   return (
     <button
@@ -26,7 +27,7 @@ export function IconButton(props: {
       disabled={props.disabled}
       role="button"
     >
-      {props.icon && (
+      {!props.reverse && props.icon && (
         <div
           className={
             styles["icon-button-icon"] +
@@ -37,8 +38,24 @@ export function IconButton(props: {
         </div>
       )}
 
-      {props.text && (
+      {!props.reverse && props.text && (
         <div className={styles["icon-button-text"]}>{props.text}</div>
+      )}
+
+
+      {props.reverse && props.text && (
+          <div className={styles["icon-button-text-rev"]}>{props.text}</div>
+      )}
+
+      {props.reverse && props.icon && (
+          <div
+              className={
+                  styles["icon-button-icon-rev"] +
+                  ` ${props.type === "primary" && "no-dark"}`
+              }
+          >
+            {props.icon}
+          </div>
       )}
     </button>
   );

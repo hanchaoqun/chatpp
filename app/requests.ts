@@ -44,15 +44,15 @@ const makeRequestParam = (
     model: modelConfig.model,
     temperature: modelConfig.temperature,
     presence_penalty: modelConfig.presence_penalty,
-    user: "chatpp",
   };
 };
 
 function getHeaders() {
   const accessStore = useAccessStore.getState();
+
   let headers: Record<string, string> = {};
 
-  if (accessStore.enabledAccessControl()) {
+  if (accessStore.isNeedAccessCode()) {
     headers["access-code"] = accessStore.accessCode;
   }
 
@@ -70,6 +70,7 @@ export function requestOpenaiClient(path: string) {
       headers: {
         "Content-Type": "application/json",
         path,
+        "model": (!body?.model)? "" : body.model,
         ...getHeaders(),
       },
       body: body && JSON.stringify(body),
@@ -158,6 +159,8 @@ export async function requestChatStream(
     onController?: (controller: AbortController) => void;
   },
 ) {
+  const accessStore = useAccessStore.getState();
+
   const req = makeRequestParam(messages, {
     stream: true,
     filterBot: options?.filterBot,
@@ -175,6 +178,7 @@ export async function requestChatStream(
       headers: {
         "Content-Type": "application/json",
         path: "v1/chat/completions",
+        "model": (!req?.model)? "" : req.model,
         ...getHeaders(),
       },
       body: JSON.stringify(req),
@@ -187,6 +191,7 @@ export async function requestChatStream(
     const finish = () => {
       options?.onMessage(responseText, true);
       controller.abort();
+      accessStore.fetchUserCount();
     };
 
     if (res.ok) {
