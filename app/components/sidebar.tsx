@@ -111,7 +111,7 @@ export function SideBar(props: { className?: string }) {
       <div className={styles["sidebar-header"]}>
         <div className={styles["sidebar-title"]}>ChatGPT</div>
         <div className={styles["sidebar-sub-title"]}>
-          Powered by OpenAI
+          { (username ? username : "Powered by OpenAI") }
         </div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
           <ChatGptIcon />
@@ -125,7 +125,7 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 reverse={true}
                 icon={<LogoutIcon />}
-                text={shouldNarrow ? undefined : (username ? username : "未登录")}
+                text={shouldNarrow ? undefined : "注销"}
                 onClick={() => { logout() }}
                 shadow
               />
