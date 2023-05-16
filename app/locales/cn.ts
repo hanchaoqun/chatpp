@@ -6,7 +6,7 @@ const cn = {
     Unauthorized:
       "未授权状态，请刷新页面或重新登录，如仍有问题请尝试清空浏览器缓存。",
     NoFee:
-      "您的剩余对话次数不足，请**充值**后重试。\n如需帮助请微信扫描：\n![gzh](/gzh.png)",
+      "您的剩余对话次数不足。\n如需帮助请微信扫描：\n![gzh](/gzh.png)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,
