@@ -4,7 +4,7 @@ import kv from "@vercel/kv";
 const USER_ACCOUNT = "USER_ACCOUNT";
 const USER_COUNT = "USER_COUNT";
 const USER_VALID = "USER_VALID";
-const USER_VALID_TIMEOUT = 60 * 5;
+const USER_VALID_TIMEOUT = 60 * 7;
 
 const EMAIL_API_KEY = process.env.EMAIL_API_KEY;
 
