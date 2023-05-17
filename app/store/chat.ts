@@ -329,9 +329,12 @@ export const useChatStore = create<ChatStore>()(
       getMessagesByLimit(messages: Message[], maxTokens: number) {
         let cleanMessages: Message[] = [];
         let sumTokens = 0;
+        // HARD LIMIT !!!!
+        let hardMaxTokens = (maxTokens > 0) ? Math.floor(maxTokens * 0.25) : 0;
+        // HARD LIMIT !!!!
         for (let i = messages.length - 1; i >= 0; i--) {
           const tks = get().getMessagesTokens(messages[i]);
-          if (sumTokens + tks > maxTokens) {
+          if (sumTokens + tks > hardMaxTokens) {
             break;
           }
           cleanMessages.unshift(messages[i]);
