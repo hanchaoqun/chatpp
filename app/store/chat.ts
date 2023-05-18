@@ -331,7 +331,7 @@ export const useChatStore = create<ChatStore>()(
         let sumTokens = 0;
         // HARD LIMIT !!!!
         let hardMaxTokens = (maxTokens > 0) ? Math.floor(maxTokens * 0.25) : 0;
-        hardMaxTokens = (hardMaxTokens > 4000) ? 4000: hardMaxTokens;
+        hardMaxTokens = (hardMaxTokens > 3000) ? 3000: hardMaxTokens;
         // HARD LIMIT !!!!
         for (let i = messages.length - 1; i >= 0; i--) {
           const tks = get().getMessagesTokens(messages[i]);
