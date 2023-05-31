@@ -22,18 +22,18 @@ export default function Register() {
         const emailValid = emailPattern.test(email);
 
         if (!emailValid) {
-            setErrorMsg("请输入有效的邮箱地址");
+            setErrorMsg("Please enter a valid email address");
         } else if (password.length < 6) {
-            setErrorMsg("密码长度至少 6 位");
+            setErrorMsg("Password must be at least 6 characters");
         } else if (password !== confirmPassword) {
-            setErrorMsg("两次输入的密码不相同");
+            setErrorMsg("Passwords entered twice are different");
         } else {
             const result = await accessStore.loginOrRegister("register", email, password, parseInt(verifyCode, 10));
             if (!result.error && accessStore.isLogin()) {
-                setErrorMsg("注册成功，请返回登录");
+                setErrorMsg("Successfully, please return to login");
                 return;
             }
-            setErrorMsg(result.msg ?? "注册失败");
+            setErrorMsg(result.msg ?? "Registration failed");
         }
     };
 
@@ -42,21 +42,21 @@ export default function Register() {
         const emailPattern = /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/;
         const emailValid = emailPattern.test(email);
         if (!emailValid) {
-            setErrorMsg("请输入有效的邮箱地址");
+            setErrorMsg("Please enter a valid email address");
             return;
         }
         const result = await accessStore.sendVerifyCode(email);
         if (result.error) {
             if (result.exists) {
-                setErrorMsg("该邮箱已注册，请返回进行登录");
+                setErrorMsg("Email is already registered, please return to login");
             } else if (result.expire > 0) {
-                setErrorMsg(`没看到邮件，可能在垃圾箱？或者 ${result.expire} 秒后重试`);
+                setErrorMsg(`Didn't see the email, maybe in the trash? Or try again after ${result.expire} seconds`);
             } else {
-                setErrorMsg(`发送失败，请检查邮箱或网络`);
+                setErrorMsg(`Failed to send, please check email or network`);
             }
             return;
         }
-        setErrorMsg("发送成功，请登录邮箱查收");
+        setErrorMsg("Sent successfully, please login to your email to check");
     };
 
     const redirectToLogin = (e: { preventDefault: () => void; }) => {
@@ -75,21 +75,21 @@ export default function Register() {
                 <input
                     className={styles.input}
                     type="text"
-                    placeholder="邮箱"
+                    placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
                     className={styles.input}
                     type="password"
-                    placeholder="密码"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <input
                     className={styles.input}
                     type="password"
-                    placeholder="确认密码"
+                    placeholder="Confirm Password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
@@ -97,20 +97,20 @@ export default function Register() {
                     <input
                         className={`${styles.input} ${styles["input-sub"]}`}
                         type="text"
-                        placeholder="验证码"
+                        placeholder="Verification code"
                         value={verifyCode}
                         onChange={(e) => setVerifyCode(e.target.value)}
                     />
                     <button className={`${styles.button} ${styles["button-sub"]}`} onClick={sendVerifyCode}>
-                        发送
+                        Send
                     </button>
                 </div>
                 <span className={styles.error}>{errorMsg}</span>
                 <button className={styles.button} onClick={validate}>
-                    注册
+                    Register
                 </button>
                 <button className={styles.button} onClick={redirectToLogin}>
-                    返回
+                    Return
                 </button>
             </div>
         </div>
