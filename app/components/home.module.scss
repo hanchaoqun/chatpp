@@ -284,7 +284,7 @@
     .chat-item-avatar {
       display: flex;
       justify-content: center;
-      opacity: 0.1;
+      opacity: 0.5;
       align-items: center;
       transform: scale(0.7);
     }
@@ -295,12 +295,13 @@
       text-align: center;
       color: var(--primary);
       opacity: 0.6;
-      transform: scale(2);
+      transform: scale(0.7);
     }
   }
 
   .chat-item-delete {
     top: 15px;
+    transform: scale(2);
   }
 
   .chat-item:hover > .chat-item-delete {
