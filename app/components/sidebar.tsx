@@ -125,7 +125,7 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 reverse={true}
                 icon={<LogoutIcon />}
-                text={shouldNarrow ? undefined : "注销"}
+                text={shouldNarrow ? undefined : "LogOut"}
                 onClick={() => { logout() }}
                 shadow
               />
@@ -135,7 +135,7 @@ export function SideBar(props: { className?: string }) {
             <IconButton
               reverse={true}
               icon={<PayIcon />}
-              text={shouldNarrow ? undefined : "剩余 [" + userCount + "] 次"}
+              text={shouldNarrow ? undefined : "Quota [" + userCount + "]"}
               onClick={() => { accessStore.fetchUserCount(); }}
               shadow
             />
