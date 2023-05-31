@@ -265,7 +265,7 @@
 
     &:hover {
       .chat-item-narrow {
-        transform: scale(0.7) translateX(-50%);
+        transform: scale(2) translateX(-50%);
       }
     }
   }
@@ -284,9 +284,9 @@
     .chat-item-avatar {
       display: flex;
       justify-content: center;
-      opacity: 0.2;
-      position: absolute;
-      transform: scale(4);
+      opacity: 0.1;
+      align-items: center;
+      transform: scale(0.7) translateX(-50%);
     }
 
     .chat-item-narrow-count {
@@ -295,6 +295,7 @@
       text-align: center;
       color: var(--primary);
       opacity: 0.6;
+      transform: scale(2);
     }
   }
 
