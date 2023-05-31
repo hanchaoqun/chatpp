@@ -125,7 +125,7 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 reverse={true}
                 icon={<LogoutIcon />}
-                text={shouldNarrow ? undefined : "LogOut"}
+                text={shouldNarrow ? undefined : "LOGOUT"}
                 onClick={() => { logout() }}
                 shadow
               />
@@ -135,7 +135,7 @@ export function SideBar(props: { className?: string }) {
             <IconButton
               reverse={true}
               icon={<PayIcon />}
-              text={shouldNarrow ? undefined : "Quota [" + userCount + "]"}
+              text={shouldNarrow ? undefined : "QUOTA [" + userCount + "]"}
               onClick={() => { accessStore.fetchUserCount(); }}
               shadow
             />
