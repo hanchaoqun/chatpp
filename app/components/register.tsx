@@ -97,7 +97,7 @@ export default function Register() {
                     <input
                         className={`${styles.input} ${styles["input-sub"]}`}
                         type="text"
-                        placeholder="Verification code"
+                        placeholder="Verify Code"
                         value={verifyCode}
                         onChange={(e) => setVerifyCode(e.target.value)}
                     />
