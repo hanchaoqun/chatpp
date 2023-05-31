@@ -15,11 +15,11 @@ export default function LoginPage() {
     const handleLogin = async function() {
         const result = await accessStore.loginOrRegister("login", email, password);
         if (!result.error && accessStore.isLogin()) {
-           setErrorMsg("登录成功");
+           setErrorMsg("Success!");
            router.push("/");
            return;
         }
-        setErrorMsg(result.msg??"登录失败");
+        setErrorMsg(result.msg??"Failed!");
     };
 
     const handleRegister = async function() {
@@ -37,23 +37,23 @@ export default function LoginPage() {
                 <input
                     className={styles.input}
                     type="text"
-                    placeholder="邮箱"
+                    placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
                     className={styles.input}
                     type="password"
-                    placeholder="密码"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <span className={styles.error}>{errorMsg}</span>
                 <button className={styles.button} onClick={handleLogin}>
-                    登录
+                    Login
                 </button>
                 <button className={styles.button} onClick={handleRegister}>
-                    注册
+                    Register
                 </button>
             </div>
         </div>
