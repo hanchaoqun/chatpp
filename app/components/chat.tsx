@@ -350,7 +350,7 @@ export function ChatActions(props: {
         <Selector
           defaultSelectedValue={currentModel}
           items={models.map((m) => ({
-            title: m.displayName,
+            title: m.name,
             value: m.name,
           }))}
           onClose={() => setShowModelSelector(false)}
@@ -359,7 +359,7 @@ export function ChatActions(props: {
             chatStore.updateCurrentSession((session) => {
               session.mask.modelConfig.model = s[0] as ModelType;
             });
-            // showToast(s[0]);
+            // showToast(s[0]); m.displayName
           }}
         />
       )}
