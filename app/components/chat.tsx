@@ -1,5 +1,5 @@
 import { useDebouncedCallback } from "use-debounce";
-import { memo, useState, useRef, useEffect, useLayoutEffect } from "react";
+import { memo, useState, useRef, useMemo, useEffect, useLayoutEffect } from "react";
 
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
@@ -11,6 +11,7 @@ import DownloadIcon from "../icons/download.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import PromptIcon from "../icons/prompt.svg";
 import MaxIcon from "../icons/max.svg";
+import MenuIcon from "../icons/menu.svg";
 import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
 
@@ -20,6 +21,7 @@ import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 
 import {
+  ALL_MODELS,
   Message,
   SubmitKey,
   useChatStore,
@@ -253,6 +255,7 @@ export function ChatActions(props: {
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
+  const chatStore = useChatStore();
 
   // switch themes
   const theme = config.theme;
@@ -268,6 +271,28 @@ export function ChatActions(props: {
   const couldStop = ControllerPool.hasPending();
   const stopAll = () => ControllerPool.stopAll();
 
+  // switch model
+  const currentModel = chatStore.currentSession().mask.modelConfig.model;
+  const allModels = ALL_MODELS;
+  const models = useMemo(
+    () => allModels.filter((m) => m.available),
+    [allModels],
+  );
+  const [showModelSelector, setShowModelSelector] = useState(false);
+
+  useEffect(() => {
+    // if current model is not available
+    // switch to first available model
+    const isUnavaliableModel = !models.some((m) => m.name === currentModel);
+    if (isUnavaliableModel && models.length > 0) {
+      const nextModel = models[0].name as ModelType;
+      chatStore.updateCurrentSession(
+        (session) => (session.mask.modelConfig.model = nextModel),
+      );
+      showToast(nextModel);
+    }
+  }, [chatStore, currentModel, models]);
+  
   return (
     <div className={chatStyle["chat-input-actions"]}>
       {couldStop && (
@@ -313,6 +338,31 @@ export function ChatActions(props: {
         <PromptIcon />
       </div>
 
+      <div
+        className={`${chatStyle["chat-input-action"]} clickable`}
+        onClick={() => setShowModelSelector(true)}
+      >
+        <MenuIcon />
+      </div>
+      
+      {showModelSelector && (
+        <Selector
+          defaultSelectedValue={currentModel}
+          items={models.map((m) => ({
+            title: m.displayName,
+            value: m.name,
+          }))}
+          onClose={() => setShowModelSelector(false)}
+          onSelection={(s) => {
+            if (s.length === 0) return;
+            chatStore.updateCurrentSession((session) => {
+              session.mask.modelConfig.model = s[0] as ModelType;
+            });
+            showToast(s[0]);
+          }}
+        />
+      )}
+      
     </div>
   );
 }
