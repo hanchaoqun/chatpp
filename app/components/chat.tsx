@@ -290,7 +290,7 @@ export function ChatActions(props: {
       chatStore.updateCurrentSession(
         (session) => (session.mask.modelConfig.model = nextModel),
       );
-      showToast(nextModel);
+      // showToast(nextModel);
     }
   }, [chatStore, currentModel, models]);
   
@@ -359,7 +359,7 @@ export function ChatActions(props: {
             chatStore.updateCurrentSession((session) => {
               session.mask.modelConfig.model = s[0] as ModelType;
             });
-            showToast(s[0]);
+            // showToast(s[0]);
           }}
         />
       )}
