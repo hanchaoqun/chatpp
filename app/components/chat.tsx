@@ -53,7 +53,7 @@ import { IconButton } from "./button";
 import styles from "./home.module.scss";
 import chatStyle from "./chat.module.scss";
 
-import { ListItem, Modal, showModal } from "./ui-lib";
+import { ListItem, Modal, Selector, showModal } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar } from "./emoji";
