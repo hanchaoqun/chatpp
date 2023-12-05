@@ -150,7 +150,7 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 reverse={true}
                 icon={<LogoutIcon />}
-                text={shouldNarrow ? undefined : ((!!userCount?.userType && userCount?.userType >= 1)? "PREMIUM" : "LOGOUT")}
+                text={shouldNarrow ? undefined : ((!!userCount?.usertype && userCount?.usertype >= 1)? "PREMIUM" : "LOGOUT")}
                 onClick={() => { logout() }}
                 shadow
               />
