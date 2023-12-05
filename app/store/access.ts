@@ -123,7 +123,7 @@ export const useAccessStore = create<AccessControlStore>()(
       },
       accessType: AccessType.Account,
       username: "",
-      userCount: {usertype：0,points:0,days:0,daysplus:0},
+      userCount: {usertype:0,points:0,days:0,daysplus:0},
 
       getAccessType() {
         get().fetch();
