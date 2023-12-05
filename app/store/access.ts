@@ -2,6 +2,13 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { StoreKey } from "../constant";
 
+export interface UserCount {
+    usertype: number,
+    points: number,
+    days: number,
+    daysplus: number,
+}
+
 export interface WechatUserInfo {
   openid: string
   nickname: string
@@ -19,7 +26,7 @@ export interface AccountResponse {
   error: boolean,
   msg?: string,
   accessCode?: string,
-  count?: number,
+  count?: UserCount,
 }
 
 export interface VerifyResponse {
@@ -27,6 +34,49 @@ export interface VerifyResponse {
     username: string,
     exists: boolean,
     expire: number,
+}
+
+export interface Discount {
+    amount: number,
+    points: number,
+    days: number,
+    daysplus: number,
+    description: string,
+}
+
+export interface DiscountResponse {
+    error: boolean,
+    msg?: string,
+    accessType?: number,
+    accessCode?: string,
+    discounts?: Discount[],
+}
+
+export interface CheckOrderResponse {
+    error: boolean,
+    msg?: string,
+    accessType?: number,
+    accessCode?: string,
+    ordStatus?: string,
+    count?: UserCount,
+}
+
+export interface PaymentResponse {
+    openid: number; // 来自文档：订单id(此处有个历史遗留错误，返回名称是openid，值是orderid，一般对接不需要这个参数)
+    url_qrcode: string;
+    url: string;
+    errcode: number;
+    errmsg: string;
+    hash?: string;
+}
+
+export interface CreateOrderResponse {
+    error: boolean,
+    msg?: string,
+    accessType?: number,
+    accessCode?: string,
+    ordStatus?: string,
+    paymentRes?: PaymentResponse,
 }
 
 export enum AccessType {
@@ -41,16 +91,16 @@ export interface AccessControlStore {
   token: string;
   wechatData: WechatUserInfo;
   accessType: number;
-  userCount: number;
+  userCount: UserCount;
   username: string;
 
   updateToken: (_: string) => void;
   updateUsername: (_: string) => void;
   updateCode: (_: string) => void;
-  updateUserCount: (_: number) => void;
+  updateUserCount: (_: UserCount) => void;
   updateWeChatData: (_: WechatUserInfo) => void;
   getAccessType: () => number;
-  fetchUserCount: () => Promise<number>;
+  fetchUserCount: () => Promise<UserCount>;
   loginOrRegister: (action:string, username:string, password:string, verify?:number) => Promise<AccountResponse>;
   sendVerifyCode: (username:string) => Promise<VerifyResponse>;
   isNeedAccessCode: () => boolean;
@@ -73,7 +123,7 @@ export const useAccessStore = create<AccessControlStore>()(
       },
       accessType: AccessType.Account,
       username: "",
-      userCount: 0,
+      userCount: {usertype：0,points:0,days:0,daysplus:0},
 
       getAccessType() {
         get().fetch();
@@ -93,7 +143,7 @@ export const useAccessStore = create<AccessControlStore>()(
       updateUsername(username: string) {
         set((state) => ({ username }));
       },
-      updateUserCount(userCount: number) {
+      updateUserCount(userCount: UserCount) {
         set((state) => ({ userCount: userCount }));
       },
       updateToken(token: string) {
@@ -139,7 +189,7 @@ export const useAccessStore = create<AccessControlStore>()(
                   if (!res.error && !!res.accessCode) {
                       get().updateUsername(username);
                       get().updateCode(res.accessCode);
-                      get().updateUserCount(res.count??0);
+                      get().updateUserCount(res.count??{usertype：0,points:0,days:0,daysplus:0});
                       accountRsp = res;
                   } else {
                       accountRsp = { error:true, msg: res.msg, };
@@ -156,7 +206,7 @@ export const useAccessStore = create<AccessControlStore>()(
           async function asyncFetch() {
               const accessType = get().getAccessType();
               if (accessType != AccessType.Account || !get().isAuthorized()) {
-                  return 0;
+                  return {usertype：0,points:0,days:0,daysplus:0} as UserCount;
               }
               try {
                 const response = await fetch("/api/account", {
@@ -168,7 +218,7 @@ export const useAccessStore = create<AccessControlStore>()(
                 });
                 const res = await response.json();
                 if (!res.error && !!res.accessCode) {
-                    const count = res.count ?? 0;
+                    const count = res.count ?? {usertype：0,points:0,days:0,daysplus:0};
                     get().updateUserCount(count);
                     // need login
                     if (!res.accessType || res.accessType != AccessType.Account) {
@@ -188,7 +238,7 @@ export const useAccessStore = create<AccessControlStore>()(
         if (accessType != AccessType.Account) {
             return false;
         }
-        return (get().userCount <= 0);
+        return (get().userCount.points <= 0 && get().userCount.days <= 0 && get().userCount.daysplus <= 0);
       },
       isLogin() {
         const accessType = get().getAccessType();
