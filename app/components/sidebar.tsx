@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./home.module.scss";
 
@@ -9,7 +9,7 @@ import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
 import LogoutIcon from "../icons/logout.svg";
 import PayIcon from "../icons/pay.svg";
-import { AccessType, useAccessStore } from "../store";
+import { UserCount, AccessType, useAccessStore } from "../store";
 
 import Locale from "../locales";
 
@@ -25,7 +25,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -81,12 +81,25 @@ function useDragSideBar() {
 
 
 export function SideBar(props: { className?: string }) {
-
   const chatStore = useChatStore();
-  const accessStore = useAccessStore();
+  const accessStore = useAccessStore.getState();
   const username = accessStore.username;
-  const userCount = accessStore.userCount;
+  const [userCount, setUserCount] = useState<UserCount>();
   const router = useRouter();
+  useEffect(() => {
+    setUserCount(accessStore.userCount);
+  }, [accessStore.userCount]);
+
+  useEffect(() => {
+    if (!accessStore.isLogin()) {
+      router.push("/login");
+    }
+    accessStore.fetchUserCount()
+      .then((count) => {
+        setUserCount(count);
+        accessStore.updateUserCount(count);
+      });
+  }, []);
 
   const getAccessType = useMemo(
     () => accessStore.getAccessType(),
@@ -101,6 +114,18 @@ export function SideBar(props: { className?: string }) {
   const logout = function () {
     accessStore.updateCode("");
     router.push("/login");
+  }
+
+  const charge = function () {
+    router.push("/charge");
+  }
+
+  const refreshPoints = function () {
+    accessStore.fetchUserCount()
+      .then((count) => {
+        setUserCount(count);
+        accessStore.updateUserCount(count);
+      });
   }
 
   return (
@@ -135,8 +160,8 @@ export function SideBar(props: { className?: string }) {
             <IconButton
               reverse={true}
               icon={<PayIcon />}
-              text={shouldNarrow ? undefined : "QUOTA [" + userCount + "]"}
-              onClick={() => { accessStore.fetchUserCount(); }}
+              text={shouldNarrow ? undefined : "QUOTA [" + userCount?.points + "]"}
+              onClick={() => { refreshPoints() }}
               shadow
             />
           </div>
