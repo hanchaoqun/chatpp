@@ -3,6 +3,7 @@ import kv from "@vercel/kv";
 
 const USER_ACCOUNT = "USER_ACCOUNT";
 const USER_COUNT = "USER_COUNT";
+const USER_TYPE  = "USER_TYPE";
 const USER_VALID = "USER_VALID";
 const USER_VALID_TIMEOUT = 60 * 7;
 const USER_SUBSCRIPTION = "USER_SUB:";
@@ -24,10 +25,11 @@ export function generateRandomSixDigitNumber() {
 }
 
 export async function queryCountAndDays(accessCode: string) : Promise<UserCount> {
+    const usertype = await queryType(accessCode);
     const points = await queryCount(accessCode);
     const days = await queryDayLeft(accessCode);
     const daysplus = await queryDayLeftPlus(accessCode);
-    return {points, days, daysplus,};
+    return {usertype, points, days, daysplus,};
 }
 
 export async function queryDayLeft(accessCode: string) {
@@ -176,6 +178,17 @@ export async function queryCount(accessCode: string) {
         return 0;
     }
     return userCount ?? 0;
+}
+
+export async function queryType(accessCode: string) {
+    if (!accessCode || accessCode.length <= 0) {
+        return 0;
+    }
+    const userType = await kv.hget<number>(USER_TYPE, accessCode);
+    if (userType && userType < 0) {
+        return 0;
+    }
+    return userType ?? 0;
 }
 
 export async function incCount(accessCode: string, num: number) {
