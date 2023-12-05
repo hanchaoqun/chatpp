@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessType, getServerSideConfig } from "../../config/server";
-import {authAccount, checkVerifyCode, queryCount, registerAccount, sendValidCode} from "../../account/server";
+import { UserCount, authAccount, checkVerifyCode, queryCountAndDays, registerAccount, sendValidCode } from "../../account/server";
 
 const serverConfig = getServerSideConfig();
 
@@ -24,7 +24,7 @@ async function error(msg: string, status: number) {
   );
 }
 
-async function success(accessCode: string, status: number, count: number) {
+async function success(accessCode: string, status: number, count: UserCount) {
   return NextResponse.json(
       {
         error: false,
@@ -42,7 +42,7 @@ async function query(ar: AccountRequest) {
   if (!ar.accessCode) {
     return error("用户未登录", 403);
   }
-  return success(ar.accessCode, 200, await queryCount(ar.accessCode));
+  return success(ar.accessCode, 200, await queryCountAndDays(ar.accessCode));
 }
 
 async function login(ar: AccountRequest) {
@@ -53,7 +53,7 @@ async function login(ar: AccountRequest) {
   if (!accessCode) {
     return error("登录失败，用户名或密码不正确", 403);
   }
-  return success(accessCode, 200, await queryCount(accessCode));
+  return success(accessCode, 200, await queryCountAndDays(accessCode));
 }
 
 async function register(ar: AccountRequest) {
@@ -71,7 +71,7 @@ async function register(ar: AccountRequest) {
   if (!accessCode) {
     return error("用户名已被占用", 403);
   }
-  return success(accessCode, 200, await queryCount(accessCode));
+  return success(accessCode, 200, await queryCountAndDays(accessCode));
 }
 
 async function verify(ar: AccountRequest) {
