@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessType, getServerSideConfig } from "./app/config/server";
-import { queryCount } from "./app/account/server";
+import { UserCount, queryCountAndDays } from "./app/account/server";
 import md5 from "spark-md5";
 
 export const config = {
@@ -31,9 +31,30 @@ async function codeAuth(req: NextRequest, accessCode: string) {
 }
 
 async function accountAuth(req: NextRequest, accessCode: string) {
-  let count = await queryCount(accessCode)??0;
-  console.log("[Auth] Count:", accessCode, count);
-  if (count > 0) {
+  const model = req.headers.get("model") ?? "";
+  let usercnt = await queryCountAndDays(accessCode);
+  console.log("[Auth] usercnt:", accessCode, usercnt);
+  if (model && model.startsWith("gpt-4")) {
+    if (usercnt.daysplus > 0) {
+      req.headers.set("calctype", "daysplus");
+      return true;
+    }
+    if (usercnt.points > 0) {
+      req.headers.set("calctype", "points");
+      return true;
+    }
+    return false;
+  }
+  if (usercnt.daysplus > 0) {
+    req.headers.set("calctype", "daysplus");
+    return true;
+  }
+  if (usercnt.days > 0) {
+    req.headers.set("calctype", "days");
+    return true;
+  }
+  if (usercnt.points > 0) {
+    req.headers.set("calctype", "points");
     return true;
   }
   return false;
