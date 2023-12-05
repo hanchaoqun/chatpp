@@ -5,13 +5,83 @@ const USER_ACCOUNT = "USER_ACCOUNT";
 const USER_COUNT = "USER_COUNT";
 const USER_VALID = "USER_VALID";
 const USER_VALID_TIMEOUT = 60 * 7;
+const USER_SUBSCRIPTION = "USER_SUB:";
+const USER_SUBSCRIPTION_PLUS = "USER_SUB_PLUS:";
 
 const EMAIL_API_KEY = process.env.EMAIL_API_KEY;
+
+export interface UserCount {
+    usertype: number,
+    points: number,
+    days: number,
+    daysplus: number,
+}
 
 export function generateRandomSixDigitNumber() {
     const min = 100000;
     const max = 999999;
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export async function queryCountAndDays(accessCode: string) : Promise<UserCount> {
+    const points = await queryCount(accessCode);
+    const days = await queryDayLeft(accessCode);
+    const daysplus = await queryDayLeftPlus(accessCode);
+    return {points, days, daysplus,};
+}
+
+export async function queryDayLeft(accessCode: string) {
+    if (!accessCode || accessCode.length <= 0) {
+        return 0;
+    }
+    const key = USER_SUBSCRIPTION.concat(accessCode);
+    const expire = await kv.ttl(key);
+    if (expire <= 0) {
+        return 0;
+    }
+    // 86400 seconds per day
+    return Math.ceil(expire/86400);
+}
+
+export async function incDayLeft(accessCode: string, day: number) {
+    if (!accessCode || accessCode.length <= 0) {
+        return 0;
+    }
+    const key = USER_SUBSCRIPTION.concat(accessCode);
+    let newexpire = day * 86400;
+    const expire = await kv.ttl(key);
+    if (expire > 0) {
+        newexpire = expire + newexpire;
+    }
+    // day is never used here. 
+    await kv.setex(key, newexpire, day);
+}
+
+export async function queryDayLeftPlus(accessCode: string) {
+    if (!accessCode || accessCode.length <= 0) {
+        return 0;
+    }
+    const key = USER_SUBSCRIPTION_PLUS.concat(accessCode);
+    const expire = await kv.ttl(key);
+    if (expire <= 0) {
+        return 0;
+    }
+    // 86400 seconds per day
+    return Math.ceil(expire/86400);
+}
+
+export async function incDayLeftPlus(accessCode: string, day: number) {
+    if (!accessCode || accessCode.length <= 0) {
+        return 0;
+    }
+    const key = USER_SUBSCRIPTION_PLUS.concat(accessCode);
+    let newexpire = day * 86400;
+    const expire = await kv.ttl(key);
+    if (expire > 0) {
+        newexpire = expire + newexpire;
+    }
+    // day is never used here. 
+    await kv.setex(key, newexpire, day);
 }
 
 export async function checkVerifyCode(username: string, verify: number) {
@@ -108,6 +178,15 @@ export async function queryCount(accessCode: string) {
     return userCount ?? 0;
 }
 
+export async function incCount(accessCode: string, num: number) {
+    if (!accessCode || accessCode.length <= 0) {
+        return 0;
+    }
+    await kv.hincrby(USER_COUNT, accessCode, num);
+    const userCount = await kv.hget<number>(USER_COUNT, accessCode);
+    return userCount;
+}
+
 export async function decCount(accessCode: string, num: number = 1) {
     if (!accessCode || accessCode.length <= 0) {
         return 0;
@@ -115,9 +194,9 @@ export async function decCount(accessCode: string, num: number = 1) {
     const userCount = await kv.hget<number>(USER_COUNT, accessCode);
     if (userCount) {
         if (userCount >= num) {
-           await kv.hincrby(USER_COUNT, accessCode, -1 * num);
+            await kv.hincrby(USER_COUNT, accessCode, -1 * num);
         } else if (userCount > 0) {
-           await kv.hincrby(USER_COUNT, accessCode, -1 * userCount);
+            await kv.hincrby(USER_COUNT, accessCode, -1 * userCount);
         }
     }
     // always return the old value!!!
