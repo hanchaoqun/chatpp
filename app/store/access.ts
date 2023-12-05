@@ -189,7 +189,7 @@ export const useAccessStore = create<AccessControlStore>()(
                   if (!res.error && !!res.accessCode) {
                       get().updateUsername(username);
                       get().updateCode(res.accessCode);
-                      get().updateUserCount(res.count??{usertype：0,points:0,days:0,daysplus:0});
+                      get().updateUserCount(res.count??{usertype:0,points:0,days:0,daysplus:0});
                       accountRsp = res;
                   } else {
                       accountRsp = { error:true, msg: res.msg, };
@@ -206,7 +206,7 @@ export const useAccessStore = create<AccessControlStore>()(
           async function asyncFetch() {
               const accessType = get().getAccessType();
               if (accessType != AccessType.Account || !get().isAuthorized()) {
-                  return {usertype：0,points:0,days:0,daysplus:0} as UserCount;
+                  return {usertype:0,points:0,days:0,daysplus:0} as UserCount;
               }
               try {
                 const response = await fetch("/api/account", {
@@ -218,7 +218,7 @@ export const useAccessStore = create<AccessControlStore>()(
                 });
                 const res = await response.json();
                 if (!res.error && !!res.accessCode) {
-                    const count = res.count ?? {usertype：0,points:0,days:0,daysplus:0};
+                    const count = res.count ?? {usertype:0,points:0,days:0,daysplus:0};
                     get().updateUserCount(count);
                     // need login
                     if (!res.accessType || res.accessType != AccessType.Account) {
