@@ -26,11 +26,11 @@
   --theme: dark;
 
   /* color */
-  --white: rgb(51, 51, 71);
-  --black: rgb(197, 187, 177);
-  --gray: rgb(29, 38, 54);
-  --primary: rgb(35, 51, 24);
-  --second: rgb(85, 58, 97);
+  --white: rgb(15, 15, 15);    /* 聊天背景 */
+  --black: rgb(250, 231, 207); /* 字体 */
+  --gray: rgb(73, 79, 82);     /* 机器回答背景 */
+  --primary: rgb(35, 51, 24);  /* 发送按钮*/
+  --second: rgb(61, 47, 57);   /* 人工问题背景 */
   --hover-color: rgb(45, 66, 87);
 
   --bar-color: rgba(255, 255, 255, 0.1);
