@@ -264,10 +264,10 @@ function ChatAction(props: {
         } as React.CSSProperties
       }
     >
-      <div ref={iconRef} className={styles["icon"]}>
+      <div ref={iconRef} className={chatStyle["icon"]}>
         {props.icon}
       </div>
-      <div className={styles["text"]} ref={textRef}>
+      <div className={chatStyle["text"]} ref={textRef}>
         {props.text}
       </div>
     </div>
