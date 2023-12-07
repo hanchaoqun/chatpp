@@ -296,7 +296,8 @@ export function ChatActions(props: {
   
   return (
     <div className={chatStyle["chat-input-actions"]}>
-      <div class="group-left">
+      
+      <div className={chatStyle["group-left"]}>
           {couldStop && (
             <div
               className={`${chatStyle["chat-input-action"]} clickable`}
@@ -347,8 +348,10 @@ export function ChatActions(props: {
             <MenuIcon />
           </div>
       </div>
-      <div class="group-right">
+      
+      <div className={chatStyle["group-right"]}>
       </div>
+      
       {showModelSelector && (
         <Selector
           defaultSelectedValue={currentModel}
