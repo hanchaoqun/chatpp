@@ -398,6 +398,11 @@ export function ChatActions(props: {
       </div>
       
       <div className={chatStyle["group-right"]}>
+        <ChatAction
+              onClick={props.scrollToBottom}
+              text={"ToBottom"}
+              icon={<BottomIcon />}
+          />
       </div>
       
       {showModelSelector && (
