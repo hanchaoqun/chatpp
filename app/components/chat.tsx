@@ -296,56 +296,59 @@ export function ChatActions(props: {
   
   return (
     <div className={chatStyle["chat-input-actions"]}>
-      {couldStop && (
-        <div
-          className={`${chatStyle["chat-input-action"]} clickable`}
-          onClick={stopAll}
-        >
-          <StopIcon />
-        </div>
-      )}
-      {!props.hitBottom && (
-        <div
-          className={`${chatStyle["chat-input-action"]} clickable`}
-          onClick={props.scrollToBottom}
-        >
-          <BottomIcon />
-        </div>
-      )}
-      {props.hitBottom && (
-        <div
-          className={`${chatStyle["chat-input-action"]} clickable`}
-          onClick={props.showPromptModal}
-        >
-          <BrainIcon />
-        </div>
-      )}
-
-      <div
-        className={`${chatStyle["chat-input-action"]} clickable`}
-        onClick={nextTheme}
-      >
-        {theme === Theme.Light ? (
-          <LightIcon />
-        ) : theme === Theme.Dark ? (
-          <DarkIcon />
-        ) : null}
+      <div class="group-left">
+          {couldStop && (
+            <div
+              className={`${chatStyle["chat-input-action"]} clickable`}
+              onClick={stopAll}
+            >
+              <StopIcon />
+            </div>
+          )}
+          {!props.hitBottom && (
+            <div
+              className={`${chatStyle["chat-input-action"]} clickable`}
+              onClick={props.scrollToBottom}
+            >
+              <BottomIcon />
+            </div>
+          )}
+          {props.hitBottom && (
+            <div
+              className={`${chatStyle["chat-input-action"]} clickable`}
+              onClick={props.showPromptModal}
+            >
+              <BrainIcon />
+            </div>
+          )}
+    
+          <div
+            className={`${chatStyle["chat-input-action"]} clickable`}
+            onClick={nextTheme}
+          >
+            {theme === Theme.Light ? (
+              <LightIcon />
+            ) : theme === Theme.Dark ? (
+              <DarkIcon />
+            ) : null}
+          </div>
+    
+          <div
+            className={`${chatStyle["chat-input-action"]} clickable`}
+            onClick={props.showPromptHints}
+          >
+            <PromptIcon />
+          </div>
+    
+          <div
+            className={`${chatStyle["chat-input-action"]} clickable`}
+            onClick={() => setShowModelSelector(true)}
+          >
+            <MenuIcon />
+          </div>
       </div>
-
-      <div
-        className={`${chatStyle["chat-input-action"]} clickable`}
-        onClick={props.showPromptHints}
-      >
-        <PromptIcon />
+      <div class="group-right">
       </div>
-
-      <div
-        className={`${chatStyle["chat-input-action"]} clickable`}
-        onClick={() => setShowModelSelector(true)}
-      >
-        <MenuIcon />
-      </div>
-      
       {showModelSelector && (
         <Selector
           defaultSelectedValue={currentModel}
