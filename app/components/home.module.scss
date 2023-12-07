@@ -529,12 +529,6 @@
   flex-direction: column;
   border-top: var(--border-in-light);
   box-shadow: var(--card-shadow);
-
-  .chat-input-actions {
-    .chat-input-action {
-      margin-bottom: 10px;
-    }
-  }
 }
 
 @mixin single-line {
