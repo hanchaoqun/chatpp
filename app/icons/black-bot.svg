@@ -8,13 +8,13 @@
     <rect fill="#e4f8f7" opacity="1"
       transform="translate(0 0)  rotate(0 14.999999999999998 14.999999999999998)" x="0" y="0"
       width="29.999999999999996" height="29.999999999999996" rx="10" />
-    <mask id="bg-mask-0" fill="white">
+    <mask id="bg-mask-0" fill="none">
       <use xlink:href="#path_0"></use>
     </mask>
     <g mask="url(#bg-mask-0)">
       <g opacity="1"
         transform="translate(4.772727272727272 4.772727272727273)  rotate(0 10.227272727272725 10.227272727272725)">
-        <mask id="bg-mask-1" fill="white">
+        <mask id="bg-mask-1" fill="none">
           <use xlink:href="#path_1"></use>
         </mask>
         <g mask="url(#bg-mask-1)">
