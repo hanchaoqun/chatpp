@@ -503,6 +503,10 @@
   background-color: var(--second);
 }
 
+.chat-message > .chat-message-container > .chat-message-item {
+  background-color: var(--gray);
+}
+
 .chat-message-actions {
   display: flex;
   flex-direction: row-reverse;
