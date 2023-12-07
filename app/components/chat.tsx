@@ -250,7 +250,7 @@ function ChatAction(props: {
 
   return (
     <div
-      className={`${styles["chat-input-action"]} clickable`}
+      className={`${chatStyle["chat-input-action"]} clickable`}
       onClick={() => {
         props.onClick();
         setTimeout(updateWidth, 1);
