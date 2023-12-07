@@ -527,10 +527,14 @@
   padding-top: 10px;
   box-sizing: border-box;
   flex-direction: column;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
   border-top: var(--border-in-light);
   box-shadow: var(--card-shadow);
+
+  .chat-input-actions {
+    .chat-input-action {
+      margin-bottom: 10px;
+    }
+  }
 }
 
 @mixin single-line {
