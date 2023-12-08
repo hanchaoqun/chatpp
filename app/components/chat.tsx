@@ -543,7 +543,7 @@ export function Chat() {
   const onRightClick = (e: any, message: Message) => {
     // auto fill user input
     if (message.role === "user") {
-      setUserInput(message.content);
+      setUserInput(message.content??'');
     }
 
     // copy to clipboard
@@ -816,7 +816,7 @@ export function Chat() {
                     onContextMenu={(e) => onRightClick(e, message)}
                     onDoubleClickCapture={() => {
                       if (!isMobileScreen) return;
-                      setUserInput(message.content);
+                      setUserInput(message.content??'');
                     }}
                     fontSize={fontSize}
                     parentRef={scrollRef}
