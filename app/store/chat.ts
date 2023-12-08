@@ -113,9 +113,6 @@ interface ChatStore {
   clearAllData: () => void;
 }
 
-function getSum(total: number, num) {
-
-}
 
 function countMessages(msgs: Message[]) {
   return msgs.reduce((pre, cur) => pre + (cur.content?.length != undefined)? cur.content?.length : 0, 0);
