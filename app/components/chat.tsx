@@ -1,6 +1,8 @@
 import { useDebouncedCallback } from "use-debounce";
 import { memo, useState, useRef, useMemo, useEffect, useLayoutEffect } from "react";
 
+import * as pdfjs from "pdfjs-dist";
+
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import ExportIcon from "../icons/share.svg";
@@ -14,7 +16,6 @@ import MaxIcon from "../icons/max.svg";
 import MenuIcon from "../icons/menu.svg";
 import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
-
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import BottomIcon from "../icons/bottom.svg";
@@ -71,6 +72,11 @@ const Markdown = dynamic(
     loading: () => <LoadingIcon />,
   },
 );
+
+/**
+ * This imports the worker from the `pdfjs-dist` package.
+ */
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'  
 
 function exportMessages(messages: Message[], topic: string) {
   const mdText =
