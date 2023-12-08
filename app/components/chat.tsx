@@ -57,7 +57,7 @@ import {
   useMaskStore,
 } from "../store/mask";
 
-import * as pdfjs from "pdfjs-dist";
+//import * as pdfjs from "pdfjs-dist";
 
 // 如果用到了webpack， https://github.com/mozilla/pdf.js/pull/11081
 //import * as pdfjs from "pdfjs-dist/webpack";
@@ -68,7 +68,7 @@ import * as pdfjs from "pdfjs-dist";
  * 如果没有执行则public下面没有，则用cdnjs的，下面第二条
  */
 // pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+//pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const Markdown = dynamic(
   async () => memo((await import("./markdown")).Markdown),
