@@ -114,7 +114,11 @@ interface ChatStore {
 }
 
 function countMessages(msgs: Message[]) {
-  return msgs.reduce((pre, cur) => pre + cur.content.length, 0);
+  let len = 0;
+  if (cur.content?.length != undefined) {
+    len = cur.content?.length;
+  }
+  return msgs.reduce((pre, cur) => pre + len, 0);
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -320,8 +324,8 @@ export const useChatStore = create<ChatStore>()(
       },
 
       getMessagesTokens(message: Message) {
-        if (message.tokens === 0 && message.content.length > 0) {
-          message.tokens = countTokens(message.content);
+        if (message.tokens === 0 && message.content?.length != undefined && message.content?.length > 0) {
+          message.tokens = countTokens(message.content??'');
         }
         return message.tokens;
       },
@@ -474,7 +478,7 @@ export const useChatStore = create<ChatStore>()(
 
         // add memory prompt
         const memoryPrompt = get().getMemoryPrompt();
-        if (memoryPrompt.content.length > 0) {
+        if (memoryPrompt.content?.length != undefined && memoryPrompt.content?.length > 0) {
           toBeSummarizedMsgs.unshift(memoryPrompt);
         }
 
@@ -506,7 +510,11 @@ export const useChatStore = create<ChatStore>()(
 
       updateStat(message) {
         get().updateCurrentSession((session) => {
-          session.stat.charCount += message.content.length;
+          let len = 0;
+          if (message.content?.length != undefined) {
+            len = message.content?.length;
+          }
+          session.stat.charCount += len;
           // TODO: should update chat count and word count
         });
       },
