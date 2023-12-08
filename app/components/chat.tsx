@@ -57,10 +57,10 @@ import {
   useMaskStore,
 } from "../store/mask";
 
-//import * as pdfjs from "pdfjs-dist";
+import * as pdfjs from "pdfjs-dist";
 
 // 如果用到了webpack， https://github.com/mozilla/pdf.js/pull/11081
-import * as pdfjs from "pdfjs-dist/webpack";
+//import * as pdfjs from "pdfjs-dist/webpack";
 
 /**
  * This imports the worker from the `pdfjs-dist` package.
