@@ -9,7 +9,6 @@
     "start": "next start",
     "lint": "next lint",
     "fetch": "node ./scripts/fetch-prompts.mjs",
-    "copypdfjs": "node ./scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.2.0",
@@ -21,8 +20,7 @@
     "fuse.js": "^6.6.2",
     "next": "^13.3.1-canary.8",
     "openai": "^3.2.1",
-    "pdfjs": "^2.4.7",
-    "pdfjs-dist": "^3.4.120",
+    "pdf-parse": "^v1.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",
