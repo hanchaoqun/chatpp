@@ -3,8 +3,8 @@
 const nextConfig = {
   webpack(config) {
     config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
+      test: /\.(svg|node)$/,
+      use: ["@svgr/webpack", "node-loader"],
     });
 
     return config;
