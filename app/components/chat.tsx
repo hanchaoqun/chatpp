@@ -59,7 +59,7 @@ import {
 
 //import * as pdfjs from "pdfjs-dist";
 
-// 如果用到了webpack，参考 https://github.com/mozilla/pdf.js/pull/11081
+// 如果用到了webpack， https://github.com/mozilla/pdf.js/pull/11081
 import * as pdfjs from "pdfjs-dist/webpack";
 
 /**
