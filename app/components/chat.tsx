@@ -84,8 +84,8 @@ function exportMessages(messages: Message[], topic: string) {
     messages
       .map((m) => {
         return m.role === "user"
-          ? `## ${Locale.Export.MessageFromYou}:\n${m.content}`
-          : `## ${Locale.Export.MessageFromChatGPT}:\n${m.content.trim()}`;
+          ? `## ${Locale.Export.MessageFromYou}:\n${m.content ?? ''}`
+          : `## ${Locale.Export.MessageFromChatGPT}:\n${m.content ?? ''}`;
       })
       .join("\n\n");
   const filename = `${topic}.md`;

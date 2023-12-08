@@ -25,7 +25,7 @@ export default function Callback() {
                 accessStore.updateWeChatData(data);
                 router.push("/")
             });
-    }, [])
+    }, [accessStore, code, router])
 
     return (
         <div>
