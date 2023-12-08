@@ -14,17 +14,9 @@ async function PDFLoaderImports() {
 }
 
 export async function PDFParse(pdfile: string) {
-      let ret = {
-        numpages: 0,
-        numrender: 0,
-        info: null,
-        metadata: null,
-        text: "",
-        version: null
-    };
     let raw = fs.readFileSync(pdfile);
     const { pdf } = await PDFLoaderImports();
-    ret = await pdf(raw);
+    let ret = await pdf(raw);
     // remove \\u0000 -> cannot be converted to text
     ret.text = ret.text.replace(/\u0000/g, '');
     return ret;
