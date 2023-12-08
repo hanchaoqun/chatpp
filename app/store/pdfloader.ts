@@ -13,7 +13,7 @@ async function PDFLoaderImports() {
     }
 }
 
-export function PDFParse(pdfile: string) {
+export async function PDFParse(pdfile: string) {
       let ret = {
         numpages: 0,
         numrender: 0,
