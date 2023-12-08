@@ -1,8 +1,5 @@
 import { useDebouncedCallback } from "use-debounce";
 import { memo, useState, useRef, useMemo, useEffect, useLayoutEffect } from "react";
-
-//import * as pdfjs from "pdfjs-dist";
-
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import ExportIcon from "../icons/share.svg";
@@ -20,7 +17,6 @@ import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
-
 import {
   ALL_MODELS,
   Message,
@@ -36,7 +32,6 @@ import {
   ModelType,
   DEFAULT_TOPIC,
 } from "../store";
-
 import {
   copyToClipboard,
   downloadAs,
@@ -44,17 +39,13 @@ import {
   autoGrowTextArea,
   useMobileScreen,
 } from "../utils";
-
 import dynamic from "next/dynamic";
-
 import { ControllerPool } from "../requests";
 import { Prompt, usePromptStore } from "../store/prompt";
 import Locale from "../locales";
-
 import { IconButton } from "./button";
 import styles from "./home.module.scss";
 import chatStyle from "./chat.module.scss";
-
 import { ListItem, Modal, Selector, showModal } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
@@ -66,17 +57,21 @@ import {
   useMaskStore,
 } from "../store/mask";
 
+import * as pdfjs from "pdfjs-dist";
+/**
+ * This imports the worker from the `pdfjs-dist` package.
+ * 如果执行了copypdfjs命令,则会复制到本地public下面，如果有pdf.worker.min.js,则用下面第一条
+ * 如果没有执行则public下面没有，则用cdnjs的，下面第二条
+ */
+// pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
 const Markdown = dynamic(
   async () => memo((await import("./markdown")).Markdown),
   {
     loading: () => <LoadingIcon />,
   },
 );
-
-/**
- * This imports the worker from the `pdfjs-dist` package.
- */
-//pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'  
 
 function exportMessages(messages: Message[], topic: string) {
   const mdText =

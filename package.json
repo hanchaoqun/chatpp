@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "fetch": "node ./scripts/fetch-prompts.mjs",
-    "copy:pdfjs": "node ./scripts/copy-pdfjs.cjs"
+    "copypdfjs": "node ./scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.2.0",
