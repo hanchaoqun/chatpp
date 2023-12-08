@@ -735,11 +735,11 @@ export function Chat() {
           const showActions =
             !isUser &&
             i > 0 &&
-            !(message.preview || message.content.length === 0);
+            !(message.preview || message.content?.length === 0);
           const showActionsUsr =
               isUser &&
               i > 0 &&
-              !(message.preview || message.content.length < 5);
+              !(message.preview || message.content?.length < 5);
           const showTyping = message.preview || message.streaming;
 
           return (
@@ -808,9 +808,9 @@ export function Chat() {
                     </div>
                   )}
                   <Markdown
-                    content={message.content}
+                    content={message.content??''}
                     loading={
-                      (message.preview || message.content.length === 0) &&
+                      (message.preview || message.content?.length === 0) &&
                       !isUser
                     }
                     onContextMenu={(e) => onRightClick(e, message)}
