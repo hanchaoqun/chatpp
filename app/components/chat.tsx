@@ -57,7 +57,11 @@ import {
   useMaskStore,
 } from "../store/mask";
 
-import * as pdfjs from "pdfjs-dist";
+//import * as pdfjs from "pdfjs-dist";
+
+// 如果用到了webpack，参考 https://github.com/mozilla/pdf.js/pull/11081
+import * as pdfjs from "pdfjs-dist/webpack";
+
 /**
  * This imports the worker from the `pdfjs-dist` package.
  * 如果执行了copypdfjs命令,则会复制到本地public下面，如果有pdf.worker.min.js,则用下面第一条
