@@ -113,12 +113,12 @@ interface ChatStore {
   clearAllData: () => void;
 }
 
+function getSum(total: number, num) {
+
+}
+
 function countMessages(msgs: Message[]) {
-  let len = 0;
-  if (cur.content?.length != undefined) {
-    len = cur.content?.length;
-  }
-  return msgs.reduce((pre, cur) => pre + len, 0);
+  return msgs.reduce((pre, cur) => pre + (cur.content?.length != undefined)? cur.content?.length : 0, 0);
 }
 
 export const useChatStore = create<ChatStore>()(
