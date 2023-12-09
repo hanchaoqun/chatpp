@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
 
 export interface PDFDoc {
@@ -6,7 +6,7 @@ export interface PDFDoc {
     text: string,
 }
 
-export async function POST(request){
+export async function POST(req: NextRequest){
     try {
         const formData = await request.formData();
         const pdfFile = formData.get('pdfFile');
