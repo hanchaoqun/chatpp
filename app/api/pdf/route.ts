@@ -6,7 +6,7 @@ export interface PDFDoc {
     text: string,
 }
 
-export async function POST(req: NextRequest){
+export async function POST(request: NextRequest){
     try {
         const formData = await request.formData();
         const pdfFile = formData.get('pdfFile');
