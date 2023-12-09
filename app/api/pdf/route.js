@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 
-
-export interface PDFDoc {
-    name: string,
-    text: string,
-}
-
 export async function POST(request: NextRequest){
     try {
         const formData = await request.formData();
@@ -38,14 +32,14 @@ async function PDFParse(pdfFile) {
     const buffer = Buffer.from(await pdfFile.arrayBuffer());
     const pdfData = await pdf(buffer);
 
-    let pdfdoc: PDFDoc = {
+    let pdfDoc = {
         name: pdfFile.name,
         text: pdfData.text
     }
     
     // remove \\u0000 -> cannot be converted to text
-    pdfdoc.text = pdfdoc.text.replace(/\u0000/g, '');
+    pdfDoc.text = pdfDoc.text.replace(/\u0000/g, '');
 
-    return pdfdoc;
+    return pdfDoc;
 }
 
