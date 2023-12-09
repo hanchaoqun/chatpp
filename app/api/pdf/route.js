@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
-export async function POST(request: NextRequest){
+export async function POST(request){
     try {
         const formData = await request.formData();
         const pdfFile = formData.get('pdfFile');
