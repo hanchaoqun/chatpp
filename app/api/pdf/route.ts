@@ -15,7 +15,7 @@ export async function POST(request: NextRequest){
 
         return NextResponse.json(parsedPdf);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
+        return NextResponse.json({ error: 'PDF parse error!' }, { status: 400 });
     }
 }
 
