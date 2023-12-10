@@ -221,6 +221,7 @@ export function PromptHints(props: {
 function ChatAction(props: {
   text: string;
   icon: JSX.Element;
+  nodark: boolean = false;
   onClick: () => void;
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
@@ -257,9 +258,15 @@ function ChatAction(props: {
         } as React.CSSProperties
       }
     >
-      <div ref={iconRef} className={chatStyle["icon"]}>
-        {props.icon}
-      </div>
+      { props.nodark ? 
+          <div ref={iconRef} className={`${chatStyle["icon"]} no-dark`}>
+            {props.icon}
+          </div>
+          :
+          <div ref={iconRef} className={chatStyle["icon"]}>
+          {props.icon}
+          </div>
+      }
       <div className={chatStyle["text"]} ref={textRef}>
         {props.text}
       </div>
@@ -333,6 +340,9 @@ function uploadPDF(onPDFload: (value: string) => void) {
                 onPDFload(prevValue)
             }
             if(file) reader.readAsText(file)
+        }
+        if (index === files.length - 1 && prevValue.length <= 0) {
+          onPDFload("No PDF file load!")
         }
     })
   }
@@ -444,6 +454,7 @@ export function ChatActions(props: {
             onClick={() => uploadPDF(props.onPDFload)}
             text={"LoadPDF"}
             icon={<PdfIcon />}
+            nodark={true}
           />
       </div>
       
