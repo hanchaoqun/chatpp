@@ -350,10 +350,17 @@ function uploadPDF(onPDFload: (value: string) => void, scrollToBottom:() => void
               const result = reader.result ?? ""
               const text = typeof result === "string" ? result.trim() : "";
               prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
+              if (prevValue.length <= 0) {
+                onPDFload("Text file is empty!")
+                scrollToBottom()
+              } else {
                 onPDFload(prevValue)
                 scrollToBottom()
+              }
             }
-            if(file) reader.readAsText(file)
+            if(file) {
+              reader.readAsText(file)
+            }
         }
         if (index === files.length - 1 && prevValue.length <= 0) {
           onPDFload("No PDF file load!")
