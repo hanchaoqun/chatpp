@@ -303,21 +303,24 @@ const getParsedPdf = async(formData:FormData) => {
       method: "POST",
       body: formData
   })
-  .then(res => res.status === 400 ? "" : res.json())
+  .then(res => res.status === 400 ? {text:'PDF read error!'} : res.json())
   .catch(err => console.log(err))
 
   return response
 }
 
-function uploadPDF(onPDFload: (value: string) => void) {
+function uploadPDF(onPDFload: (value: string) => void, scrollToBottom:() => void) {
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
   fileInput.accept = '.txt, .pdf'
   fileInput.multiple = true
   fileInput.formEnctype = "multipart/form-data"
   fileInput.onchange = _ => {
-    onPDFload('')
+    onPDFload('Reading...')
+    scrollToBottom()
     if (fileInput.files == null) {
+      onPDFload('No file selected!')
+      scrollToBottom()
       return
     }
     const files =  Array.from(fileInput.files)
@@ -326,13 +329,20 @@ function uploadPDF(onPDFload: (value: string) => void) {
         if(file.type === "application/pdf") {
             if(file.size > 5242880) {
               onPDFload("PDF file size > 5M!")
+              scrollToBottom()
               return
             }
             const formData = new FormData()
             formData.append("pdfFile", file)
             const extractedText = await getParsedPdf(formData).then(res => res.text)
             prevValue = `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`
-            onPDFload(prevValue)
+            if (prevValue.length <= 0) {
+              onPDFload("PDF file is empty!")
+              scrollToBottom()
+            } else {
+              onPDFload(prevValue)
+              scrollToBottom()
+            }
         }
         else{
             const reader = new FileReader()
@@ -340,12 +350,21 @@ function uploadPDF(onPDFload: (value: string) => void) {
               const result = reader.result ?? ""
               const text = typeof result === "string" ? result.trim() : "";
               prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
+              if (prevValue.length <= 0) {
+                onPDFload("Text file is empty!")
+                scrollToBottom()
+              } else {
                 onPDFload(prevValue)
+                scrollToBottom()
+              }
             }
-            if(file) reader.readAsText(file)
+            if(file) {
+              reader.readAsText(file)
+            }
         }
         if (index === files.length - 1 && prevValue.length <= 0) {
           onPDFload("No PDF file load!")
+          scrollToBottom()
         }
     })
   }
@@ -460,7 +479,7 @@ export function ChatActions(props: {
       
       <div className={chatStyle["group-right"]}>
           <ChatAction
-            onClick={() => uploadPDF(props.onPDFload)}
+            onClick={() => uploadPDF(props.onPDFload,props.scrollToBottom)}
             text={"LoadPDF"}
             icon={<PdfIcon />}
             nodark={true}
@@ -734,7 +753,11 @@ export function Chat() {
   }, []);
 
   const onPDFload = (text:string) => {
-    setPDFInput(text);
+    let intext:string = text;
+    if (intext.length <= 0) {
+      intext = "Nothing read!";
+    }
+    setPDFInput(intext);
   }
 
   return (
