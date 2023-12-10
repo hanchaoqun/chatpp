@@ -442,7 +442,7 @@ export function ChatActions(props: {
       <div className={chatStyle["group-right"]}>
           <ChatAction
             onClick={() => uploadPDF(props.onPDFload)}
-            text={currentModel}
+            text={"LoadPDF"}
             icon={<PdfIcon />}
           />
       </div>
@@ -554,11 +554,13 @@ export function Chat() {
 
   // submit user input
   const onUserSubmit = () => {
-    if (userInput.length <= 0) return;
+    if (userInput.length <= 0 && pdfInput.length <= 0) return;
+    let inputText:string = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
     setIsLoading(true);
-    chatStore.onUserInput(userInput??'').then(() => setIsLoading(false));
-    setBeforeInput(userInput);
+    chatStore.onUserInput(inputText??'').then(() => setIsLoading(false));
+    setBeforeInput(inputText);
     setUserInput("");
+    setPDFInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
@@ -671,7 +673,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: "---\n```".concat(pdfInput).concat("```\n---\n").concat(userInput),
+                content: "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput),
               }),
               preview: true,
             },
