@@ -316,9 +316,11 @@ function uploadPDF(onPDFload: (value: string) => void, scrollToBottom:() => void
   fileInput.multiple = true
   fileInput.formEnctype = "multipart/form-data"
   fileInput.onchange = _ => {
-    onPDFload('')
+    onPDFload('Reading...')
     scrollToBottom()
     if (fileInput.files == null) {
+      onPDFload('No file selected!')
+      scrollToBottom()
       return
     }
     const files =  Array.from(fileInput.files)
@@ -334,8 +336,13 @@ function uploadPDF(onPDFload: (value: string) => void, scrollToBottom:() => void
             formData.append("pdfFile", file)
             const extractedText = await getParsedPdf(formData).then(res => res.text)
             prevValue = `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`
-            onPDFload(prevValue)
-            scrollToBottom()
+            if (prevValue.length <= 0) {
+              onPDFload("PDF file is empty!")
+              scrollToBottom()
+            } else {
+              onPDFload(prevValue)
+              scrollToBottom()
+            }
         }
         else{
             const reader = new FileReader()
