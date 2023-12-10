@@ -900,6 +900,7 @@ export function Chat() {
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
+          onPDFload={onPDFload}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {
