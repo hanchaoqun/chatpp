@@ -555,7 +555,10 @@ export function Chat() {
   // submit user input
   const onUserSubmit = () => {
     if (userInput.length <= 0 && pdfInput.length <= 0) return;
-    let inputText:string = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
+    let inputText:string = userInput;
+    if (pdfInput.length > 0) {
+      inputText = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
+    }
     setIsLoading(true);
     chatStore.onUserInput(inputText??'').then(() => setIsLoading(false));
     setBeforeInput(inputText);
