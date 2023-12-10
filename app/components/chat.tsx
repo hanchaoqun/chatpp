@@ -221,7 +221,7 @@ export function PromptHints(props: {
 function ChatAction(props: {
   text: string;
   icon: JSX.Element;
-  nodark: boolean = false;
+  nodark: boolean;
   onClick: () => void;
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
@@ -405,6 +405,7 @@ export function ChatActions(props: {
               onClick={stopAll}
               text={"Stop"}
               icon={<StopIcon />}
+              nodark={false}
             />
           )}
           {!props.hitBottom && (
@@ -412,6 +413,7 @@ export function ChatActions(props: {
               onClick={props.scrollToBottom}
               text={"ToBottom"}
               icon={<BottomIcon />}
+              nodark={false}
             />
           )}
           {props.hitBottom && (
@@ -419,6 +421,7 @@ export function ChatActions(props: {
               onClick={props.showPromptModal}
               text={"Settings"}
               icon={<BrainIcon />}
+              nodark={false}
             />
           )}
     
@@ -434,18 +437,21 @@ export function ChatActions(props: {
                 ) : null}
               </>
             }
+            nodark={false}
           />
 
           <ChatAction
             onClick={props.showPromptHints}
             text={"Prompts"}
             icon={<PromptIcon />}
+            nodark={false}
           />
     
           <ChatAction
             onClick={() => setShowModelSelector(true)}
             text={currentModel}
             icon={<MenuIcon />}
+            nodark={false}
           />
       </div>
       
