@@ -324,7 +324,10 @@ function uploadPDF(onPDFload: (value: string) => void) {
     let prevValue:string = ''
     files.forEach(async(file, index)=> {
         if(file.type === "application/pdf") {
-            if(file.size > 5242880) return
+            if(file.size > 5242880) {
+              onPDFload("PDF file size > 5M!")
+              return
+            }
             const formData = new FormData()
             formData.append("pdfFile", file)
             const extractedText = await getParsedPdf(formData).then(res => res.text)
