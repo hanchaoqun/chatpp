@@ -318,12 +318,12 @@ function uploadPDF(onPDFload: (value: string) => void) {
               const formData = new FormData()
               formData.append("pdfFile", file)
               const extractedText = await getParsedPdf(formData).then(res => res.text)
-              onPDFload(prevValue => `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`)
+              onPDFload((prevValue:string) => `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`)
           }
           else{
               const reader = new FileReader()
               reader.onload = () => {
-                  onPDFload(prevValue => `${prevValue}${index > 0 ? "\n" : ""}${reader.result.trim()}`)
+                  onPDFload((prevValue:string) => `${prevValue}${index > 0 ? "\n" : ""}${reader.result.trim()}`)
               }
               if(file) reader.readAsText(file)
           }
