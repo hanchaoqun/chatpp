@@ -303,7 +303,7 @@ const getParsedPdf = async(formData:FormData) => {
       method: "POST",
       body: formData
   })
-  .then(res => res.status === 400 ? "" : res.json())
+  .then(res => res.status === 400 ? {text:'PDF read error!'} : res.json())
   .catch(err => console.log(err))
 
   return response
@@ -739,7 +739,11 @@ export function Chat() {
   }, []);
 
   const onPDFload = (text:string) => {
-    setPDFInput(text);
+    let intext:string = text;
+    if (intext.length <= 0) {
+      intext = "Nothing read!";
+    }
+    setPDFInput(intext);
   }
 
   return (
