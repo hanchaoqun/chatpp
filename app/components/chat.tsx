@@ -309,7 +309,7 @@ const getParsedPdf = async(formData:FormData) => {
   return response
 }
 
-function uploadPDF(onPDFload: (value: string) => void) {
+function uploadPDF(onPDFload: (value: string) => void, scrollToBottom:() => void) {
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
   fileInput.accept = '.txt, .pdf'
@@ -317,6 +317,7 @@ function uploadPDF(onPDFload: (value: string) => void) {
   fileInput.formEnctype = "multipart/form-data"
   fileInput.onchange = _ => {
     onPDFload('')
+    scrollToBottom()
     if (fileInput.files == null) {
       return
     }
@@ -326,6 +327,7 @@ function uploadPDF(onPDFload: (value: string) => void) {
         if(file.type === "application/pdf") {
             if(file.size > 5242880) {
               onPDFload("PDF file size > 5M!")
+              scrollToBottom()
               return
             }
             const formData = new FormData()
@@ -333,6 +335,7 @@ function uploadPDF(onPDFload: (value: string) => void) {
             const extractedText = await getParsedPdf(formData).then(res => res.text)
             prevValue = `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`
             onPDFload(prevValue)
+            scrollToBottom()
         }
         else{
             const reader = new FileReader()
@@ -341,11 +344,13 @@ function uploadPDF(onPDFload: (value: string) => void) {
               const text = typeof result === "string" ? result.trim() : "";
               prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
                 onPDFload(prevValue)
+                scrollToBottom()
             }
             if(file) reader.readAsText(file)
         }
         if (index === files.length - 1 && prevValue.length <= 0) {
           onPDFload("No PDF file load!")
+          scrollToBottom()
         }
     })
   }
@@ -460,7 +465,7 @@ export function ChatActions(props: {
       
       <div className={chatStyle["group-right"]}>
           <ChatAction
-            onClick={() => uploadPDF(props.onPDFload)}
+            onClick={() => uploadPDF(props.onPDFload,props.scrollToBottom)}
             text={"LoadPDF"}
             icon={<PdfIcon />}
             nodark={true}
