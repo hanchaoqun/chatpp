@@ -326,7 +326,9 @@ function uploadPDF(onPDFload: (value: string) => void) {
         else{
             const reader = new FileReader()
             reader.onload = () => {
-              prevValue = `${prevValue}${index > 0 ? "\n" : ""}${reader.result.trim()}`
+              // 使用空值合并运算符为 null/undefined 的情况提供一个默认值
+              const text = (reader.result?.trim()) ?? "";
+              prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
                 onPDFload(prevValue)
             }
             if(file) reader.readAsText(file)
