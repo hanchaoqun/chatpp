@@ -94,12 +94,14 @@ export function SideBar(props: { className?: string }) {
     if (!accessStore.isLogin()) {
       router.push("/login");
     }
+    /*
     accessStore.fetchUserCount()
       .then((count) => {
         setUserCount(count);
         accessStore.updateUserCount(count);
       });
-  }, [accessStore, router]);
+      */
+  }, [router]);
 
   const getAccessType = useMemo(
     () => accessStore.getAccessType(),
