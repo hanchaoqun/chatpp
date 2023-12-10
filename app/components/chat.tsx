@@ -290,10 +290,50 @@ function useScrollToBottom() {
   };
 }
 
+const getParsedPdf = async(formData:FormData) => {
+  const response = await fetch("/api/pdf",{
+      method: "POST",
+      body: formData
+  })
+  .then(res => res.status === 400 ? "" : res.json())
+  .catch(err => console.log(err))
+
+  return response
+}
+
+function uploadPDF(onPDFload: (value: string) => void) {
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = '.txt, .pdf'
+  fileInput.multiple = true
+  fileInput.formEnctype = "multipart/form-data"
+  fileInput.onchange = _ => {
+      const files =  Array.from(fileInput.files)
+      files.forEach(async(file, index)=> {
+          if(file.type === "application/pdf") {
+              if(file.size > 5242880) return
+              const formData = new FormData()
+              formData.append("pdfFile", file)
+              const extractedText = await getParsedPdf(formData).then(res => res.text)
+              onPDFload(prevValue => `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`)
+          }
+          else{
+              const reader = new FileReader()
+              reader.onload = () => {
+                  onPDFload(prevValue => `${prevValue}${index > 0 ? "\n" : ""}${reader.result.trim()}`)
+              }
+              if(file) reader.readAsText(file)
+          }
+      })
+  }
+  fileInput.click()
+}
+
 export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
+  onPDFload: (text:string) => void;
   hitBottom: boolean;
 }) {
   const config = useAppConfig();
@@ -390,6 +430,11 @@ export function ChatActions(props: {
       </div>
       
       <div className={chatStyle["group-right"]}>
+          <ChatAction
+            onClick={() => uploadPDF(props.onPDFload)}
+            text={currentModel}
+            icon={<MenuIcon />}
+          />
       </div>
       
       {showModelSelector && (
@@ -428,6 +473,7 @@ export function Chat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
   const [beforeInput, setBeforeInput] = useState("");
+  const [pdfInput, setPDFInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { submitKey, shouldSubmit } = useSubmitHandler();
   const { scrollRef, setAutoScroll, scrollToBottom } = useScrollToBottom();
@@ -610,6 +656,19 @@ export function Chat() {
         : [],
     )
     .concat(
+      pdfInput.length > 0
+        ? [
+            {
+              ...createMessage({
+                role: "user",
+                content: "---\n```".concat(pdfInput).concat("```\n---\n").concat(userInput),
+              }),
+              preview: true,
+            },
+          ]
+        : [],
+    )
+    .concat(
       userInput.length > 0 && config.sendPreviewBubble
         ? [
             {
@@ -638,6 +697,10 @@ export function Chat() {
     inputRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onPDFload = (text:string) => {
+    setPDFInput(text);
+  }
 
   return (
     <div className={styles.chat} key={session.id}>
