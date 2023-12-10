@@ -308,26 +308,30 @@ function uploadPDF(onPDFload: (value: string) => void) {
   fileInput.multiple = true
   fileInput.formEnctype = "multipart/form-data"
   fileInput.onchange = _ => {
-      if (fileInput.files == null) {
-        return
-      }
-      const files =  Array.from(fileInput.files)
-      files.forEach(async(file, index)=> {
-          if(file.type === "application/pdf") {
-              if(file.size > 5242880) return
-              const formData = new FormData()
-              formData.append("pdfFile", file)
-              const extractedText = await getParsedPdf(formData).then(res => res.text)
-              onPDFload((prevValue:string) => `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`)
-          }
-          else{
-              const reader = new FileReader()
-              reader.onload = () => {
-                  onPDFload((prevValue:string) => `${prevValue}${index > 0 ? "\n" : ""}${reader.result.trim()}`)
-              }
-              if(file) reader.readAsText(file)
-          }
-      })
+    onPDFload('')
+    if (fileInput.files == null) {
+      return
+    }
+    const files =  Array.from(fileInput.files)
+    let prevValue:string = ''
+    files.forEach(async(file, index)=> {
+        if(file.type === "application/pdf") {
+            if(file.size > 5242880) return
+            const formData = new FormData()
+            formData.append("pdfFile", file)
+            const extractedText = await getParsedPdf(formData).then(res => res.text)
+            prevValue = `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`
+            onPDFload(prevValue)
+        }
+        else{
+            const reader = new FileReader()
+            reader.onload = () => {
+              prevValue = `${prevValue}${index > 0 ? "\n" : ""}${reader.result.trim()}`
+                onPDFload(prevValue)
+            }
+            if(file) reader.readAsText(file)
+        }
+    })
   }
   fileInput.click()
 }
