@@ -221,6 +221,7 @@ export function PromptHints(props: {
 function ChatAction(props: {
   text: string;
   icon: JSX.Element;
+  nodark: boolean;
   onClick: () => void;
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
@@ -257,9 +258,15 @@ function ChatAction(props: {
         } as React.CSSProperties
       }
     >
-      <div ref={iconRef} className={chatStyle["icon"]}>
-        {props.icon}
-      </div>
+      { props.nodark ? 
+          <div ref={iconRef} className={`${chatStyle["icon"]} no-dark`}>
+            {props.icon}
+          </div>
+          :
+          <div ref={iconRef} className={chatStyle["icon"]}>
+          {props.icon}
+          </div>
+      }
       <div className={chatStyle["text"]} ref={textRef}>
         {props.text}
       </div>
@@ -317,7 +324,10 @@ function uploadPDF(onPDFload: (value: string) => void) {
     let prevValue:string = ''
     files.forEach(async(file, index)=> {
         if(file.type === "application/pdf") {
-            if(file.size > 5242880) return
+            if(file.size > 5242880) {
+              onPDFload("PDF file size > 5M!")
+              return
+            }
             const formData = new FormData()
             formData.append("pdfFile", file)
             const extractedText = await getParsedPdf(formData).then(res => res.text)
@@ -333,6 +343,9 @@ function uploadPDF(onPDFload: (value: string) => void) {
                 onPDFload(prevValue)
             }
             if(file) reader.readAsText(file)
+        }
+        if (index === files.length - 1 && prevValue.length <= 0) {
+          onPDFload("No PDF file load!")
         }
     })
   }
@@ -395,6 +408,7 @@ export function ChatActions(props: {
               onClick={stopAll}
               text={"Stop"}
               icon={<StopIcon />}
+              nodark={false}
             />
           )}
           {!props.hitBottom && (
@@ -402,6 +416,7 @@ export function ChatActions(props: {
               onClick={props.scrollToBottom}
               text={"ToBottom"}
               icon={<BottomIcon />}
+              nodark={false}
             />
           )}
           {props.hitBottom && (
@@ -409,6 +424,7 @@ export function ChatActions(props: {
               onClick={props.showPromptModal}
               text={"Settings"}
               icon={<BrainIcon />}
+              nodark={false}
             />
           )}
     
@@ -424,18 +440,21 @@ export function ChatActions(props: {
                 ) : null}
               </>
             }
+            nodark={false}
           />
 
           <ChatAction
             onClick={props.showPromptHints}
             text={"Prompts"}
             icon={<PromptIcon />}
+            nodark={false}
           />
     
           <ChatAction
             onClick={() => setShowModelSelector(true)}
             text={currentModel}
             icon={<MenuIcon />}
+            nodark={false}
           />
       </div>
       
@@ -444,6 +463,7 @@ export function ChatActions(props: {
             onClick={() => uploadPDF(props.onPDFload)}
             text={"LoadPDF"}
             icon={<PdfIcon />}
+            nodark={true}
           />
       </div>
       
