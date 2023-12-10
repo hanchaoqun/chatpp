@@ -308,6 +308,9 @@ function uploadPDF(onPDFload: (value: string) => void) {
   fileInput.multiple = true
   fileInput.formEnctype = "multipart/form-data"
   fileInput.onchange = _ => {
+      if (fileInput.files == null) {
+        return
+      }
       const files =  Array.from(fileInput.files)
       files.forEach(async(file, index)=> {
           if(file.type === "application/pdf") {
