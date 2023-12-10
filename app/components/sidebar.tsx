@@ -99,12 +99,12 @@ export function SideBar(props: { className?: string }) {
         setUserCount(count);
         accessStore.updateUserCount(count);
       });
-  }, []);
+  }, [accessStore, router]);
 
   const getAccessType = useMemo(
     () => accessStore.getAccessType(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [accessStore],
   );
 
   // drag side bar

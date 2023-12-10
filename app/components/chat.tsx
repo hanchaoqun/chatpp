@@ -1,6 +1,5 @@
 import { useDebouncedCallback } from "use-debounce";
 import { memo, useState, useRef, useMemo, useEffect, useLayoutEffect } from "react";
-
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import ExportIcon from "../icons/share.svg";
@@ -14,12 +13,11 @@ import MaxIcon from "../icons/max.svg";
 import MenuIcon from "../icons/menu.svg";
 import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
-
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
-
+import PdfIcon from "../icons/pdf.svg";
 import {
   ALL_MODELS,
   Message,
@@ -35,7 +33,6 @@ import {
   ModelType,
   DEFAULT_TOPIC,
 } from "../store";
-
 import {
   copyToClipboard,
   downloadAs,
@@ -43,17 +40,13 @@ import {
   autoGrowTextArea,
   useMobileScreen,
 } from "../utils";
-
 import dynamic from "next/dynamic";
-
 import { ControllerPool } from "../requests";
 import { Prompt, usePromptStore } from "../store/prompt";
 import Locale from "../locales";
-
 import { IconButton } from "./button";
 import styles from "./home.module.scss";
 import chatStyle from "./chat.module.scss";
-
 import { ListItem, Modal, Selector, showModal } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
@@ -78,8 +71,8 @@ function exportMessages(messages: Message[], topic: string) {
     messages
       .map((m) => {
         return m.role === "user"
-          ? `## ${Locale.Export.MessageFromYou}:\n${m.content}`
-          : `## ${Locale.Export.MessageFromChatGPT}:\n${m.content.trim()}`;
+          ? `## ${Locale.Export.MessageFromYou}:\n${m.content ?? ''}`
+          : `## ${Locale.Export.MessageFromChatGPT}:\n${m.content ?? ''}`;
       })
       .join("\n\n");
   const filename = `${topic}.md`;
@@ -298,10 +291,59 @@ function useScrollToBottom() {
   };
 }
 
+const getParsedPdf = async(formData:FormData) => {
+  const response = await fetch("/api/pdf",{
+      method: "POST",
+      body: formData
+  })
+  .then(res => res.status === 400 ? "" : res.json())
+  .catch(err => console.log(err))
+
+  return response
+}
+
+function uploadPDF(onPDFload: (value: string) => void) {
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = '.txt, .pdf'
+  fileInput.multiple = true
+  fileInput.formEnctype = "multipart/form-data"
+  fileInput.onchange = _ => {
+    onPDFload('')
+    if (fileInput.files == null) {
+      return
+    }
+    const files =  Array.from(fileInput.files)
+    let prevValue:string = ''
+    files.forEach(async(file, index)=> {
+        if(file.type === "application/pdf") {
+            if(file.size > 5242880) return
+            const formData = new FormData()
+            formData.append("pdfFile", file)
+            const extractedText = await getParsedPdf(formData).then(res => res.text)
+            prevValue = `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`
+            onPDFload(prevValue)
+        }
+        else{
+            const reader = new FileReader()
+            reader.onload = () => {
+              const result = reader.result ?? ""
+              const text = typeof result === "string" ? result.trim() : "";
+              prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
+                onPDFload(prevValue)
+            }
+            if(file) reader.readAsText(file)
+        }
+    })
+  }
+  fileInput.click()
+}
+
 export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
+  onPDFload: (text:string) => void;
   hitBottom: boolean;
 }) {
   const config = useAppConfig();
@@ -398,6 +440,11 @@ export function ChatActions(props: {
       </div>
       
       <div className={chatStyle["group-right"]}>
+          <ChatAction
+            onClick={() => uploadPDF(props.onPDFload)}
+            text={"LoadPDF"}
+            icon={<PdfIcon />}
+          />
       </div>
       
       {showModelSelector && (
@@ -436,6 +483,7 @@ export function Chat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
   const [beforeInput, setBeforeInput] = useState("");
+  const [pdfInput, setPDFInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { submitKey, shouldSubmit } = useSubmitHandler();
   const { scrollRef, setAutoScroll, scrollToBottom } = useScrollToBottom();
@@ -462,7 +510,7 @@ export function Chat() {
   const onPromptSelect = (prompt: Prompt) => {
     setPromptHints([]);
     inputRef.current?.focus();
-    setUserInput(prompt.content);
+    setUserInput(prompt.content??'');
   };
 
   // auto grow input
@@ -506,11 +554,13 @@ export function Chat() {
 
   // submit user input
   const onUserSubmit = () => {
-    if (userInput.length <= 0) return;
+    if (userInput.length <= 0 && pdfInput.length <= 0) return;
+    let inputText:string = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
-    setBeforeInput(userInput);
+    chatStore.onUserInput(inputText??'').then(() => setIsLoading(false));
+    setBeforeInput(inputText);
     setUserInput("");
+    setPDFInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
@@ -537,7 +587,7 @@ export function Chat() {
   const onRightClick = (e: any, message: Message) => {
     // auto fill user input
     if (message.role === "user") {
-      setUserInput(message.content);
+      setUserInput(message.content??'');
     }
 
     // copy to clipboard
@@ -582,7 +632,7 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content).then(() => setIsLoading(false));
+    chatStore.onUserInput(content??'').then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
@@ -618,6 +668,19 @@ export function Chat() {
         : [],
     )
     .concat(
+      pdfInput.length > 0
+        ? [
+            {
+              ...createMessage({
+                role: "user",
+                content: "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput),
+              }),
+              preview: true,
+            },
+          ]
+        : [],
+    )
+    .concat(
       userInput.length > 0 && config.sendPreviewBubble
         ? [
             {
@@ -646,6 +709,10 @@ export function Chat() {
     inputRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onPDFload = (text:string) => {
+    setPDFInput(text);
+  }
 
   return (
     <div className={styles.chat} key={session.id}>
@@ -729,11 +796,11 @@ export function Chat() {
           const showActions =
             !isUser &&
             i > 0 &&
-            !(message.preview || message.content.length === 0);
+            !(message.preview || message.content?.length == undefined || message.content?.length === 0);
           const showActionsUsr =
               isUser &&
               i > 0 &&
-              !(message.preview || message.content.length < 5);
+              !(message.preview || message.content?.length == undefined || message.content?.length < 5);
           const showTyping = message.preview || message.streaming;
 
           return (
@@ -802,15 +869,15 @@ export function Chat() {
                     </div>
                   )}
                   <Markdown
-                    content={message.content}
+                    content={message.content??''}
                     loading={
-                      (message.preview || message.content.length === 0) &&
+                      (message.preview || message.content?.length == undefined || message.content?.length === 0) &&
                       !isUser
                     }
                     onContextMenu={(e) => onRightClick(e, message)}
                     onDoubleClickCapture={() => {
                       if (!isMobileScreen) return;
-                      setUserInput(message.content);
+                      setUserInput(message.content??'');
                     }}
                     fontSize={fontSize}
                     parentRef={scrollRef}
@@ -836,6 +903,7 @@ export function Chat() {
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
+          onPDFload={onPDFload}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {

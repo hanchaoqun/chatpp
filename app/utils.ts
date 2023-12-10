@@ -6,13 +6,13 @@ export function trimTopic(topic: string) {
   return topic.replace(/[，。！？”“"、,.!?]*$/, "");
 }
 
-export async function copyToClipboard(text: string) {
+export async function copyToClipboard(text: string | undefined) {
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(text??'');
     showToast(Locale.Copy.Success);
   } catch (error) {
     const textArea = document.createElement("textarea");
-    textArea.value = text;
+    textArea.value = text??'';
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
@@ -91,14 +91,14 @@ export function isFirefox() {
   );
 }
 
-export function selectOrCopy(el: HTMLElement, content: string) {
+export function selectOrCopy(el: HTMLElement, content: string | undefined) {
   const currentSelection = window.getSelection();
 
   if (currentSelection?.type === "Range") {
     return false;
   }
 
-  copyToClipboard(content);
+  copyToClipboard(content??'');
 
   return true;
 }
