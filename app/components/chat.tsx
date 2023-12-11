@@ -311,6 +311,7 @@ const getParsedPdf = async(formData:FormData) => {
   return response
 }
 
+/*
 function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() => void) {
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
@@ -370,11 +371,94 @@ function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() => voi
   }
   fileInput.click()
 }
+*/
+
+async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() => void) {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.txt, .pdf';
+  fileInput.multiple = true;
+  fileInput.formEnctype = "multipart/form-data";
+  fileInput.onchange = async _ => {
+      onPDFsLoad('Reading...');
+      scrollToBottom();
+
+      if (fileInput.files == null) {
+          onPDFsLoad('No file selected!');
+          scrollToBottom();
+          return;
+      }
+
+      const files = Array.from(fileInput.files);
+      let prevValue:string = '';
+
+      for (const [index, file] of files.entries()) {
+          try {
+              if (file.type === "application/pdf") {
+                  if(file.size > 5242880) {
+                      onPDFsLoad("PDF file size > 5M!");
+                      scrollToBottom();
+                      return;
+                  }
+
+                  const formData = new FormData();
+                  formData.append("pdfFile", file);
+
+                  const result = await getParsedPdf(formData).then(res => res.text);
+                  const text = typeof result === "string" ? result.trim() : "";
+                  if (text.length <= 0) {
+                      onPDFsLoad("PDF file can't be read!");
+                      scrollToBottom();
+                      return;
+                  }
+                  prevValue = `${prevValue}${index > 0 && prevValue ? "\n" : ""}${text}`;
+              } else {
+                  const reader = new FileReader();
+
+                  // 通过新的 Promise 来处理读取
+                  const text = await new Promise<string>((resolve, reject) => {
+                      reader.onerror = () => {
+                          reject(new Error("Text file read error!"));
+                      };
+                      reader.onload = () => {
+                          resolve(reader.result as string);
+                      };
+                      reader.readAsText(file);
+                  });
+
+                  const trimmedText = text.trim();
+                  if (trimmedText.length <= 0) {
+                      onPDFsLoad("Text file can't be read!");
+                      scrollToBottom();
+                      return; 
+                  }
+                  prevValue = `${prevValue}${index > 0 && prevValue ? "\n" : ""}${trimmedText}`;
+              }
+
+              // 更新状态和滚动位置
+              onPDFsLoad(prevValue);
+              scrollToBottom();
+          } catch (error) {
+              // 错误处理
+              onPDFsLoad((error as Error).message);
+              scrollToBottom();
+          }
+      }
+
+      // 检查是否没有 PDF 被处理
+      if (prevValue.length <= 0) {
+          onPDFsLoad("No PDF or text file could be processed!");
+          scrollToBottom();
+      }
+  }
+  fileInput.click();
+}
 
 function isVisionModel(model:string) {
   return model.startsWith("gpt-4-vision");
 }
 
+/*
 function uploadImage(onImagesLoad: (images: string | ImageContent[]) => void, scrollToBottom:() => void) {
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
@@ -424,6 +508,64 @@ function uploadImage(onImagesLoad: (images: string | ImageContent[]) => void, sc
     })
   }
   fileInput.click()
+}
+*/
+
+async function uploadImage(
+  onImagesLoad: (images: string | ImageContent[]) => void,
+  scrollToBottom:() => void
+) {
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = 'image/jpeg,image/jpg,image/png'
+  fileInput.multiple = true
+  fileInput.onchange = async (_) => {
+    onImagesLoad('Reading...')
+    scrollToBottom()
+
+    const files = fileInput.files ? Array.from(fileInput.files) : [];
+    if (!files.length) {
+      onImagesLoad('No file selected!')
+      scrollToBottom()
+    } else {
+      let prevValue: ImageContent[] = [];
+      for (const file of files) {
+        if (file.size > 5242880) {
+          onImagesLoad("Image file size > 5M!")
+          scrollToBottom()
+          return
+        }
+        if (["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
+          const result = await readFileAsDataURL(file);
+          if (result) {
+            const imageContent = { type: "image_url", image_url: { url: result } };
+            prevValue.push(imageContent);
+          }
+        }
+      }
+      if (!prevValue.length) {
+        onImagesLoad("No valid images loaded!")
+      } else {
+        onImagesLoad(prevValue)
+      }
+      scrollToBottom()
+    }
+  }
+  fileInput.click()
+}
+
+function readFileAsDataURL(file: File): Promise<string | null> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => {
+      reader.abort();
+      resolve(null);
+    };
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 export function ChatActions(props: {
