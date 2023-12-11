@@ -311,68 +311,6 @@ const getParsedPdf = async(formData:FormData) => {
   return response
 }
 
-/*
-function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() => void) {
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file'
-  fileInput.accept = '.txt, .pdf'
-  fileInput.multiple = true
-  fileInput.formEnctype = "multipart/form-data"
-  fileInput.onchange = _ => {
-    onPDFsLoad('Reading...')
-    scrollToBottom()
-    if (fileInput.files == null) {
-      onPDFsLoad('No file selected!')
-      scrollToBottom()
-      return
-    }
-    const files =  Array.from(fileInput.files)
-    let prevValue:string = ''
-    files.forEach(async(file, index)=> {
-        if(file.type === "application/pdf") {
-            if(file.size > 5242880) {
-              onPDFsLoad("PDF file size > 5M!")
-              scrollToBottom()
-              return
-            }
-            const formData = new FormData()
-            formData.append("pdfFile", file)
-            const result = await getParsedPdf(formData).then(res => res.text)
-            const text = typeof result === "string" ? result.trim() : "";
-            if (text.length <= 0) {
-              onPDFsLoad("PDF file can't be read!")
-              scrollToBottom()
-              return
-            }
-            prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
-            onPDFsLoad(prevValue)
-            scrollToBottom()
-        } else {
-            const reader = new FileReader()
-            reader.onload = () => {
-              const result = reader.result ?? ""
-              const text = typeof result === "string" ? result.trim() : "";
-              if (text.length <= 0) {
-                onPDFsLoad("Text file can't be read!")
-                scrollToBottom()
-                return
-              }
-              prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
-              onPDFsLoad(prevValue)
-              scrollToBottom()
-            }
-            reader.readAsText(file)
-        }
-        if (index === files.length - 1 && prevValue.length <= 0) {
-          onPDFsLoad("No PDF file load!")
-          scrollToBottom()
-        }
-    })
-  }
-  fileInput.click()
-}
-*/
-
 async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() => void) {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
@@ -394,6 +332,9 @@ async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() 
 
       for (const [index, file] of files.entries()) {
           try {
+            
+              console.log(file);
+
               if (file.type === "application/pdf") {
                   if(file.size > 5242880) {
                       onPDFsLoad("PDF file size > 5M!");
@@ -458,59 +399,6 @@ function isVisionModel(model:string) {
   return model.startsWith("gpt-4-vision");
 }
 
-/*
-function uploadImage(onImagesLoad: (images: string | ImageContent[]) => void, scrollToBottom:() => void) {
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file'
-  fileInput.accept = 'image/jpeg,image/jpg,image/png'
-  fileInput.multiple = true
-  fileInput.formEnctype = "multipart/form-data"
-  fileInput.onchange = _ => {
-    onImagesLoad('Reading...')
-    scrollToBottom()
-    if (fileInput.files == null) {
-      onImagesLoad('No file selected!')
-      scrollToBottom()
-      return
-    }
-    const files =  Array.from(fileInput.files)
-    let prevValue:ImageContent[] = []
-    files.forEach(async(file, index)=> {
-        if(file.type === "image/jpeg" ||
-            file.type === "image/jpg" ||
-            file.type === "image/png" ) {
-            if(file.size > 5242880) {
-              onImagesLoad("Image file size > 5M!")
-              scrollToBottom()
-              return
-            }
-            const reader = new FileReader()
-            reader.onload = () => {
-              const result = reader.result ?? ""
-              const text = typeof result === "string" ? result.trim() : "";
-              if (text.length <= 0) {
-                onImagesLoad("Image file can't be read!")
-                scrollToBottom()
-                return
-              }
-              const imageUrl = { url: text } as ImageUrl;
-              const imageContent = { type: "image_url", image_url: imageUrl };
-              prevValue.push(imageContent)
-              onImagesLoad(prevValue)
-              scrollToBottom()
-            }
-            reader.readAsDataURL(file)
-        }
-        if (index === files.length - 1 && prevValue.length <= 0) {
-          onImagesLoad("No Image file load!")
-          scrollToBottom()
-        }
-    })
-  }
-  fileInput.click()
-}
-*/
-
 async function uploadImage(
   onImagesLoad: (images: string | ImageContent[]) => void,
   scrollToBottom:() => void
@@ -530,6 +418,9 @@ async function uploadImage(
     } else {
       let prevValue: ImageContent[] = [];
       for (const file of files) {
+
+        console.log(file);
+
         if (file.size > 5242880) {
           onImagesLoad("Image file size > 5M!")
           scrollToBottom()
@@ -1043,11 +934,15 @@ export function Chat() {
   const onImagesLoad = (images: string | ImageContent[]) => {
     const text = typeof images === "string" ? images : "";
     const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
-    if (text.length <= 0 && imgs.length <= 0) {
-      setImageInput("Nothing read!");
+    if (text.length > 0) {
+      setImageInput(text);
+      return;
+    }
+    if (imgs.length > 0) {
+      setImageInput(imgs);
       return
     }
-    setImageInput(images);
+    setImageInput("Nothing read!");
   }
 
   const clearImage = () => {
