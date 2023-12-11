@@ -830,7 +830,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: getImagesAndUserInput(imageInput, userInput),
+                content: "Image\n---\n".concat(getImagesInputAsText(imageInput)).concat("\n---\n\n").concat(userInput),
               }),
               preview: true,
               isPDF: false,
