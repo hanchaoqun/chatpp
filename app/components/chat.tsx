@@ -332,7 +332,7 @@ async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() 
 
       for (const [index, file] of files.entries()) {
           try {
-            
+
               console.log(file);
 
               if (file.type === "application/pdf") {
@@ -933,7 +933,7 @@ export function Chat() {
 
   const onImagesLoad = (images: string | ImageContent[]) => {
     const text = typeof images === "string" ? images : "";
-    const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
+    const imgs = Array.isArray(images) ? images : [] as ImageContent[];
     if (text.length > 0) {
       setImageInput(text);
       return;
