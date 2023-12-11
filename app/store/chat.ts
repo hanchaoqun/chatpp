@@ -20,21 +20,20 @@ import { useAccessStore, AccessType } from "./access";
 export type Message = ChatMessage & {
   date: string;
   tokens: number;
+  id?: number;
   streaming?: boolean;
   isError?: boolean;
-  id?: number;
   model?: ModelType;
   isImage?: boolean;
 };
 
 export function createMessage(override: Partial<Message>): Message {
   return {
-    id: Date.now(),
     date: new Date().toLocaleString(),
-    role: "user",
     tokens: 0,
+    id: Date.now(),
+    role: "user",
     content: "",
-    isImage: false,
     ...override,
   };
 }
@@ -49,15 +48,12 @@ export interface ChatStat {
 
 export interface ChatSession {
   id: number;
-
   topic: string;
-
   memoryPrompt: string;
   messages: Message[];
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
-
   mask: Mask;
 }
 
@@ -283,10 +279,10 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // make request
-        if (isImage) {
-          const imgctns = JSON.parse(userMessage.content??"") as ImageContent[];
-          userMessage.content = imgctns;
-        }
+        //if (isImage) {
+          //const imgctns = JSON.parse(userMessage.content??"") as ImageContent[];
+          //userMessage.content = imgctns;
+        //}
         const sendMessages = recentMessages.concat(userMessage);
         console.log("[User Input] ", sendMessages);
         requestChatStream(sendMessages, {
