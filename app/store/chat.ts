@@ -284,7 +284,7 @@ export const useChatStore = create<ChatStore>()(
 
         // make request
         if (isImage) {
-          const imgctns = JSON.parse(userMessage.content) as ImageContent[];
+          const imgctns = JSON.parse(userMessage.content??"") as ImageContent[];
           userMessage.content = imgctns;
         }
         const sendMessages = recentMessages.concat(userMessage);
