@@ -595,7 +595,7 @@ function getImagesAndUserInput(imageInput: string | ImageContent[], userInput: s
 }
 
 export function Chat() {
-  type RenderMessage = Message & { preview?: boolean };
+  type RenderMessage = Message & { preview?: boolean; isPDF?: boolean; isImage?: boolean; };
 
   const chatStore = useChatStore();
   const [session, sessionIndex] = useChatStore((state) => [
