@@ -19,6 +19,7 @@ import { countTokens } from "../tokens";
 import { useAccessStore, AccessType } from "./access";
 
 export type Message = ChatResponse & {
+  role?: string;
   date: string;
   tokens: number;
   streaming?: boolean;
