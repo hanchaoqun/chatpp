@@ -729,7 +729,7 @@ export function Chat() {
       setPDFInput("");
     }
     setIsLoading(true);
-    chatStore.onUserInput(inputText??'').then(() => setIsLoading(false));
+    chatStore.onUserInput(inputText??'', isVisionModel(currentModel)).then(() => setIsLoading(false));
     setBeforeInput(inputText);
     setUserInput("");
     setPromptHints([]);
@@ -799,11 +799,11 @@ export function Chat() {
     // find last user input message and resend
     const userIndex = findLastUserIndex(botMessageId);
     if (userIndex === null) return;
-
+    const currentModel = chatStore.currentSession().mask.modelConfig.model;
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content??'').then(() => setIsLoading(false));
+    chatStore.onUserInput(content??'', isVisionModel(currentModel)).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 

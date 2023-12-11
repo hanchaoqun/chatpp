@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { type ChatCompletionResponseMessage } from "openai";
+import type { ChatResponse } from "./api/openai/typing";
 import {
   ControllerPool,
   requestChatStream,
@@ -18,13 +18,14 @@ import { countTokens } from "../tokens";
 
 import { useAccessStore, AccessType } from "./access";
 
-export type Message = ChatCompletionResponseMessage & {
+export type Message = ChatResponse & {
   date: string;
   tokens: number;
   streaming?: boolean;
   isError?: boolean;
   id?: number;
   model?: ModelType;
+  isImage?: boolean;
 };
 
 export function createMessage(override: Partial<Message>): Message {
@@ -34,6 +35,7 @@ export function createMessage(override: Partial<Message>): Message {
     role: "user",
     tokens: 0,
     content: "",
+    isImage: false,
     ...override,
   };
 }
@@ -106,7 +108,7 @@ interface ChatStore {
   deleteSession: (index?: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: Message) => void;
-  onUserInput: (content: string) => Promise<void>;
+  onUserInput: (content: string, isImage: boolean) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: Message) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -256,8 +258,8 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content) {
-        const userMessage: Message = createMessage({
+      async onUserInput(content, isImage) {
+        let userMessage: Message = createMessage({
           role: "user",
           content,
         });
@@ -272,7 +274,6 @@ export const useChatStore = create<ChatStore>()(
         // get recent messages
         const usrMsgLength = content.length;
         const recentMessages = get().getMessagesWithMemory(usrMsgLength);
-        const sendMessages = recentMessages.concat(userMessage);
         const sessionIndex = get().currentSessionIndex;
         const messageIndex = get().currentSession().messages.length + 1;
 
@@ -283,6 +284,11 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // make request
+        if (isImage) {
+          const imgctns = JSON.parse(userMessage.content) as ImageContent[];
+          userMessage.content = imgctns;
+        }
+        const sendMessages = recentMessages.concat(userMessage);
         console.log("[User Input] ", sendMessages);
         requestChatStream(sendMessages, {
           onMessage(content, done) {
