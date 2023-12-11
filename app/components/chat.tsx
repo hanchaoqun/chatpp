@@ -789,6 +789,8 @@ export function Chat() {
     context.push(copiedHello);
   }
 
+  const currentModel = chatStore.currentSession().mask.modelConfig.model;
+
   // preview messages
   const messages = context
     .concat(session.messages as RenderMessage[])
