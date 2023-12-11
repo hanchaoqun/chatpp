@@ -60,6 +60,17 @@ export interface ChatSession {
   mask: Mask;
 }
 
+export interface ImageUrl {
+  url: string; 
+  detail?: "low" | "high" | "auto";
+}
+
+export interface ImageContent {
+  type: string;
+  text?: string;
+  image_url?: ImageUrl;
+}
+
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
 export const BOT_HELLO: Message = createMessage({
   role: "assistant",
