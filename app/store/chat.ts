@@ -257,6 +257,7 @@ export const useChatStore = create<ChatStore>()(
         let userMessage: Message = createMessage({
           role: "user",
           content,
+          isImage,
         });
 
         const botMessage: Message = createMessage({
@@ -266,9 +267,9 @@ export const useChatStore = create<ChatStore>()(
           model: useAppConfig.getState().modelConfig.model,
         });
 
-        // get recent messages
+        // get history messages
         const usrMsgLength = content.length;
-        const recentMessages = get().getMessagesWithMemory(usrMsgLength);
+        const historyMessages = get().getMessagesWithMemory(usrMsgLength);
         const sessionIndex = get().currentSessionIndex;
         const messageIndex = get().currentSession().messages.length + 1;
 
@@ -283,9 +284,10 @@ export const useChatStore = create<ChatStore>()(
           //const imgctns = JSON.parse(userMessage.content??"") as ImageContent[];
           //userMessage.content = imgctns;
         //}
-        const sendMessages = recentMessages.concat(userMessage);
-        console.log("[User Input] ", sendMessages);
-        requestChatStream(sendMessages, {
+        //const sendMessages = recentMessages.concat(userMessage);
+        console.log("[History Input] ", historyMessages);
+        console.log("[User Input] ", userMessage);
+        requestChatStream(historyMessages, userMessage, {
           onMessage(content, done) {
             // stream response
             if (done) {
