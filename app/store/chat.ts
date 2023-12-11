@@ -20,6 +20,7 @@ import { useAccessStore, AccessType } from "./access";
 
 export type Message = ChatResponse & {
   role?: string;
+  content: string | ImageContent[];
   date: string;
   tokens: number;
   streaming?: boolean;
