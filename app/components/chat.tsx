@@ -575,6 +575,11 @@ export function ChatActions(props: {
   );
 }
 
+function getImagesInputAsText(imageInput: string | ImageContent[]) : string {
+  const text = typeof imageInput === "string" ? imageInput : "";
+  return text;
+}
+
 function getImagesInput(imageInput: string | ImageContent[]) : ImageContent[] {
   const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
   return imgs;
@@ -827,6 +832,21 @@ export function Chat() {
               preview: true,
               isPDF: false,
               isImage: true,
+            },
+          ]
+        : [],
+    )
+    .concat(
+      getImagesInputAsText(imageInput).length > 0 && isVisionModel(currentModel)
+        ? [
+            {
+              ...createMessage({
+                role: "user",
+                content: "Image\n---\n".concat(getImagesInputAsText(imageInput)).concat("\n---\n\n").concat(userInput),
+              }),
+              preview: true,
+              isPDF: false,
+              isImage: false,
             },
           ]
         : [],
