@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { ChatRequest } from "../api/openai/typing";
 import {
   ControllerPool,
   requestChatStream,
@@ -16,9 +17,7 @@ import { countTokens } from "../tokens";
 
 import { useAccessStore, AccessType } from "./access";
 
-export type Message = {
-  role: string;
-  content: string;
+export type Message = ChatRequest & {
   date: string;
   tokens: number;
   streaming?: boolean;
