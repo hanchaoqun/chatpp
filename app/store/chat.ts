@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { ChatResponse } from "../api/openai/typing";
+import type { CreateChatCompletionResponse } from "openai";
 import {
   ControllerPool,
   requestChatStream,
@@ -18,7 +18,7 @@ import { countTokens } from "../tokens";
 
 import { useAccessStore, AccessType } from "./access";
 
-export type Message = ChatResponse & {
+export type Message = CreateChatCompletionResponse & {
   date: string;
   tokens: number;
   streaming?: boolean;
