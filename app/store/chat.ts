@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { ChatResponse } from "./api/openai/typing";
+import type { ChatResponse } from "../api/openai/typing";
 import {
   ControllerPool,
   requestChatStream,
