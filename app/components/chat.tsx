@@ -681,6 +681,7 @@ export function Chat() {
   // submit user input
   const onUserSubmit = () => {
     let inputText:string = "";
+    const currentModel = chatStore.currentSession().mask.modelConfig.model;
     if (isVisionModel(currentModel)) {
       const imgs:ImageContent[] = getImagesAndUserInput(imageInput, userInput);
       if (imgs.length <= 0) return;
