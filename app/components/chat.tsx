@@ -576,12 +576,12 @@ export function ChatActions(props: {
 }
 
 function getImagesInput(imageInput: string | ImageContent[]) : ImageContent[] {
-  const imgs = typeof imageInput === "ImageContent[]" ? imageInput : [] as ImageContent[];
+  const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
   return imgs;
 }
 
 function getImagesAndUserInput(imageInput: string | ImageContent[], userInput: string) : ImageContent[] {
-  let imgs = typeof imageInput === "ImageContent[]" ? imageInput : [] as ImageContent[];
+  let imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
   imgs.push({
       type: "text",
       text: userInput,
@@ -877,7 +877,7 @@ export function Chat() {
 
   const onImagesLoad = (images: string | ImageContent[]) => {
     const text = typeof images === "string" ? images : "";
-    const imgs = typeof images === "ImageContent[]" ? images : [] as ImageContent[];
+    const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
     if (text.length <= 0 && imgs.length <= 0) {
       setImageInput("Nothing read!");
       return
