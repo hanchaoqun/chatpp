@@ -18,9 +18,12 @@ import DarkIcon from "../icons/dark.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 import PdfIcon from "../icons/pdf.svg";
+import ImageIcon from "../icons/image.svg";
 import {
   ALL_MODELS,
   Message,
+  ImageUrl,
+  ImageContent,
   SubmitKey,
   useChatStore,
   BOT_HELLO,
@@ -70,7 +73,7 @@ function exportMessages(messages: Message[], topic: string) {
     `# ${topic}\n\n` +
     messages
       .map((m) => {
-        return m.role === "user"
+        return (m.role??'') === "user"
           ? `## ${Locale.Export.MessageFromYou}:\n${m.content ?? ''}`
           : `## ${Locale.Export.MessageFromChatGPT}:\n${m.content ?? ''}`;
       })
@@ -309,78 +312,168 @@ const getParsedPdf = async(formData:FormData) => {
   return response
 }
 
-function uploadPDF(onPDFload: (value: string) => void, scrollToBottom:() => void) {
+async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() => void) {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.txt, .pdf';
+  fileInput.multiple = true;
+  fileInput.formEnctype = "multipart/form-data";
+  fileInput.onchange = async _ => {
+      onPDFsLoad('Reading...');
+      scrollToBottom();
+
+      if (fileInput.files == null) {
+          onPDFsLoad('No file selected!');
+          scrollToBottom();
+          return;
+      }
+
+      const files = Array.from(fileInput.files);
+      let prevValue:string = '';
+
+      for (const [index, file] of files.entries()) {
+          try {
+
+              console.log(file);
+
+              if (file.type === "application/pdf") {
+                  if(file.size > 2097152) {
+                      onPDFsLoad("PDF file size > 2M!");
+                      scrollToBottom();
+                      return;
+                  }
+
+                  const formData = new FormData();
+                  formData.append("pdfFile", file);
+
+                  const result = await getParsedPdf(formData).then(res => res.text);
+                  const text = typeof result === "string" ? result.trim() : "";
+                  if (text.length <= 0) {
+                      onPDFsLoad("PDF file can't be read!");
+                      scrollToBottom();
+                      return;
+                  }
+                  prevValue = `${prevValue}${index > 0 && prevValue ? "\n" : ""}${text}`;
+              } else {
+                  const reader = new FileReader();
+
+                  // 通过新的 Promise 来处理读取
+                  const text = await new Promise<string>((resolve, reject) => {
+                      reader.onerror = () => {
+                          reject(new Error("Text file read error!"));
+                      };
+                      reader.onload = () => {
+                          resolve(reader.result as string);
+                      };
+                      reader.readAsText(file);
+                  });
+
+                  const trimmedText = text.trim();
+                  if (trimmedText.length <= 0) {
+                      onPDFsLoad("Text file can't be read!");
+                      scrollToBottom();
+                      return; 
+                  }
+                  prevValue = `${prevValue}${index > 0 && prevValue ? "\n" : ""}${trimmedText}`;
+              }
+
+              // 更新状态和滚动位置
+              onPDFsLoad(prevValue);
+              scrollToBottom();
+          } catch (error) {
+              // 错误处理
+              onPDFsLoad((error as Error).message);
+              scrollToBottom();
+          }
+      }
+
+      // 检查是否没有 PDF 被处理
+      if (prevValue.length <= 0) {
+          onPDFsLoad("No PDF or text file could be processed!");
+          scrollToBottom();
+      }
+  }
+  fileInput.click();
+}
+
+function isVisionModel(model:string) {
+  return model.startsWith("gpt-4-vision");
+}
+
+async function uploadImage(
+  onImagesLoad: (images: string | ImageContent[]) => void,
+  scrollToBottom:() => void
+) {
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
-  fileInput.accept = '.txt, .pdf'
+  fileInput.accept = 'image/jpeg,image/jpg,image/png'
   fileInput.multiple = true
-  fileInput.formEnctype = "multipart/form-data"
-  fileInput.onchange = _ => {
-    onPDFload('Reading...')
+  fileInput.onchange = async (_) => {
+    onImagesLoad('Reading...')
     scrollToBottom()
-    if (fileInput.files == null) {
-      onPDFload('No file selected!')
+
+    const files = fileInput.files ? Array.from(fileInput.files) : [];
+    if (!files.length) {
+      onImagesLoad('No file selected!')
       scrollToBottom()
-      return
-    }
-    const files =  Array.from(fileInput.files)
-    let prevValue:string = ''
-    files.forEach(async(file, index)=> {
-        if(file.type === "application/pdf") {
-            if(file.size > 5242880) {
-              onPDFload("PDF file size > 5M!")
-              scrollToBottom()
-              return
-            }
-            const formData = new FormData()
-            formData.append("pdfFile", file)
-            const extractedText = await getParsedPdf(formData).then(res => res.text)
-            prevValue = `${prevValue}${index > 0 ? "\n" : ""}${extractedText.trim()}`
-            if (prevValue.length <= 0) {
-              onPDFload("PDF file is empty!")
-              scrollToBottom()
-            } else {
-              onPDFload(prevValue)
-              scrollToBottom()
-            }
-        }
-        else{
-            const reader = new FileReader()
-            reader.onload = () => {
-              const result = reader.result ?? ""
-              const text = typeof result === "string" ? result.trim() : "";
-              prevValue = `${prevValue}${index > 0 ? "\n" : ""}${text}`
-              if (prevValue.length <= 0) {
-                onPDFload("Text file is empty!")
-                scrollToBottom()
-              } else {
-                onPDFload(prevValue)
-                scrollToBottom()
-              }
-            }
-            if(file) {
-              reader.readAsText(file)
-            }
-        }
-        if (index === files.length - 1 && prevValue.length <= 0) {
-          onPDFload("No PDF file load!")
+    } else {
+      let prevValue: ImageContent[] = [];
+      for (const file of files) {
+
+        console.log(file);
+
+        if (file.size > 2097152) {
+          onImagesLoad("Image file size > 2M!")
           scrollToBottom()
+          return
         }
-    })
+        if (["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
+          const result = await readFileAsDataURL(file);
+          if (result) {
+            const imageContent = { type: "image_url", image_url: { url: result, file_name: file.name } as ImageUrl } as ImageContent;
+            prevValue.push(imageContent);
+          }
+        }
+      }
+      if (!prevValue.length) {
+        onImagesLoad("No valid images loaded!")
+      } else {
+        onImagesLoad(prevValue)
+      }
+      scrollToBottom()
+    }
   }
   fileInput.click()
+}
+
+function readFileAsDataURL(file: File): Promise<string | null> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => {
+      reader.abort();
+      resolve(null);
+    };
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
-  onPDFload: (text:string) => void;
+  onPDFsLoad: (text:string) => void;
+  clearPDF: () => void;
+  onImagesLoad: (images: string | ImageContent[]) => void;
+  clearImage: () => void;
   hitBottom: boolean;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
   const chatStore = useChatStore();
+  const accessStoreState = useAccessStore.getState();
 
   // switch themes
   const theme = config.theme;
@@ -478,12 +571,37 @@ export function ChatActions(props: {
       </div>
       
       <div className={chatStyle["group-right"]}>
-          <ChatAction
-            onClick={() => uploadPDF(props.onPDFload,props.scrollToBottom)}
-            text={"LoadPDF"}
-            icon={<PdfIcon />}
-            nodark={true}
-          />
+        { !isVisionModel(currentModel) ?
+            <ChatAction
+              onClick={() => {
+                if ( !!accessStoreState.userCount?.usertype && accessStoreState.userCount?.usertype >= 1 ) {
+                  props.clearImage();
+                  uploadPDF(props.onPDFsLoad,props.scrollToBottom);
+                  return
+                }
+                props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
+                props.scrollToBottom();
+              }}
+              text={"LoadPDFs"}
+              icon={<PdfIcon />}
+              nodark={true}
+            />
+          :
+            <ChatAction
+              onClick={() => {
+                if ( !!accessStoreState.userCount?.usertype && accessStoreState.userCount?.usertype >= 1 ) {
+                  props.clearPDF();
+                  uploadImage(props.onImagesLoad,props.scrollToBottom);
+                  return
+                }
+                props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
+                props.scrollToBottom();
+              }}
+              text={"LoadImages"}
+              icon={<ImageIcon />}
+              nodark={true}
+            />
+        }
       </div>
       
       {showModelSelector && (
@@ -508,8 +626,33 @@ export function ChatActions(props: {
   );
 }
 
+function getImagesInputError(imageInput: string | ImageContent[]) : string {
+  const text = typeof imageInput === "string" ? imageInput : "";
+  return text;
+}
+
+function getImagesInputMarkDown(imageInput: string | ImageContent[]) : string {
+  const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
+  if (imgs.length == 0) {
+    return '';
+  }
+  const md = imgs.filter((m) => m.type === "image_url")
+                 .map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
+                 .join('\n');
+  return md;
+}
+
+function getImagesInputArray(imageInput: string | ImageContent[], userInput: string) : ImageContent[] {
+  let imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
+  imgs.push({
+      type: "text",
+      text: userInput,
+    } as ImageContent);
+  return imgs;
+}
+
 export function Chat() {
-  type RenderMessage = Message & { preview?: boolean };
+  type RenderMessage = Message & { preview?: boolean; isPDF?: boolean; isImage?: boolean; };
 
   const chatStore = useChatStore();
   const [session, sessionIndex] = useChatStore((state) => [
@@ -523,9 +666,10 @@ export function Chat() {
   const [userInput, setUserInput] = useState("");
   const [beforeInput, setBeforeInput] = useState("");
   const [pdfInput, setPDFInput] = useState("");
+  const [imageInput, setImageInput] = useState<string | ImageContent[]>("");
   const [isLoading, setIsLoading] = useState(false);
-  const { submitKey, shouldSubmit } = useSubmitHandler();
-  const { scrollRef, setAutoScroll, scrollToBottom } = useScrollToBottom();
+  const {submitKey, shouldSubmit } = useSubmitHandler();
+  const {scrollRef, setAutoScroll, scrollToBottom } = useScrollToBottom();
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
@@ -593,16 +737,25 @@ export function Chat() {
 
   // submit user input
   const onUserSubmit = () => {
-    if (userInput.length <= 0 && pdfInput.length <= 0) return;
-    let inputText:string = userInput;
-    if (pdfInput.length > 0) {
-      inputText = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
+    let inputText:string = "";
+    const currentModel = chatStore.currentSession().mask.modelConfig.model;
+    if (isVisionModel(currentModel)) {
+      const imgs:ImageContent[] = getImagesInputArray(imageInput, userInput);
+      if (imgs.length <= 0) return;
+      inputText = JSON.stringify(imgs);
+      setImageInput("");
+    } else {
+      if (userInput.length <= 0 && pdfInput.length <= 0) return;
+      inputText = userInput;
+      if (pdfInput.length > 0) {
+        inputText = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
+      }
+      setPDFInput("");
     }
     setIsLoading(true);
-    chatStore.onUserInput(inputText??'').then(() => setIsLoading(false));
+    chatStore.onUserInput(inputText??'', isVisionModel(currentModel)).then(() => setIsLoading(false));
     setBeforeInput(inputText);
     setUserInput("");
-    setPDFInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
@@ -670,16 +823,15 @@ export function Chat() {
     // find last user input message and resend
     const userIndex = findLastUserIndex(botMessageId);
     if (userIndex === null) return;
-
+    const currentModel = chatStore.currentSession().mask.modelConfig.model;
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore.onUserInput(content??'').then(() => setIsLoading(false));
+    chatStore.onUserInput(content??'', isVisionModel(currentModel)).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
   const context: RenderMessage[] = session.mask.context.slice();
-
   const accessStore = useAccessStore();
 
   if (
@@ -693,6 +845,8 @@ export function Chat() {
     context.push(copiedHello);
   }
 
+  const currentModel = chatStore.currentSession().mask.modelConfig.model;
+
   // preview messages
   const messages = context
     .concat(session.messages as RenderMessage[])
@@ -705,19 +859,53 @@ export function Chat() {
                 content: "……",
               }),
               preview: true,
+              isPDF: false,
+              isImage: false,
             },
           ]
         : [],
     )
     .concat(
-      pdfInput.length > 0
+      pdfInput.length > 0 && !isVisionModel(currentModel)
         ? [
             {
               ...createMessage({
                 role: "user",
-                content: "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput),
+                content: `PDF\n---\n${pdfInput}\n---\n\n${userInput}`,
               }),
               preview: true,
+              isPDF: true,
+              isImage: false,
+            },
+          ]
+        : [],
+    )
+    .concat(
+      getImagesInputError(imageInput).length > 0 && isVisionModel(currentModel)
+        ? [
+            {
+              ...createMessage({
+                role: "user",
+                content: `Image\n---\n${getImagesInputError(imageInput)}\n---\n\n${userInput}`,
+              }),
+              preview: true,
+              isPDF: false,
+              isImage: true,
+            },
+          ]
+        : [],
+    )
+    .concat(
+      getImagesInputMarkDown(imageInput).length > 0 && isVisionModel(currentModel)
+        ? [
+            {
+              ...createMessage({
+                role: "user",
+                content: `Image\n---\n${getImagesInputMarkDown(imageInput)}\n---\n\n${userInput}`,
+              }),
+              preview: true,
+              isPDF: false,
+              isImage: false,
             },
           ]
         : [],
@@ -731,6 +919,8 @@ export function Chat() {
                 content: userInput,
               }),
               preview: true,
+              isPDF: false,
+              isImage: false,
             },
           ]
         : [],
@@ -752,12 +942,34 @@ export function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onPDFload = (text:string) => {
+  const onPDFsLoad = (text:string) => {
     let intext:string = text;
     if (intext.length <= 0) {
       intext = "Nothing read!";
     }
     setPDFInput(intext);
+  }
+
+  const clearPDF = () => {
+    setPDFInput("");
+  }
+
+  const onImagesLoad = (images: string | ImageContent[]) => {
+    const text = typeof images === "string" ? images : "";
+    const imgs = Array.isArray(images) ? images : [] as ImageContent[];
+    if (text.length > 0) {
+      setImageInput(text);
+      return;
+    }
+    if (imgs.length > 0) {
+      setImageInput(imgs);
+      return
+    }
+    setImageInput("Nothing read!");
+  }
+
+  const clearImage = () => {
+    setImageInput("");
   }
 
   return (
@@ -949,7 +1161,10 @@ export function Chat() {
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
-          onPDFload={onPDFload}
+          onPDFsLoad={onPDFsLoad}
+          clearPDF={clearPDF}
+          onImagesLoad={onImagesLoad}
+          clearImage={clearImage}
           showPromptHints={() => {
             // Click again to close
             if (promptHints.length > 0) {

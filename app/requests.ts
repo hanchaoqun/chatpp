@@ -1,6 +1,7 @@
-import type { ChatRequest, ChatResponse } from "./api/openai/typing";
 import {
   Message,
+  ImageUrl,
+  ImageContent,
   ModelConfig,
   ModelType,
   useAccessStore,
@@ -12,14 +13,15 @@ import { showToast } from "./components/ui-lib";
 const TIME_OUT_MS = 60000;
 
 const makeRequestParam = (
-  messages: Message[],
+  historyMessages: Message[],
+  userMessage: Message,
   options?: {
     filterBot?: boolean;
     stream?: boolean;
     model?: ModelType;
   },
-): ChatRequest => {
-  let sendMessages = messages.map((v) => ({
+) => {
+  let sendMessages = historyMessages.map((v) => ({
     role: v.role,
     content: v.content,
   }));
@@ -38,8 +40,36 @@ const makeRequestParam = (
     modelConfig.model = options.model;
   }
 
+  if ((userMessage.isImage??false) === true) {
+      const userimgs = JSON.parse(userMessage.content) as ImageContent[];
+      let imgs = userimgs.filter((m) => m.type === "image_url").map((v) => ({
+        type: v.type,
+        image_url: {
+          url: v.image_url?.url,
+          detail: v.image_url?.detail,
+        },
+      }));
+      let texts = userimgs.filter((m) => m.type === "text").map((v) => ({
+        type: v.type,
+        text: v.text,
+      }));
+      return {
+        messages: [{
+          role: userMessage.role,
+          content: [...imgs, ...texts],
+        }],
+        stream: options?.stream,
+        model: modelConfig.model,
+        temperature: modelConfig.temperature,
+        presence_penalty: modelConfig.presence_penalty,
+        max_tokens: 4096,
+      };
+  }
   return {
-    messages: sendMessages,
+    messages: [...sendMessages, {
+      role: userMessage.role,
+      content: userMessage.content,
+    }],
     stream: options?.stream,
     model: modelConfig.model,
     temperature: modelConfig.temperature,
@@ -78,12 +108,13 @@ export function requestOpenaiClient(path: string) {
 }
 
 export async function requestChat(
-  messages: Message[],
+  historyMessages: Message[],
+  userMessage: Message,
   options?: {
     model?: ModelType;
   },
 ) {
-  const req: ChatRequest = makeRequestParam(messages, {
+  const req = makeRequestParam(historyMessages, userMessage, {
     filterBot: true,
     model: options?.model,
   });
@@ -91,7 +122,7 @@ export async function requestChat(
   const res = await requestOpenaiClient("v1/chat/completions")(req);
 
   try {
-    const response = (await res.json()) as ChatResponse;
+    const response = await res.json();
     return response;
   } catch (error) {
     console.error("[Request Chat] ", error, res.body);
@@ -149,7 +180,8 @@ export async function requestUsage() {
 }
 
 export async function requestChatStream(
-  messages: Message[],
+  historyMessages: Message[],
+  userMessage: Message,
   options?: {
     filterBot?: boolean;
     modelConfig?: ModelConfig;
@@ -161,7 +193,7 @@ export async function requestChatStream(
 ) {
   const accessStore = useAccessStore.getState();
 
-  const req = makeRequestParam(messages, {
+  const req = makeRequestParam(historyMessages, userMessage, {
     stream: true,
     filterBot: options?.filterBot,
     model: options?.model,
@@ -235,22 +267,20 @@ export async function requestChatStream(
 }
 
 export async function requestWithPrompt(
-  messages: Message[],
+  historyMessages: Message[],
   prompt: string,
   options?: {
     model?: ModelType;
   },
 ) {
-  messages = messages.concat([
-    {
+  const userMessage = {
       role: "user",
       content: prompt,
       date: new Date().toLocaleString(),
       tokens: 0,
-    },
-  ]);
+  };
 
-  const res = await requestChat(messages, options);
+  const res = await requestChat(historyMessages, userMessage, options);
 
   return res?.choices?.at(0)?.message?.content ?? "";
 }

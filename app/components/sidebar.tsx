@@ -85,9 +85,15 @@ export function SideBar(props: { className?: string }) {
   const accessStore = useAccessStore.getState();
   const username = accessStore.username;
   const [userCount, setUserCount] = useState<UserCount>();
+  const [userLevelName, setUserLevelName] = useState("");
   const router = useRouter();
   useEffect(() => {
     setUserCount(accessStore.userCount);
+    let usrTyName = (!!accessStore.userCount?.usertype && accessStore.userCount?.usertype >= 1)
+                    ? "PREMIUM" : "LOGOUT";
+    usrTyName = (!!accessStore.userCount?.usertype && accessStore.userCount?.usertype >= 2)
+                ? "PREMIUM+" : usrTyName;
+    setUserLevelName(usrTyName);
   }, [accessStore.userCount]);
 
   useEffect(() => {
@@ -127,6 +133,11 @@ export function SideBar(props: { className?: string }) {
       .then((count) => {
         setUserCount(count);
         accessStore.updateUserCount(count);
+        let usrTyName = (!!accessStore.userCount?.usertype && accessStore.userCount?.usertype >= 1)
+                ? "PREMIUM" : "LOGOUT";
+        usrTyName = (!!accessStore.userCount?.usertype && accessStore.userCount?.usertype >= 2)
+            ? "PREMIUM+" : usrTyName;
+        setUserLevelName(usrTyName);
       });
   }
 
@@ -152,7 +163,7 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 reverse={true}
                 icon={<LogoutIcon />}
-                text={shouldNarrow ? undefined : ((!!userCount?.usertype && userCount?.usertype >= 1)? "PREMIUM" : "LOGOUT")}
+                text={shouldNarrow ? undefined : userLevelName}
                 onClick={() => { logout() }}
                 shadow
               />

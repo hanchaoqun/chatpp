@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-import { type ChatCompletionResponseMessage } from "openai";
+import type { ChatMessage } from "../api/openai/typing";
 import {
   ControllerPool,
   requestChatStream,
@@ -18,21 +17,22 @@ import { countTokens } from "../tokens";
 
 import { useAccessStore, AccessType } from "./access";
 
-export type Message = ChatCompletionResponseMessage & {
+export type Message = ChatMessage & {
   date: string;
   tokens: number;
+  id?: number;
   streaming?: boolean;
   isError?: boolean;
-  id?: number;
   model?: ModelType;
+  isImage?: boolean;
 };
 
 export function createMessage(override: Partial<Message>): Message {
   return {
-    id: Date.now(),
     date: new Date().toLocaleString(),
-    role: "user",
     tokens: 0,
+    id: Date.now(),
+    role: "user",
     content: "",
     ...override,
   };
@@ -48,16 +48,25 @@ export interface ChatStat {
 
 export interface ChatSession {
   id: number;
-
   topic: string;
-
   memoryPrompt: string;
   messages: Message[];
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
-
   mask: Mask;
+}
+
+export interface ImageUrl {
+  url: string; 
+  detail?: "low" | "high" | "auto";
+  file_name?: string;
+}
+
+export interface ImageContent {
+  type: string;
+  text?: string;
+  image_url?: ImageUrl;
 }
 
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
@@ -95,7 +104,7 @@ interface ChatStore {
   deleteSession: (index?: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: Message) => void;
-  onUserInput: (content: string) => Promise<void>;
+  onUserInput: (content: string, isImage: boolean) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: Message) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -245,10 +254,11 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content) {
+      async onUserInput(content, isImage) {
         const userMessage: Message = createMessage({
           role: "user",
           content,
+          isImage,
         });
 
         const botMessage: Message = createMessage({
@@ -258,22 +268,39 @@ export const useChatStore = create<ChatStore>()(
           model: useAppConfig.getState().modelConfig.model,
         });
 
-        // get recent messages
+        // get history messages
         const usrMsgLength = content.length;
-        const recentMessages = get().getMessagesWithMemory(usrMsgLength);
-        const sendMessages = recentMessages.concat(userMessage);
+        const historyMessages = get().getMessagesWithMemory(usrMsgLength);
         const sessionIndex = get().currentSessionIndex;
         const messageIndex = get().currentSession().messages.length + 1;
 
         // save user's and bot's message
+        let saveUserMessage: Message = createMessage({
+              ...userMessage,
+            });
+        if (isImage) {
+          const userimgs = JSON.parse(userMessage.content) as ImageContent[];
+          let imgs  = userimgs.filter((m) => m.type === "image_url")
+                              .map((v) => `IMG:${v.image_url?.file_name??''}`)
+                              .join('\n');
+          let texts = userimgs.filter((m) => m.type === "text")
+                              .map((v) => v.text??'')
+                              .join('\n');
+          let saveimgs = '';
+          if (imgs.length > 0) {
+            saveimgs = `Image\n---\n${imgs}\n---\n\n`;
+          }
+          saveUserMessage.content = `${saveimgs}${texts}`;
+        }
         get().updateCurrentSession((session) => {
-          session.messages.push(userMessage);
+          session.messages.push(saveUserMessage);
           session.messages.push(botMessage);
         });
 
         // make request
-        console.log("[User Input] ", sendMessages);
-        requestChatStream(sendMessages, {
+        console.log("[History Input] ", historyMessages);
+        console.log("[User Input Save] ", saveUserMessage);
+        requestChatStream(historyMessages, userMessage, {
           onMessage(content, done) {
             // stream response
             if (done) {
@@ -334,7 +361,7 @@ export const useChatStore = create<ChatStore>()(
         const accessStore = useAccessStore.getState();
         const userType = accessStore.userCount.usertype;
         let hardMaxTokens = maxTokens;
-        if (userType <= 0) {
+        if (userType <= 1) {
           hardMaxTokens = (maxTokens > 0) ? Math.floor(maxTokens * 0.25) : 0;
           hardMaxTokens = (hardMaxTokens > 2000) ? 2000: hardMaxTokens;
         }
