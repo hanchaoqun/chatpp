@@ -24,6 +24,7 @@ import {
   Message,
   ImageUrl,
   ImageContent,
+  getImagesInputMarkDown,
   SubmitKey,
   useChatStore,
   BOT_HELLO,
@@ -430,7 +431,10 @@ async function uploadImage(
         if (["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
           const result = await readFileAsDataURL(file);
           if (result) {
-            const imageContent = { type: "image_url", image_url: { url: result, file_name: file.name } as ImageUrl } as ImageContent;
+            const imageContent = {
+                type: "image_url",
+                image_url: { url: result, file_name: file.name, file_size: file.size } as ImageUrl
+              } as ImageContent;
             prevValue.push(imageContent);
           }
         }
@@ -629,18 +633,6 @@ export function ChatActions(props: {
 function getImagesInputError(imageInput: string | ImageContent[]) : string {
   const text = typeof imageInput === "string" ? imageInput : "";
   return text;
-}
-
-function getImagesInputMarkDown(imageInput: string | ImageContent[]) : string {
-  const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
-  if (imgs.length == 0) {
-    return '';
-  }
-  const md = imgs.filter((m) => m.type === "image_url")
-                 .map((v) => `IMG:${v.image_url?.file_name??''}`)
-                 .join('\n'); 
-                 //.map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
-  return md;
 }
 
 function getImagesInputArray(imageInput: string | ImageContent[], userInput: string) : ImageContent[] {
@@ -872,7 +864,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: `PDF\n---\n${pdfInput}\n---\n\n`, //${userInput}
+                content: `PDFs:\n---\n${pdfInput}\n---\n\n`, //${userInput}
               }),
               preview: true,
               isPDF: true,
@@ -887,7 +879,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: `Image\n---\n${getImagesInputError(imageInput)}\n---\n\n`, //${userInput}
+                content: `Images:\n---\n${getImagesInputError(imageInput)}\n---\n\n`, //${userInput}
               }),
               preview: true,
               isPDF: false,
@@ -902,7 +894,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: `Image\n---\n${getImagesInputMarkDown(imageInput)}\n---\n\n`, //${userInput}
+                content: `Images:\n---\n${getImagesInputMarkDown(imageInput)}\n---\n\n`, //${userInput}
               }),
               preview: true,
               isPDF: false,
