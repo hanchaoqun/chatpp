@@ -337,8 +337,8 @@ async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() 
               console.log(file);
 
               if (file.type === "application/pdf") {
-                  if(file.size > 2097152) {
-                      onPDFsLoad("PDF file size > 2M!");
+                  if(file.size > 3145728) {
+                      onPDFsLoad("PDF file size > 3M!");
                       scrollToBottom();
                       return;
                   }
@@ -422,8 +422,8 @@ async function uploadImage(
 
         console.log(file);
 
-        if (file.size > 2097152) {
-          onImagesLoad("Image file size > 2M!")
+        if (file.size > 3145728) {
+          onImagesLoad("Image file size > 3M!")
           scrollToBottom()
           return
         }
