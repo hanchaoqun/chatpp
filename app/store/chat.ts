@@ -83,7 +83,8 @@ export function getImagesInputMarkDown(imageInput: string | ImageContent[]) : st
     return '';
   }
 
-  const sumsize = imgs.filter((m) => m.type === "image_url").reduce((total, num) => total + num/1024, 0);
+  const sumsize = imgs.filter((m) => m.type === "image_url")
+                      .reduce((total, v) => total + (v.image_url?.file_size??0)/1024, 0);
 
   if (sumsize > 500) {
     const mdname = imgs.filter((m) => m.type === "image_url")
