@@ -573,7 +573,7 @@ export function ChatActions(props: {
         { !isVisionModel(currentModel) ?
             <ChatAction
               onClick={() => {
-                if (accessStoreState.userCount.type <= 0) {
+                if ( (accessStoreState.userCount.type??0) <= 0 ) {
                   props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
                   props.scrollToBottom();
                   return
@@ -588,7 +588,7 @@ export function ChatActions(props: {
           :
             <ChatAction
               onClick={() => {
-                if (accessStoreState.userCount.type <= 0) {
+                if ( (accessStoreState.userCount.type??0) <= 0 ) {
                   props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
                   props.scrollToBottom();
                   return
