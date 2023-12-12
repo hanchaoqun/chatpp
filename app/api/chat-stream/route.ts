@@ -48,7 +48,11 @@ async function createStream(req: NextRequest) {
           }
           try {
             const json = JSON.parse(data);
-            if (json.choices[0].finish_reason === "stop") {
+            if ((json.choices[0].finish_reason??"") === "stop") {
+              controller.close();
+              return;
+            }
+            if ((json.choices[0].finish_details??"") === "stop") {
               controller.close();
               return;
             }
