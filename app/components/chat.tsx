@@ -871,7 +871,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: `PDF\n---\n${pdfInput}\n---\n\n${userInput}`,
+                content: `PDF\n---\n${pdfInput}\n---\n\n`, //${userInput}
               }),
               preview: true,
               isPDF: true,
@@ -886,7 +886,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: `Image\n---\n${getImagesInputError(imageInput)}\n---\n\n${userInput}`,
+                content: `Image\n---\n${getImagesInputError(imageInput)}\n---\n\n`, //${userInput}
               }),
               preview: true,
               isPDF: false,
@@ -901,7 +901,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: `Image\n---\n${getImagesInputMarkDown(imageInput)}\n---\n\n${userInput}`,
+                content: `Image\n---\n${getImagesInputMarkDown(imageInput)}\n---\n\n`, //${userInput}
               }),
               preview: true,
               isPDF: false,
