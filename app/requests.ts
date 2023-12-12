@@ -54,7 +54,7 @@ const makeRequestParam = (
       return {
         messages: [{
           role: userMessage.role,
-          content: [imgs, texts],
+          content: [...imgs, ...texts],
         }],
         stream: options?.stream,
         model: modelConfig.model,
@@ -63,7 +63,7 @@ const makeRequestParam = (
       };
   }
   return {
-    messages: [sendMessages, {
+    messages: [...sendMessages, {
       role: userMessage.role,
       content: userMessage.content,
     }],
