@@ -472,7 +472,7 @@ export function ChatActions(props: {
   const config = useAppConfig();
   const navigate = useNavigate();
   const chatStore = useChatStore();
-  const accessStore = useAccessStore();
+  const accessStoreState = useAccessStore.getState();
 
   // switch themes
   const theme = config.theme;
@@ -573,7 +573,7 @@ export function ChatActions(props: {
         { !isVisionModel(currentModel) ?
             <ChatAction
               onClick={() => {
-                if (accessStore.getState().userCount.type <= 0) {
+                if (accessStoreState.userCount.type <= 0) {
                   props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
                   props.scrollToBottom();
                   return
@@ -588,7 +588,7 @@ export function ChatActions(props: {
           :
             <ChatAction
               onClick={() => {
-                if (accessStore.getState().userCount.type <= 0) {
+                if (accessStoreState.userCount.type <= 0) {
                   props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
                   props.scrollToBottom();
                   return
