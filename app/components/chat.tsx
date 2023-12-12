@@ -18,6 +18,7 @@ import DarkIcon from "../icons/dark.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 import PdfIcon from "../icons/pdf.svg";
+import ImageIcon from "../icons/image.svg";
 import {
   ALL_MODELS,
   Message,
@@ -597,7 +598,7 @@ export function ChatActions(props: {
                 props.scrollToBottom();
               }}
               text={"LoadImages"}
-              icon={<MenuIcon />}
+              icon={<ImageIcon />}
               nodark={true}
             />
         }

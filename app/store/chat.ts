@@ -361,7 +361,7 @@ export const useChatStore = create<ChatStore>()(
         const accessStore = useAccessStore.getState();
         const userType = accessStore.userCount.usertype;
         let hardMaxTokens = maxTokens;
-        if (userType <= 0) {
+        if (userType <= 1) {
           hardMaxTokens = (maxTokens > 0) ? Math.floor(maxTokens * 0.25) : 0;
           hardMaxTokens = (hardMaxTokens > 2000) ? 2000: hardMaxTokens;
         }
