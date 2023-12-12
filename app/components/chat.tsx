@@ -637,8 +637,9 @@ function getImagesInputMarkDown(imageInput: string | ImageContent[]) : string {
     return '';
   }
   const md = imgs.filter((m) => m.type === "image_url")
-                 .map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
-                 .join('\n');
+                 .map((v) => `IMG:${v.image_url?.file_name??''}`)
+                 .join('\n'); 
+                 //.map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
   return md;
 }
 
