@@ -573,13 +573,13 @@ export function ChatActions(props: {
         { !isVisionModel(currentModel) ?
             <ChatAction
               onClick={() => {
-                if ( (accessStoreState.userCount.type??0) <= 0 ) {
-                  props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
-                  props.scrollToBottom();
+                if ( !!accessStoreState.userCount?.usertype && accessStoreState.userCount?.usertype >= 1 ) {
+                  props.clearImage();
+                  uploadPDF(props.onPDFsLoad,props.scrollToBottom);
                   return
                 }
-                props.clearImage();
-                uploadPDF(props.onPDFsLoad,props.scrollToBottom);
+                props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
+                props.scrollToBottom();
               }}
               text={"LoadPDFs"}
               icon={<PdfIcon />}
@@ -588,13 +588,13 @@ export function ChatActions(props: {
           :
             <ChatAction
               onClick={() => {
-                if ( (accessStoreState.userCount.type??0) <= 0 ) {
-                  props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
-                  props.scrollToBottom();
+                if ( !!accessStoreState.userCount?.usertype && accessStoreState.userCount?.usertype >= 1 ) {
+                  props.clearPDF();
+                  uploadImage(props.onImagesLoad,props.scrollToBottom);
                   return
                 }
-                props.clearPDF();
-                uploadImage(props.onImagesLoad,props.scrollToBottom);
+                props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
+                props.scrollToBottom();
               }}
               text={"LoadImages"}
               icon={<MenuIcon />}
