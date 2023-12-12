@@ -309,7 +309,7 @@ export const useChatStore = create<ChatStore>()(
                               .join('\n');
           let saveimgs = '';
           if (imgs.length > 0) {
-            saveimgs = `Image\n---\n${imgs}\n---\n\n`;
+            saveimgs = `Images:\n---\n${imgs}\n---\n\n`;
           }
           saveUserMessage.content = `${saveimgs}${texts}`;
         }
