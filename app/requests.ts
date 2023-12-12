@@ -1,4 +1,3 @@
-import type { ChatRequest, ChatResponse } from "./api/openai/typing";
 import {
   Message,
   ImageUrl,
@@ -45,7 +44,10 @@ const makeRequestParam = (
       const userimgs = JSON.parse(userMessage.content) as ImageContent[];
       let imgs = userimgs.filter((m) => m.type === "image_url").map((v) => ({
         type: v.type,
-        image_url: v.image_url,
+        image_url: {
+          url: v.image_url?.url,
+          detail: v.image_url?.detail,
+        },
       }));
       let texts = userimgs.filter((m) => m.type === "text").map((v) => ({
         type: v.type,

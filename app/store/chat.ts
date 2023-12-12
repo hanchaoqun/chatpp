@@ -60,6 +60,7 @@ export interface ChatSession {
 export interface ImageUrl {
   url: string; 
   detail?: "low" | "high" | "auto";
+  file_name?: string;
 }
 
 export interface ImageContent {
@@ -254,7 +255,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       async onUserInput(content, isImage) {
-        let userMessage: Message = createMessage({
+        const userMessage: Message = createMessage({
           role: "user",
           content,
           isImage,
@@ -274,19 +275,25 @@ export const useChatStore = create<ChatStore>()(
         const messageIndex = get().currentSession().messages.length + 1;
 
         // save user's and bot's message
+        let saveUserMessage: Message = userMessage;
+        if (isImage) {
+          const userimgs = JSON.parse(userMessage.content) as ImageContent[];
+          let imgs  = userimgs.filter((m) => m.type === "image_url")
+                              .map((v) => v.image_url?.file_name??'')
+                              .join('\n');
+          let texts = userimgs.filter((m) => m.type === "text")
+                              .map((v) => v.text??'')
+                              .join('\n');
+          saveUserMessage.content = `Image\n---\n${imgs}"\n---\n\n"${texts}`;
+        }
         get().updateCurrentSession((session) => {
-          session.messages.push(userMessage);
+          session.messages.push(saveUserMessage);
           session.messages.push(botMessage);
         });
 
         // make request
-        //if (isImage) {
-          //const imgctns = JSON.parse(userMessage.content??"") as ImageContent[];
-          //userMessage.content = imgctns;
-        //}
-        //const sendMessages = recentMessages.concat(userMessage);
         console.log("[History Input] ", historyMessages);
-        console.log("[User Input] ", userMessage);
+        console.log("[User Input] ", saveUserMessage);
         requestChatStream(historyMessages, userMessage, {
           onMessage(content, done) {
             // stream response

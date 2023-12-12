@@ -5,7 +5,7 @@ import type {
 } from "openai";
 
 //export type ChatRequest = CreateChatCompletionRequest;
-export type ChatResponse = CreateChatCompletionResponse;
+//export type ChatResponse = CreateChatCompletionResponse;
 //export type ChatMessage = ChatCompletionResponseMessage;
 
 export interface ChatMessage {

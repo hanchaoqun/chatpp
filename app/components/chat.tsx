@@ -429,7 +429,7 @@ async function uploadImage(
         if (["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
           const result = await readFileAsDataURL(file);
           if (result) {
-            const imageContent = { type: "image_url", image_url: { url: result } };
+            const imageContent = { type: "image_url", image_url: { url: result, file_name: file.name } as ImageUrl } as ImageContent;
             prevValue.push(imageContent);
           }
         }
@@ -608,17 +608,20 @@ export function ChatActions(props: {
   );
 }
 
-function getImagesInputAsText(imageInput: string | ImageContent[]) : string {
+function getImagesInputError(imageInput: string | ImageContent[]) : string {
   const text = typeof imageInput === "string" ? imageInput : "";
   return text;
 }
 
-function getImagesInput(imageInput: string | ImageContent[]) : ImageContent[] {
+function getImagesInputMarkDown(imageInput: string | ImageContent[]) : string {
   const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
-  return imgs;
+  const md = imgs.filter((m) => m.type === "image_url")
+                 .map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
+                 .join('\n');
+  return md;
 }
 
-function getImagesAndUserInput(imageInput: string | ImageContent[], userInput: string) : ImageContent[] {
+function getImagesInputArray(imageInput: string | ImageContent[], userInput: string) : ImageContent[] {
   let imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
   imgs.push({
       type: "text",
@@ -716,7 +719,7 @@ export function Chat() {
     let inputText:string = "";
     const currentModel = chatStore.currentSession().mask.modelConfig.model;
     if (isVisionModel(currentModel)) {
-      const imgs:ImageContent[] = getImagesAndUserInput(imageInput, userInput);
+      const imgs:ImageContent[] = getImagesInputArray(imageInput, userInput);
       if (imgs.length <= 0) return;
       inputText = JSON.stringify(imgs);
       setImageInput("");
@@ -848,7 +851,7 @@ export function Chat() {
             {
               ...createMessage({
                 role: "user",
-                content: "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput),
+                content: `PDF\n---\n${pdfInput}\n---\n\n${userInput}`,
               }),
               preview: true,
               isPDF: true,
@@ -858,12 +861,12 @@ export function Chat() {
         : [],
     )
     .concat(
-      getImagesInput(imageInput).length > 0 && isVisionModel(currentModel)
+      getImagesInputError(imageInput).length > 0 && isVisionModel(currentModel)
         ? [
             {
               ...createMessage({
                 role: "user",
-                content: "Image\n---\n".concat(JSON.stringify(getImagesInput(imageInput))).concat("\n---\n\n").concat(userInput),
+                content: `Image\n---\n${getImagesInputError(imageInput)}\n---\n\n${userInput}`,
               }),
               preview: true,
               isPDF: false,
@@ -873,12 +876,12 @@ export function Chat() {
         : [],
     )
     .concat(
-      getImagesInputAsText(imageInput).length > 0 && isVisionModel(currentModel)
+      getImagesInputMarkDown(imageInput).length > 0 && isVisionModel(currentModel)
         ? [
             {
               ...createMessage({
                 role: "user",
-                content: "Image\n---\n".concat(getImagesInputAsText(imageInput)).concat("\n---\n\n").concat(userInput),
+                content: `Image\n---\n${getImagesInputMarkDown(imageInput)}\n---\n\n${userInput}`,
               }),
               preview: true,
               isPDF: false,
