@@ -281,7 +281,7 @@ export const useChatStore = create<ChatStore>()(
         if (isImage) {
           const userimgs = JSON.parse(userMessage.content) as ImageContent[];
           let imgs  = userimgs.filter((m) => m.type === "image_url")
-                              .map((v) => v.image_url?.file_name??'')
+                              .map((v) => `IMG:${v.image_url?.file_name??''}`)
                               .join('\n');
           let texts = userimgs.filter((m) => m.type === "text")
                               .map((v) => v.text??'')
