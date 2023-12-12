@@ -275,7 +275,9 @@ export const useChatStore = create<ChatStore>()(
         const messageIndex = get().currentSession().messages.length + 1;
 
         // save user's and bot's message
-        let saveUserMessage: Message = userMessage;
+        let saveUserMessage: Message = createMessage({
+              ...userMessage,
+            });
         if (isImage) {
           const userimgs = JSON.parse(userMessage.content) as ImageContent[];
           let imgs  = userimgs.filter((m) => m.type === "image_url")
@@ -284,7 +286,11 @@ export const useChatStore = create<ChatStore>()(
           let texts = userimgs.filter((m) => m.type === "text")
                               .map((v) => v.text??'')
                               .join('\n');
-          saveUserMessage.content = `Image\n---\n${imgs}"\n---\n\n"${texts}`;
+          let saveimgs = '';
+          if (imgs.length > 0) {
+            saveimgs = `Image\n---\n${imgs}\n---\n\n`;
+          }
+          saveUserMessage.content = `${saveimgs}${texts}`;
         }
         get().updateCurrentSession((session) => {
           session.messages.push(saveUserMessage);
@@ -293,7 +299,7 @@ export const useChatStore = create<ChatStore>()(
 
         // make request
         console.log("[History Input] ", historyMessages);
-        console.log("[User Input] ", saveUserMessage);
+        console.log("[User Input Save] ", saveUserMessage);
         requestChatStream(historyMessages, userMessage, {
           onMessage(content, done) {
             // stream response

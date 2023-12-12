@@ -632,6 +632,9 @@ function getImagesInputError(imageInput: string | ImageContent[]) : string {
 
 function getImagesInputMarkDown(imageInput: string | ImageContent[]) : string {
   const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
+  if (imgs.length == 0) {
+    return '';
+  }
   const md = imgs.filter((m) => m.type === "image_url")
                  .map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
                  .join('\n');
