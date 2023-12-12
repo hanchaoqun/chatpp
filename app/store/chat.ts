@@ -86,7 +86,7 @@ export function getImagesInputMarkDown(imageInput: string | ImageContent[]) : st
   const sumsize = imgs.filter((m) => m.type === "image_url")
                       .reduce((total, v) => total + (v.image_url?.file_size??0)/1024, 0);
 
-  if (sumsize > 500) {
+  if (sumsize > 200) {
     const mdname = imgs.filter((m) => m.type === "image_url")
       .map((v) => `IMG:"${v.image_url?.file_name??''}" SIZE:(${((v.image_url?.file_size??0)/1024).toFixed(2)}k)`)
       .join('\n');
