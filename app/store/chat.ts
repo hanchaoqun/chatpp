@@ -291,6 +291,11 @@ export const useChatStore = create<ChatStore>()(
           model: useAppConfig.getState().modelConfig.model,
         });
 
+        // if image then clear history message
+        if (isImage) {
+          get().resetSession();
+        }
+
         // get history messages
         const usrMsgLength = content.length;
         const historyMessages = get().getMessagesWithMemory(usrMsgLength);
