@@ -60,6 +60,7 @@ const makeRequestParam = (
         model: modelConfig.model,
         temperature: modelConfig.temperature,
         presence_penalty: modelConfig.presence_penalty,
+        max_tokens: 4096,
       };
   }
   return {
