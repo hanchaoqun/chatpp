@@ -472,6 +472,7 @@ export function ChatActions(props: {
   const config = useAppConfig();
   const navigate = useNavigate();
   const chatStore = useChatStore();
+  const accessStore = useAccessStore();
 
   // switch themes
   const theme = config.theme;
@@ -571,14 +572,30 @@ export function ChatActions(props: {
       <div className={chatStyle["group-right"]}>
         { !isVisionModel(currentModel) ?
             <ChatAction
-              onClick={() => {props.clearImage();uploadPDF(props.onPDFsLoad,props.scrollToBottom)}}
+              onClick={() => {
+                if (accessStore.getState().userCount.type <= 0) {
+                  props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
+                  props.scrollToBottom();
+                  return
+                }
+                props.clearImage();
+                uploadPDF(props.onPDFsLoad,props.scrollToBottom);
+              }}
               text={"LoadPDFs"}
               icon={<PdfIcon />}
               nodark={true}
             />
           :
             <ChatAction
-              onClick={() => {props.clearPDF();uploadImage(props.onImagesLoad,props.scrollToBottom)}}
+              onClick={() => {
+                if (accessStore.getState().userCount.type <= 0) {
+                  props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
+                  props.scrollToBottom();
+                  return
+                }
+                props.clearPDF();
+                uploadImage(props.onImagesLoad,props.scrollToBottom);
+              }}
               text={"LoadImages"}
               icon={<MenuIcon />}
               nodark={true}
@@ -811,7 +828,6 @@ export function Chat() {
   };
 
   const context: RenderMessage[] = session.mask.context.slice();
-
   const accessStore = useAccessStore();
 
   if (
