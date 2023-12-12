@@ -119,7 +119,7 @@ export async function requestChat(
   const res = await requestOpenaiClient("v1/chat/completions")(req);
 
   try {
-    const response = (await res.json()) as ChatResponse;
+    const response = await res.json();
     return response;
   } catch (error) {
     console.error("[Request Chat] ", error, res.body);
