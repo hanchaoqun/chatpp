@@ -48,6 +48,10 @@ async function createStream(req: NextRequest) {
           }
           try {
             const json = JSON.parse(data);
+            if (json.choices[0].finish_reason === "stop") {
+              controller.close();
+              return;
+            }
             const text = json.choices[0].delta.content;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
