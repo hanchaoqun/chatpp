@@ -61,6 +61,7 @@ export interface ImageUrl {
   url: string; 
   detail?: "low" | "high" | "auto";
   file_name?: string;
+  file_size?: number;
 }
 
 export interface ImageContent {
@@ -74,6 +75,27 @@ export const BOT_HELLO: Message = createMessage({
   role: "assistant",
   content: Locale.Store.BotHello,
 });
+
+export function getImagesInputMarkDown(imageInput: string | ImageContent[]) : string {
+  const imgs = Array.isArray(imageInput) ? imageInput : [] as ImageContent[];
+  
+  if (imgs.length == 0) {
+    return '';
+  }
+
+  const sumsize = imgs.filter((m) => m.type === "image_url").reduce((total, num) => total + num/1024, 0);
+
+  if (sumsize > 500) {
+    const mdname = imgs.filter((m) => m.type === "image_url")
+      .map((v) => `IMG:${v.image_url?.file_name??''} SIZE:${(v.image_url?.file_size??0)/1024}k`)
+      .join('\n');
+    return mdname;
+  }
+  const mdbase64 = imgs.filter((m) => m.type === "image_url")
+    .map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
+    .join('\n');
+  return mdbase64;
+}
 
 function createEmptySession(): ChatSession {
   return {
@@ -280,9 +302,7 @@ export const useChatStore = create<ChatStore>()(
             });
         if (isImage) {
           const userimgs = JSON.parse(userMessage.content) as ImageContent[];
-          let imgs  = userimgs.filter((m) => m.type === "image_url")
-                              .map((v) => `IMG:${v.image_url?.file_name??''}`)
-                              .join('\n');
+          let imgs  = getImagesInputMarkDown(userimgs.filter((m) => m.type === "image_url"));
           let texts = userimgs.filter((m) => m.type === "text")
                               .map((v) => v.text??'')
                               .join('\n');
