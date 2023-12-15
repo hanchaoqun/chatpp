@@ -583,7 +583,8 @@ export function ChatActions(props: {
                   uploadPDF(props.onPDFsLoad,props.scrollToBottom);
                   return
                 }
-                props.onPDFsLoad("Pemium User Only!\n仅供高级用户使用!");
+                props.onPDFsLoad("Pemium User Only! Send an email to hanssccv@gmail.com to apply for permission, please include your account number.\n"
+                               + "仅供高级用户使用! 发邮件到hanssccv@gmail.com申请权限，请附上您的账号。");
                 props.scrollToBottom();
               }}
               text={"LoadPDFs"}
@@ -598,7 +599,8 @@ export function ChatActions(props: {
                   uploadImage(props.onImagesLoad,props.scrollToBottom);
                   return
                 }
-                props.onImagesLoad("Pemium User Only!\n仅供高级用户使用!");
+                props.onImagesLoad("Pemium User Only! Send an email to hanssccv@gmail.com to apply for permission, please include your account number.\n"
+                                 + "仅供高级用户使用! 发邮件到hanssccv@gmail.com申请权限，请附上您的账号。");
                 props.scrollToBottom();
               }}
               text={"LoadImages"}
