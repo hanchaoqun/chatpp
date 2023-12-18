@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ChatMessage, ImageUrl, ImageContent } from "../api/type/typing";
+import type { Message, ImageUrl, ImageContent } from "../api/type/typing";
 import {
   ControllerPool,
   requestChatStream,

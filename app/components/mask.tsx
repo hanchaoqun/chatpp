@@ -3,7 +3,8 @@ import AddIcon from "../icons/add.svg";
 import DeleteIcon from "../icons/delete.svg";
 
 import { DEFAULT_MASK_AVATAR, Mask, Updater } from "../store/mask";
-import { Message, ModelConfig, ROLES } from "../store";
+import { ModelConfig, ROLES } from "../store";
+import { Message } from "../api/type/typing";
 import { Input, List } from "./ui-lib";
 import { Avatar } from "./emoji";
 import Locale from "../locales";

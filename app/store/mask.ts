@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { BUILTIN_MASKS } from "../masks";
 import { getLang, Lang } from "../locales";
-import { DEFAULT_TOPIC, Message } from "./chat";
+import { DEFAULT_TOPIC } from "./chat";
+import { Message } from "../api/type/typing";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { StoreKey } from "../constant";
 
