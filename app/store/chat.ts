@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ChatMessage } from "../api/openai/typing";
+import type { ChatMessage, ImageUrl, ImageContent } from "../api/type/typing";
 import {
   ControllerPool,
   requestChatStream,
@@ -16,16 +16,6 @@ import { StoreKey } from "../constant";
 import { countTokens } from "../tokens";
 
 import { useAccessStore, AccessType } from "./access";
-
-export type Message = ChatMessage & {
-  date: string;
-  tokens: number;
-  id?: number;
-  streaming?: boolean;
-  isError?: boolean;
-  model?: ModelType;
-  isImage?: boolean;
-};
 
 export function createMessage(override: Partial<Message>): Message {
   return {
@@ -55,19 +45,6 @@ export interface ChatSession {
   lastUpdate: number;
   lastSummarizeIndex: number;
   mask: Mask;
-}
-
-export interface ImageUrl {
-  url: string; 
-  detail?: "low" | "high" | "auto";
-  file_name?: string;
-  file_size?: number;
-}
-
-export interface ImageContent {
-  type: string;
-  text?: string;
-  image_url?: ImageUrl;
 }
 
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
