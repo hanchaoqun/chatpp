@@ -8,11 +8,15 @@ const OPENAI_CHAT_STREAM_PATH = "v1/chat/completions";
 const DEFAULT_PROTOCOL = "https";
 const PROTOCOL = process.env.PROTOCOL ?? DEFAULT_PROTOCOL;
 const BASE_URL = process.env.BASE_URL ?? OPENAI_URL;
+const API_KEY = process.env.OPENAI_API_KEY ?? "";
 
 export async function requestOpenAi(req: NextRequest, stream: boolean) {
   const openaiPath = (stream)? OPENAI_CHAT_STREAM_PATH : OPENAI_CHAT_PATH;
 
-  const apiKey = req.headers.get("token");
+  let apiKey = req.headers.get("token");
+  if (!apiKey) {
+    apiKey = API_KEY;
+  }
   const model = req.headers.get("model");
 
   let baseUrl = BASE_URL;

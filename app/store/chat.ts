@@ -75,6 +75,16 @@ export function getImagesInputMarkDown(imageInput: string | ImageContent[]) : st
   return mdbase64;
 }
 
+function getSummaryModel(model: string): string {
+  if (model.startsWith("gpt")) {
+    return "gpt-3.5-turbo";
+  }
+  if(model.startsWith("gemini")) {
+    return "gemini-pro";
+  }
+  return "gpt-3.5-turbo";
+}
+
 function createEmptySession(): ChatSession {
   return {
     id: Date.now() + Math.random(),
@@ -473,7 +483,7 @@ export const useChatStore = create<ChatStore>()(
           countMessages(session.messages) >= SUMMARIZE_MIN_LEN
         ) {
           requestWithPrompt(session.messages, Locale.Store.Prompt.Topic, {
-            model: "gpt-3.5-turbo",
+            model: getSummaryModel(session.mask.modelConfig.model),
           }).then((res) => {
             get().updateCurrentSession(
               (session) =>
@@ -515,7 +525,7 @@ export const useChatStore = create<ChatStore>()(
           session.mask.modelConfig.sendMemory
         ) {
           requestWithPrompt(toBeSummarizedMsgs, Locale.Store.Prompt.Summarize, {
-            model: "gpt-3.5-turbo",
+            model: getSummaryModel(session.mask.modelConfig.model),
           }).then((res) => {
             if (res && trimTopic(res).length > 0) {
               session.memoryPrompt = trimTopic(res);

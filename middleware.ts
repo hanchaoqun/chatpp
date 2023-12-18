@@ -65,19 +65,14 @@ export async function middleware(req: NextRequest) {
   const token = req.headers.get("token");
 
   let authSuccess = false;
-  let needInjectKey = false;
   if (serverConfig.accessType == AccessType.WeChat && (accessCode && await wechatAuth(req, accessCode))) {
     authSuccess = true;
-    needInjectKey = true;
   } else if (serverConfig.accessType == AccessType.Code && (accessCode && await codeAuth(req, accessCode))) {
     authSuccess = true;
-    needInjectKey = true;
   } else if (serverConfig.accessType == AccessType.Account && (accessCode && await accountAuth(req, accessCode))) {
     authSuccess = true;
-    needInjectKey = true;
   } else if (serverConfig.accessType == AccessType.Token && token) {
     authSuccess = true;
-    needInjectKey = false;
   } else {
     return NextResponse.json(
       {
@@ -102,22 +97,6 @@ export async function middleware(req: NextRequest) {
     );
   }
 
-  if (needInjectKey) {
-    const apiKey = serverConfig.apiKey;
-    if (apiKey) {
-      req.headers.set("token", apiKey);
-    } else {
-      return NextResponse.json(
-        {
-          error: true,
-          msg: "Empty Api Key",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-  }
 
   return NextResponse.next({
     request: {
