@@ -47,10 +47,12 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
     };
     try {
         const json = await res.json();
+        console.log("[JSON]", json);
         msg = {
             role: json?.choices?.at(0)?.message?.role ?? "",
             content: json?.choices?.at(0)?.message?.content ?? "",
         };
+        console.log("[MSG]", msg);
     } catch(e) {
         console.log("[ERROR]", e);
     }
