@@ -122,7 +122,7 @@ export async function requestChat(
     const response = await res.json();
     return response;
   } catch (error) {
-    console.error("[Request Chat] ", error, res.body);
+    console.error("[ERROR] ", error);
   }
 }
 
