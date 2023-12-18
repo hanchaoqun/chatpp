@@ -35,7 +35,7 @@ async function createStream(req: NextRequest) {
 
   await decAccountCount(model??"", accessCode??"");
 
-  const stream = await responseStream(model, res, encoder, decoder);
+  const stream = await responseStream(model??"", res, encoder, decoder);
   return stream;
 }
 
