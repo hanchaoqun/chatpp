@@ -38,7 +38,7 @@ export type Message = ChatMessage & {
     id?: number;
     streaming?: boolean;
     isError?: boolean;
-    model?: ModelType;
+    model?: string;
     isImage?: boolean;
   };
 
