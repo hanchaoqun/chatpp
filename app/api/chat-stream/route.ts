@@ -1,6 +1,5 @@
-import { createParser } from "eventsource-parser";
 import { NextRequest } from "next/server";
-import { requestOpenai } from "../common";
+import { request, responseStream } from "../llm/sdk";
 import { decCount } from "../../account/server";
 import { getServerSideConfig } from "../../config/server";
 
@@ -23,7 +22,7 @@ async function createStream(req: NextRequest) {
   const model = req.headers.get("model");
   const accessCode = req.headers.get("access-code");
 
-  const res = await requestOpenai(req);
+  const res = await request(model, req, true);
 
   const contentType = res.headers.get("Content-Type") ?? "";
   if (!contentType.includes("stream")) {
@@ -36,41 +35,7 @@ async function createStream(req: NextRequest) {
 
   await decAccountCount(model??"", accessCode??"");
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      function onParse(event: any) {
-        if (event.type === "event") {
-          const data = event.data;
-          // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
-          if (data === "[DONE]") {
-            controller.close();
-            return;
-          }
-          try {
-            const json = JSON.parse(data);
-            if ((json.choices[0].finish_reason??"") === "stop") {
-              controller.close();
-              return;
-            }
-            if ((json.choices[0].finish_details??"") === "stop") {
-              controller.close();
-              return;
-            }
-            const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
-          }
-        }
-      }
-
-      const parser = createParser(onParse);
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk, { stream: true }));
-      }
-    },
-  });
+  const stream = await responseStream(model, res, encoder, decoder);
   return stream;
 }
 
