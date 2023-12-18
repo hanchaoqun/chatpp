@@ -54,7 +54,7 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
     } catch(e) {
         console.log("[ERROR]", e);
     }
-    return new Response(msg, {
+    return new Response(JSON.stringify(msg), {
         status: 200, 
         headers: {'Content-Type': 'application/json',},
     });
