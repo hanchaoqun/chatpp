@@ -41,5 +41,3 @@ export type Message = ChatMessage & {
     model?: string;
     isImage?: boolean;
   };
-
-export type Updater<T> = (updater: (value: T) => void) => void;

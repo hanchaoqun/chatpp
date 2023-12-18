@@ -6,6 +6,8 @@ import { DEFAULT_TOPIC, Message } from "./chat";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { StoreKey } from "../constant";
 
+export type Updater<T> = (updater: (value: T) => void) => void;
+
 export type Mask = {
   id: number;
   avatar: string;
