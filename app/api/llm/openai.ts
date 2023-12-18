@@ -10,11 +10,12 @@ const PROTOCOL = process.env.PROTOCOL ?? DEFAULT_PROTOCOL;
 const BASE_URL = process.env.BASE_URL ?? OPENAI_URL;
 
 export async function requestOpenAi(req: NextRequest, stream: boolean) {
+  const openaiPath = (stream)? OPENAI_CHAT_STREAM_PATH : OPENAI_CHAT_PATH;
+  
   const apiKey = req.headers.get("token");
   const model = req.headers.get("model");
 
   let baseUrl = BASE_URL;
-
   if (!baseUrl.startsWith("http")) {
     baseUrl = `${PROTOCOL}://${baseUrl}`;
   }
@@ -25,7 +26,6 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
     console.log("[Org ID]", process.env.OPENAI_ORG_ID);
   }
 
-  const openaiPath = (stream)? OPENAI_CHAT_STREAM_PATH : OPENAI_CHAT_PATH;
   const response = fetch(`${baseUrl}/${openaiPath}`, {
     headers: {
       "Content-Type": "application/json",
