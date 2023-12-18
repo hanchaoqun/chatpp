@@ -22,7 +22,7 @@ async function createStream(req: NextRequest) {
   const model = req.headers.get("model");
   const accessCode = req.headers.get("access-code");
 
-  const res = await request(model, req, true);
+  const res = await request(model??"", req, true);
 
   const contentType = res.headers.get("Content-Type") ?? "";
   if (!contentType.includes("stream")) {

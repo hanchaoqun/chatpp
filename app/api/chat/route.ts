@@ -4,7 +4,7 @@ import { request } from "../llm/sdk";
 async function makeRequest(req: NextRequest) {
   try {
     const model = req.headers.get("model");
-    const api = await request(model, req, false);
+    const api = await request(model??"", req, false);
     const res = new NextResponse(api.body);
     res.headers.set("Content-Type", "application/json");
     res.headers.set("Cache-Control", "no-cache");
