@@ -301,8 +301,6 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // make request
-        console.log("[History Input] ", historyMessages);
-        console.log("[User Input Save] ", saveUserMessage);
         requestChatStream(historyMessages, userMessage, {
           onMessage(content, done) {
             // stream response
@@ -511,13 +509,6 @@ export const useChatStore = create<ChatStore>()(
 
         const lastSummarizeIndex = session.messages.length;
 
-        console.log(
-          "[Chat History] ",
-          toBeSummarizedMsgs,
-          historyMsgLength,
-          config.modelConfig.compressMessageLengthThreshold,
-        );
-
         if (
           historyMsgLength >
           config.modelConfig.compressMessageLengthThreshold &&
@@ -528,7 +519,6 @@ export const useChatStore = create<ChatStore>()(
           }).then((res) => {
             if (res && trimTopic(res).length > 0) {
               session.memoryPrompt = trimTopic(res);
-              console.log("[Memory] ", session.memoryPrompt);
               session.lastSummarizeIndex = lastSummarizeIndex;
             }
           });

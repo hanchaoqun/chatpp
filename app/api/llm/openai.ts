@@ -20,11 +20,7 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
     baseUrl = `${PROTOCOL}://${baseUrl}`;
   }
 
-  console.log("[OPENAI] Request:", baseUrl, openaiPath, model??"");
-
-  if (process.env.OPENAI_ORG_ID) {
-    console.log("[Org ID]", process.env.OPENAI_ORG_ID);
-  }
+  console.log("[OPENAI] Request:", baseUrl, openaiPath, model??"", stream);
 
   const response = fetch(`${baseUrl}/${openaiPath}`, {
     headers: {

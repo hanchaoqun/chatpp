@@ -33,7 +33,7 @@ async function codeAuth(req: NextRequest, accessCode: string) {
 async function accountAuth(req: NextRequest, accessCode: string) {
   const model = req.headers.get("model") ?? "";
   let usercnt = await queryCountAndDays(accessCode);
-  console.log("[Auth] usercnt:", accessCode, usercnt);
+  console.log("[Auth]:", getIP(req), accessCode, usercnt);
   if (model && model.startsWith("gpt-4")) {
     if (usercnt.daysplus > 0) {
       req.headers.set("calctype", "daysplus");
@@ -63,11 +63,6 @@ async function accountAuth(req: NextRequest, accessCode: string) {
 export async function middleware(req: NextRequest) {
   const accessCode = req.headers.get("access-code");
   const token = req.headers.get("token");
-
-  console.log("[Auth] AccessType:", serverConfig.accessType);
-  console.log("[Auth] AccessCode:", accessCode);
-  console.log("[Auth] UserIP:", getIP(req));
-  console.log("[Auth] Time:", new Date().toLocaleString());
 
   let authSuccess = false;
   let needInjectKey = false;
@@ -110,7 +105,6 @@ export async function middleware(req: NextRequest) {
   if (needInjectKey) {
     const apiKey = serverConfig.apiKey;
     if (apiKey) {
-      console.log("[Auth] Set system token");
       req.headers.set("token", apiKey);
     } else {
       return NextResponse.json(
