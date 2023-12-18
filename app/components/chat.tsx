@@ -21,9 +21,6 @@ import PdfIcon from "../icons/pdf.svg";
 import ImageIcon from "../icons/image.svg";
 import {
   ALL_MODELS,
-  Message,
-  ImageUrl,
-  ImageContent,
   getImagesInputMarkDown,
   SubmitKey,
   useChatStore,
@@ -37,6 +34,11 @@ import {
   ModelType,
   DEFAULT_TOPIC,
 } from "../store";
+import {
+  Message,
+  ImageUrl,
+  ImageContent,
+} from "../api/type/typing";
 import {
   copyToClipboard,
   downloadAs,
