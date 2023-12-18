@@ -39,8 +39,8 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
   if (stream) {
     return response;
   }
-  
-  return response.then(res => {
+
+  return response.then( async(res) => {
     let msg: ChatResponse = {
         role: "",
         content: "",
