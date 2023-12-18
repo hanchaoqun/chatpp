@@ -11,7 +11,7 @@ const BASE_URL = process.env.BASE_URL ?? OPENAI_URL;
 
 export async function requestOpenAi(req: NextRequest, stream: boolean) {
   const openaiPath = (stream)? OPENAI_CHAT_STREAM_PATH : OPENAI_CHAT_PATH;
-  
+
   const apiKey = req.headers.get("token");
   const model = req.headers.get("model");
 
@@ -39,11 +39,21 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
   if (stream) {
     return response;
   }
+  
   return response.then(res => {
-    const msg: ChatResponse = {
-        role: res?.choices?.at(0)?.message?.role ?? "",
-        content: res?.choices?.at(0)?.message?.content ?? "",
+    let msg: ChatResponse = {
+        role: "",
+        content: "",
     };
+    try {
+        const json = await res.json();
+        msg = {
+            role: json?.choices?.at(0)?.message?.role ?? "",
+            content: json?.choices?.at(0)?.message?.content ?? "",
+        };
+    } catch(e) {
+        console.log("[ERROR]", e);
+    }
     return new Response(msg, {
         status: 200, 
         headers: {'Content-Type': 'application/json',},
