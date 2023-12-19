@@ -180,7 +180,7 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         const dataString = event.data;
         try {
           const msg = JSON.parse(dataString);
-          const text = (msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "") as string;
+          const text = msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
           const queue = encoder.encode(text);
           controller.enqueue(queue);
         } catch (e) {
