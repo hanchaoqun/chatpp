@@ -24,6 +24,7 @@ function convertRole(role: string) {
     if (role === "assistant") {
         return "model";
     }
+    return "";
 }
 
 function reverseRole(role: string) {
@@ -33,6 +34,7 @@ function reverseRole(role: string) {
   if (role === "model") {
       return "assistant";
   }
+  return "";
 }
 
 function getMimeType(img: ImageContent) {
