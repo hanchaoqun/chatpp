@@ -172,8 +172,9 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
     async transform(chunk, controller) {
         try {
           const data = decoder.decode(chunk, {stream: true});
+          console.log("[DEBUG] data ->", data);
           const json = JSON.parse(data);
-
+          console.log("[DEBUG] json ->", json);
           const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
 
           controller.enqueue(encoder.encode(text));
