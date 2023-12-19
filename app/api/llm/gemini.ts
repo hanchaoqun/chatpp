@@ -95,9 +95,9 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
   const body = {
     contents: [...msgs],
     generationConfig: {
-      temperature?: chatReq.temperature,
-      topP?: chatReq.top_p,
-      maxOutputTokens?: chatReq.max_tokens,
+      temperature: chatReq.temperature,
+      topP: chatReq.top_p,
+      maxOutputTokens: chatReq.max_tokens,
     },
   };
 
