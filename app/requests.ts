@@ -25,10 +25,22 @@ const makeRequestParam = (
     model?: ModelType;
   },
 ) => {
-  let sendMessages = historyMessages.map((v) => ({
-    role: v.role,
-    content: v.content,
-  }));
+  let sendMessages: Message[] = [];
+
+  let lastRole = "system";
+  historyMessages.forEach((v) => {
+    if (v.role !== lastRole) {
+      sendMessages.push({
+        role: v.role,
+        content: v.content,
+      });
+      lastRole = v.role;
+    }
+  });
+  
+  if (sendMessages.length > 0 && sendMessages[0].role !== 'user') {
+    sendMessages.shift();
+  }
 
   if (options?.filterBot) {
     sendMessages = sendMessages.filter((m) => (m.role !== "system")).map((m) => {
@@ -224,6 +236,7 @@ export async function requestWithPrompt(
     model?: ModelType;
   },
 ) {
+
   const userMessage = {
       role: "user",
       content: prompt,

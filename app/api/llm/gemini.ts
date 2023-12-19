@@ -103,8 +103,6 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     },
   };
 
-  console.log("[DEBUG] body ->", body);
-
   let opts = "";
   if (stream) {
     opts = "&alt=sse";
@@ -169,7 +167,8 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
             body: await res.text(),
         };
         const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
-        controller.enqueue(errorMsg);
+        const queue = encoder.encode(errorMsg);
+        controller.enqueue(queue);
         controller.close();
         return;
       }
