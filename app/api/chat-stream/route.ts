@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     return new Response(stream);
   } catch (error) {
     return new Response(
-        ["```json\n ERROR: Fetch error!\n", JSON.stringify(error, null, "  "), "\n```"].join(""),
+        ["```json\nERROR: Fetch error!\n", JSON.stringify(error, null, "  "), "\n```"].join(""),
     );
   }
 }

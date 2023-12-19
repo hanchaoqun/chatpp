@@ -136,12 +136,12 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
 
 export async function checkResponseStreamGemini(res: Response, stream: boolean) {
   const contentType = res.headers.get("Content-Type") ?? "";
-  /* text/html */
-  if (stream && !contentType.includes("text/html")) {
+  /* text/event-stream */
+  if (stream && !contentType.includes("stream")) {
     const content = await (
         await res.text()
     ).replace(/provided:.*. You/, "provided: ***. You");
-    return "```json\n ERROR: Stream error!\n" + content + "```";
+    return "```json\nERROR: Stream error!\n" + content + "```";
   }
 }
 
