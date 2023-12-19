@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requestOpenAi, responseStreamOpenAi, requestGemini, responseStreamGemini } from "./openai";
+import { requestOpenAi, responseStreamOpenAi } from "./openai";
+import { requestGemini, responseStreamGemini } from "./gemini";
 
 
 export async function request(model: string, req: NextRequest, stream: boolean) {
