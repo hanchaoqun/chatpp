@@ -46,11 +46,16 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
         content: "",
     };
     try {
-        const json = await res.json();
-        msg = {
-            role: json?.choices?.at(0)?.message?.role ?? "",
-            content: json?.choices?.at(0)?.message?.content ?? "",
-        };
+      const json = await res.json();
+      const role = (json?.choices?.at(0)?.message?.role ?? "") as string;
+      const content = (json?.choices?.at(0)?.message?.content ?? "") as string;
+      msg = {
+          role,
+          content,
+      };
+      if (role.length <= 0 && content.length <= 0) {
+        console.log("[ERROR] Response", json);
+      }
     } catch(e) {
         console.log("[ERROR]", e);
     }
@@ -82,7 +87,8 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
             body: await res.text(),
         };
         const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
-        controller.error(errorMsg);
+        controller.enqueue(errorMsg);
+        controller.close();
         return;
       }
 
@@ -112,7 +118,7 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);
-          controller.error(errorMsg);
+          controller.close();
         }
       }
 

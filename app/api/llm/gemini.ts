@@ -103,6 +103,8 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     },
   };
 
+  console.log("[DEBUG] body ->", body);
+
   let opts = "";
   if (stream) {
     opts = "&alt=sse";
@@ -127,10 +129,15 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     };
     try {
         const json = await res.json();
+        const role = reverseRole(json?.candidates?.at(0)?.content?.role??"");
+        const content = (json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "") as string;
         msg = {
-            role: reverseRole(json?.candidates?.at(0)?.content?.role??""),
-            content: json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "",
+            role,
+            content,
         };
+        if (role.length <= 0 && content.length <= 0) {
+          console.log("[ERROR] Response", json);
+        }
     } catch(e) {
         console.log("[ERROR]", e);
     }
@@ -162,7 +169,8 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
             body: await res.text(),
         };
         const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
-        controller.error(errorMsg);
+        controller.enqueue(errorMsg);
+        controller.close();
         return;
       }
 
@@ -179,7 +187,7 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);
-          controller.error(errorMsg);
+          controller.close();
         }
       }
 
