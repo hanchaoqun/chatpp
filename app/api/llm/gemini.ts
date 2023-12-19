@@ -159,35 +159,33 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         return;
       }
 
-      // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
-      // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
-      function onParse(event: any) {
-        console.log("[DEBUG] event, ", event);
-        if (event.type !== "event") return;
-        const dataString = event.data;
-        try {
-          const msg = JSON.parse(dataString);
-          const text = msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
-          const queue = encoder.encode(text);
-          controller.enqueue(queue);
-        } catch (e) {
-          const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
-          controller.enqueue(errorMsg);
-          controller.error(errorMsg);
-        }
-      }
-
-      const parser = createParser(onParse);
       for await (const chunk of res.body as any) {
-        const dataString = decoder.decode(chunk, { stream: true });
-        console.log("[DEBUG] dataString, ", dataString);
-        parser.feed(dataString);
+        controller.enqueue(chunk);
       }
 
       controller.close();
     },
   });
-  return stream;
+
+
+  const transformStream = new TransformStream({
+    async transform(chunk, controller) {
+        try {
+          const data = decoder.decode(chunk, {stream: true});
+          const json = JSON.parse(data);
+
+          const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
+
+          controller.enqueue(encoder.encode(text));
+        } catch (e) {
+          const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
+          controller.enqueue(errorMsg);
+          controller.error(errorMsg);
+        }
+    },
+  });
+
+  return stream.pipeThrough(transformStream);
 }
 
 export const runtime = "edge";

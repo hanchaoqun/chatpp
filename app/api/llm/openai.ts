@@ -73,59 +73,60 @@ export async function checkResponseStreamOpenAi(res: Response, stream: boolean) 
 }
 
 export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decoder: TextDecoder) {
-    const stream = new ReadableStream({
-        async start(controller) {
-          if (res.status !== 200) {
-            const data = {
-                status: res.status,
-                statusText: res.statusText,
-                body: await res.text(),
-            };
-            const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
-            controller.error(errorMsg);
+  const stream = new ReadableStream({
+    async start(controller) {
+      if (res.status !== 200) {
+        const data = {
+            status: res.status,
+            statusText: res.statusText,
+            body: await res.text(),
+        };
+        const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
+        controller.error(errorMsg);
+        return;
+      }
+
+      // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
+      // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
+      function onParse(event: any) {
+        if (event.type !== "event") return;
+        const dataString = event.data;
+        // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
+        if (dataString === "[DONE]") {
+          controller.close();
+          return;
+        }
+        try {
+          const msg = JSON.parse(dataString);
+          if ((msg?.choices?.at(0)?.finish_reason??"") === "stop") {
+            controller.close();
             return;
           }
-
-          // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
-          // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
-          function onParse(event: any) {
-            if (event.type !== "event") return;
-            const dataString = event.data;
-            // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
-            if (dataString === "[DONE]") {
-              controller.close();
-              return;
-            }
-            try {
-              const msg = JSON.parse(dataString);
-              if ((msg?.choices?.at(0)?.finish_reason??"") === "stop") {
-                controller.close();
-                return;
-              }
-              if ((msg?.choices?.at(0)?.finish_details??"") === "stop") {
-                controller.close();
-                return;
-              }
-              const text = msg?.choices?.at(0)?.delta?.content??"";
-              const queue = encoder.encode(text);
-              controller.enqueue(queue);
-            } catch (e) {
-              const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
-              controller.enqueue(errorMsg);
-              controller.error(errorMsg);
-            }
+          if ((msg?.choices?.at(0)?.finish_details??"") === "stop") {
+            controller.close();
+            return;
           }
-    
-          const parser = createParser(onParse);
-          for await (const chunk of res.body as any) {
-            const dataString = decoder.decode(chunk, { stream: true });
-            parser.feed(dataString);
-          }
+          const text = msg?.choices?.at(0)?.delta?.content??"";
+          const queue = encoder.encode(text);
+          controller.enqueue(queue);
+        } catch (e) {
+          const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
+          controller.enqueue(errorMsg);
+          controller.error(errorMsg);
+        }
+      }
 
-          controller.close();
-        },
-      });
-    return stream;
+      const parser = createParser(onParse);
+      for await (const chunk of res.body as any) {
+        const dataString = decoder.decode(chunk, { stream: true });
+        parser.feed(dataString);
+      }
+
+      controller.close();
+    },
+  });
+  
+  return stream;
 }
 
 export const runtime = "edge";
