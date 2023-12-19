@@ -483,7 +483,7 @@ export const useChatStore = create<ChatStore>()(
           countMessages(session.messages) >= SUMMARIZE_MIN_LEN
         ) {
           requestWithPrompt(session.messages, Locale.Store.Prompt.Topic, {
-            model: getSummaryModel(session.mask.modelConfig.model),
+            model: getSummaryModel(session.mask.modelConfig.model) as ModelType,
           }).then((res) => {
             get().updateCurrentSession(
               (session) =>
@@ -525,7 +525,7 @@ export const useChatStore = create<ChatStore>()(
           session.mask.modelConfig.sendMemory
         ) {
           requestWithPrompt(toBeSummarizedMsgs, Locale.Store.Prompt.Summarize, {
-            model: getSummaryModel(session.mask.modelConfig.model),
+            model: getSummaryModel(session.mask.modelConfig.model) as ModelType,
           }).then((res) => {
             if (res && trimTopic(res).length > 0) {
               session.memoryPrompt = trimTopic(res);
