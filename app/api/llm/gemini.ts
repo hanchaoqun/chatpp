@@ -81,12 +81,12 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     (isImage) 
     ? {
         role  : convertRole(v.role),
-        parts : convertImage(v.content),
+        parts : convertImage(v.content as ImageContent[]),
       }
     : {
         role  : convertRole(v.role),
         parts : [{
-                    text: v.content,
+                    text: v.content as string,
                 }], 
     }
   });
