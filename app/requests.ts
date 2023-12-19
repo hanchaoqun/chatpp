@@ -9,6 +9,7 @@ import {
   Message,
   ImageUrl,
   ImageContent,
+  ChatMessage,
   ChatRequest,
   ChatResponse,
 } from "./api/type/typing";
@@ -25,7 +26,7 @@ const makeRequestParam = (
     model?: ModelType;
   },
 ) => {
-  let sendMessages = [];
+  let sendMessages : ChatMessage[] = [];
 
   let lastRole = "system";
   historyMessages.forEach((v) => {
