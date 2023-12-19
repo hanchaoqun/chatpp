@@ -10,11 +10,10 @@ async function makeRequest(req: NextRequest) {
     res.headers.set("Cache-Control", "no-cache");
     return res;
   } catch (e) {
-    console.error("[ERROR] ", req.body, e);
     return NextResponse.json(
       {
         error: true,
-        msg: JSON.stringify(e),
+        msg: "ERROR: Fetch error!\n" + JSON.stringify(e),
       },
       {
         status: 500,

@@ -29,8 +29,7 @@ async function createStream(req: NextRequest) {
     const content = await (
         await res.text()
     ).replace(/provided:.*. You/, "provided: ***. You");
-    console.log("[Stream] ERROR ", content);
-    return "```json\n" + content + "```";
+    return "```json\n ERROR: Stream error!\n" + content + "```";
   }
 
   await decAccountCount(model??"", accessCode??"");
@@ -44,9 +43,8 @@ export async function POST(req: NextRequest) {
     const stream = await createStream(req);
     return new Response(stream);
   } catch (error) {
-    console.error("[ERROR]", error);
     return new Response(
-        ["```json\n", JSON.stringify(error, null, "  "), "\n```"].join(""),
+        ["```json\n ERROR: Fetch error!\n", JSON.stringify(error, null, "  "), "\n```"].join(""),
     );
   }
 }
