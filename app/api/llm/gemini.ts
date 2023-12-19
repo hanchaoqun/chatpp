@@ -181,9 +181,14 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         const dataString = event.data;
         try {
           const msg = JSON.parse(dataString);
-          const text = msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
-          const queue = encoder.encode(text);
-          controller.enqueue(queue);
+          const text = (msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "") as string;
+          if (text.length <= 0) {
+            const queue = encoder.encode(dataString);
+            controller.enqueue(queue);
+          } else {
+            const queue = encoder.encode(text);
+            controller.enqueue(queue);
+          }
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);

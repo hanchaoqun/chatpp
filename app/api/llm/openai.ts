@@ -113,8 +113,13 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
             return;
           }
           const text = msg?.choices?.at(0)?.delta?.content??"";
-          const queue = encoder.encode(text);
-          controller.enqueue(queue);
+          if (text.length <= 0) {
+            const queue = encoder.encode(dataString);
+            controller.enqueue(queue);
+          } else {
+            const queue = encoder.encode(text);
+            controller.enqueue(queue);
+          }
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);
