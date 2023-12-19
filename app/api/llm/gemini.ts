@@ -200,15 +200,23 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
           controller.close();
       },
   });
-  
-  const transformStream = new TransformStream({
-      async transform(chunk, controller) {
-          const data = decoder.decode(chunk);
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-      },
-  });
 
-  return stream.pipeThrough(transformStream);
+  const transformStream = new TransformStream({
+    async transform(chunk, controller) {
+        try {
+          const data = decoder.decode(chunk, {stream: true});
+          const json = JSON.parse(data);
+          
+          const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
+
+          controller.enqueue(encoder.encode(text));
+        } catch (e) {
+          controller.error(e);
+        }
+    },
+});
+
+  return readableStream.pipeThrough(transformStream);
 }
 
 export const runtime = "edge";

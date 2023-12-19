@@ -149,16 +149,16 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
 
             const json = JSON.parse(data);
 
-            if ((json.choices[0].finish_reason??"") === "stop") {
+            if ((json?.choices?.at(0)?.finish_reason??"") === "stop") {
               controller.close();
               return;
             }
-            if ((json.choices[0].finish_details??"") === "stop") {
+            if ((json?.choices?.at(0)?.finish_details??"") === "stop") {
               controller.close();
               return;
             }
+            const text = json?.choices?.at(0)?.delta?.content??"";
 
-            const text = json.choices[0].delta.content;
             controller.enqueue(encoder.encode(text));
           } catch (e) {
             controller.error(e);
