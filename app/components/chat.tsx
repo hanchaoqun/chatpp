@@ -400,7 +400,8 @@ async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() 
 }
 
 function isVisionModel(model:string) {
-  return model.startsWith("gpt-4-vision");
+  /* gpt-4-vision && gemini-pro-vision */
+  return model.includes("vision");
 }
 
 async function uploadImage(

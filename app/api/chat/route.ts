@@ -59,4 +59,4 @@ export const preferredRegion =
       "sfo1",
       "sin1",
       "syd1"
-    ];
+  ];
