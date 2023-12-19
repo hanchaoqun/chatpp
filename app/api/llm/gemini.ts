@@ -76,7 +76,7 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     baseUrl = `${PROTOCOL}://${baseUrl}`;
   }
 
-  console.log("[GEMINI] Request:", baseUrl, chatPath, model, stream);
+  console.log("[GEMINI] Request:", baseUrl, chatPath, model, chatOP, stream);
 
   const chatReq = await req.json() as ChatRequest;
   const msgs = chatReq.messages.map((v) => {
@@ -134,14 +134,28 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
   });
 }
 
+export async function checkResponseStreamGemini(res: Response, stream: boolean) {
+  const contentType = res.headers.get("Content-Type") ?? "";
+  /* text/html */
+  if (stream && !contentType.includes("text/html")) {
+    const content = await (
+        await res.text()
+    ).replace(/provided:.*. You/, "provided: ***. You");
+    return "```json\n ERROR: Stream error!\n" + content + "```";
+  }
+}
+
 export async function responseStreamGemini(res: any, encoder: TextEncoder, decoder: TextDecoder) {
     const stream = new ReadableStream({
         async start(controller) {
           function onParse(event: any) {
+            console.log("DEBUG: event ->", event);
             if (event.type === "event") {
               const data = event.data;
               try {
+                console.log("DEBUG: data ->", data);
                 const json = JSON.parse(data);
+                console.log("DEBUG: json ->", json);
                 const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
                 const queue = encoder.encode(text);
                 controller.enqueue(queue);
@@ -153,6 +167,7 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
     
           const parser = createParser(onParse);
           for await (const chunk of res.body as any) {
+            console.log("DEBUG: chunk ->", chunk);
             parser.feed(decoder.decode(chunk, { stream: true }));
           }
           

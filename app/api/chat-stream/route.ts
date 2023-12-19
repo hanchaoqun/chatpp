@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { request, responseStream } from "../llm/sdk";
+import { request, responseStream, checkResponseStream } from "../llm/sdk";
 import { decCount } from "../../account/server";
 import { getServerSideConfig } from "../../config/server";
 
@@ -23,13 +23,10 @@ async function createStream(req: NextRequest) {
 
   const res = await request(model??"", req, true);
 
-  const contentType = res.headers.get("Content-Type") ?? "";
-  console.log("DEBUG", "contentType", contentType);
-  if (!contentType.includes("stream")) {
-    const content = await (
-        await res.text()
-    ).replace(/provided:.*. You/, "provided: ***. You");
-    return "```json\n ERROR: Stream error!\n" + content + "```";
+  const errorMsg = await checkResponseStream(model??"", res, true);
+
+  if (errorMsg) {
+    return errorMsg;
   }
 
   await decAccountCount(model??"", accessCode??"");

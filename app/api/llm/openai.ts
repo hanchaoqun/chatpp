@@ -61,6 +61,17 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
   });
 }
 
+export async function checkResponseStreamOpenAi(res: Response, stream: boolean) {
+  const contentType = res.headers.get("Content-Type") ?? "";
+  /* text/event-stream */
+  if (stream && !contentType.includes("stream")) {
+    const content = await (
+        await res.text()
+    ).replace(/provided:.*. You/, "provided: ***. You");
+    return "```json\n ERROR: Stream error!\n" + content + "```";
+  }
+}
+
 export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decoder: TextDecoder) {
     const stream = new ReadableStream({
         async start(controller) {

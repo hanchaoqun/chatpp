@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requestOpenAi, responseStreamOpenAi } from "./openai";
-import { requestGemini, responseStreamGemini } from "./gemini";
-
+import { requestOpenAi, responseStreamOpenAi, checkResponseStreamOpenAi } from "./openai";
+import { requestGemini, responseStreamGemini, checkResponseStreamGemini } from "./gemini";
 
 export async function request(model: string, req: NextRequest, stream: boolean) {
     if (model.startsWith("gpt")) {
@@ -11,6 +10,16 @@ export async function request(model: string, req: NextRequest, stream: boolean) 
         return await requestGemini(req, stream);
     }
     return await requestOpenAi(req, stream);
+}
+
+export async function checkResponseStream(model: string, res: Response, stream: boolean) {
+    if (model.startsWith("gpt")) {
+        return await checkResponseStreamOpenAi(res, stream);
+    }
+    if (model.startsWith("gemini")) {
+        return await checkResponseStreamGemini(res, stream);
+    }
+    return await checkResponseStreamOpenAi(res, stream);
 }
 
 export async function responseStream(model: string, res: any, encoder: TextEncoder, decoder: TextDecoder) {
