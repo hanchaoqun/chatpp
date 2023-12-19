@@ -72,6 +72,7 @@ export async function checkResponseStreamOpenAi(res: Response, stream: boolean) 
   }
 }
 
+/*
 export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decoder: TextDecoder) {
     const stream = new ReadableStream({
         async start(controller) {
@@ -109,6 +110,63 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
         },
       });
     return stream;
+}
+*/
+
+
+export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decoder: TextDecoder) {
+  // https://web.dev/articles/streams
+  const readableStream = new ReadableStream({
+    async start(controller) {
+        if (res.status !== 200) {
+            const data = {
+                status: res.status,
+                statusText: res.statusText,
+                body: await res.text(),
+            }
+            controller.error(`ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`);
+            return;
+        }
+
+        for await (const chunk of res.body as any) {
+            controller.enqueue(chunk);
+        }
+
+        controller.close();
+    },
+  });
+
+  const transformStream = new TransformStream({
+      async transform(chunk, controller) {
+          try {
+            const data = decoder.decode(chunk, {stream: true});
+
+            // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
+            if (data === "[DONE]") {
+              controller.close();
+              return;
+            }
+
+            const json = JSON.parse(data);
+
+            if ((json.choices[0].finish_reason??"") === "stop") {
+              controller.close();
+              return;
+            }
+            if ((json.choices[0].finish_details??"") === "stop") {
+              controller.close();
+              return;
+            }
+
+            const text = json.choices[0].delta.content;
+            controller.enqueue(encoder.encode(text));
+          } catch (e) {
+            controller.error(e);
+          }
+      },
+  });
+
+  return readableStream.pipeThrough(transformStream);
 }
 
 export const runtime = "edge";

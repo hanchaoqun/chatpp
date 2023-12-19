@@ -145,6 +145,7 @@ export async function checkResponseStreamGemini(res: Response, stream: boolean) 
   }
 }
 
+/*
 export async function responseStreamGemini(res: any, encoder: TextEncoder, decoder: TextDecoder) {
     const stream = new ReadableStream({
         async start(controller) {
@@ -175,6 +176,39 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         },
       });
     return stream;
+}*/
+
+export async function responseStreamGemini(res: any, encoder: TextEncoder, decoder: TextDecoder) {
+  // https://web.dev/articles/streams
+  const readableStream = new ReadableStream({
+      async start(controller) {
+          if (res.status !== 200) {
+              const data = {
+                  status: res.status,
+                  statusText: res.statusText,
+                  body: await res.text(),
+              }
+              console.error(`ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`);
+              controller.close();
+              return;
+          }
+
+          for await (const chunk of res.body as any) {
+              controller.enqueue(chunk);
+          }
+
+          controller.close();
+      },
+  });
+  
+  const transformStream = new TransformStream({
+      async transform(chunk, controller) {
+          const data = decoder.decode(chunk);
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+      },
+  });
+
+  return stream.pipeThrough(transformStream);
 }
 
 export const runtime = "edge";
