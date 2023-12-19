@@ -80,24 +80,24 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
 
   const chatReq = await req.json() as ChatRequest;
   const msgs = chatReq.messages.map((v) => {
-    (isImage) 
-    ? {
-        role  : convertRole(v.role),
-        parts : convertImage(v.content as ImageContent[]),
-      }
-    : {
-        role  : convertRole(v.role),
-        parts : [{
-                    text: v.content as string,
-                }], 
-    }
+    return (isImage) 
+            ? {
+                role  : convertRole(v.role),
+                parts : convertImage(v.content as ImageContent[]),
+              }
+            : {
+                role  : convertRole(v.role),
+                parts : [{
+                            text: v.content as string,
+                        }], 
+              };
   });
   const body = {
     contents: [...msgs],
     generationConfig: {
-      temperature: chatReq.temperature,
-      topP: chatReq.top_p,
-      maxOutputTokens: chatReq.max_tokens,
+      temperature?: chatReq.temperature,
+      topP?: chatReq.top_p,
+      maxOutputTokens?: chatReq.max_tokens,
     },
   };
 
