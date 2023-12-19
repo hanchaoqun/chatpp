@@ -76,6 +76,14 @@ export const ALL_MODELS = [
     name: "gpt-3.5-turbo-16k",
     available: true,
   },
+  {
+    name: "gemini-pro",
+    available: true,
+  },
+  {
+    name: "gemini-pro-vision",
+    available: true,
+  },
 ] as const;
 
 export type ModelType = (typeof ALL_MODELS)[number]["name"];
