@@ -138,9 +138,8 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
 
 export async function checkResponseStreamGemini(res: Response, stream: boolean) {
   const contentType = res.headers.get("Content-Type") ?? "";
-  console.log("[DEBUG] contentType ->", contentType);
-  /* text/html */
-  if (stream && !contentType.includes("text")) {
+  /* application/json */
+  if (stream && !contentType.includes("json")) {
     const content = await (
         await res.text()
     ).replace(/provided:.*. You/, "provided: ***. You");
