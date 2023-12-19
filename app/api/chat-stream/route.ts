@@ -24,6 +24,7 @@ async function createStream(req: NextRequest) {
   const res = await request(model??"", req, true);
 
   const contentType = res.headers.get("Content-Type") ?? "";
+  console.log("DEBUG", "contentType", contentType);
   if (!contentType.includes("stream")) {
     const content = await (
         await res.text()
