@@ -127,6 +127,7 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     };
     try {
         const json = await res.json();
+        console.log("[DEBUG] json ->", json);
         msg = {
             role: reverseRole(json?.candidates?.at(0)?.content?.role??""),
             content: json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "",
