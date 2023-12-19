@@ -37,13 +37,15 @@ async function createStream(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    /*
     const headers = {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-    }
+    }*/
     const stream = await createStream(req);
-    return new Response(stream, {headers});
+    /* Add {headers} as parameter? */
+    return new Response(stream);
   } catch (error) {
     return new Response(
         ["```json\n ERROR: Fetch error!\n", JSON.stringify(error, null, "  "), "\n```"].join(""),

@@ -82,9 +82,7 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
                 body: await res.text(),
             };
             const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
-            //controller.error(errorMsg);
-            controller.enqueue(errorMsg);
-            controller.close();
+            controller.error(errorMsg);
             return;
           }
 
@@ -113,9 +111,7 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
               controller.enqueue(queue);
             } catch (e) {
               const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
-              //controller.error(errorMsg);
-              controller.enqueue(errorMsg);
-              controller.close();
+              controller.error(errorMsg);
             }
           }
     
