@@ -3,8 +3,8 @@ import { createParser } from "eventsource-parser";
 import { ChatResponse, ChatRequest, ImageContent } from "../type/typing";
 
 const GEMINI_URL = "generativelanguage.googleapis.com";
-const GEMINI_CHAT_PATH = "v1beta/models/";
-const GEMINI_CHAT_STREAM_PATH = "v1beta/models/";
+const GEMINI_CHAT_PATH = "v1beta/models";
+const GEMINI_CHAT_STREAM_PATH = "v1beta/models";
 const GEMINI_CHAT_OP = "generateContent";
 const GEMINI_CHAT_STREAM_OP = "streamGenerateContent";
 const DEFAULT_PROTOCOL = "https";
