@@ -145,78 +145,42 @@ export async function checkResponseStreamGemini(res: Response, stream: boolean) 
   }
 }
 
-/*
 export async function responseStreamGemini(res: any, encoder: TextEncoder, decoder: TextDecoder) {
-    const stream = new ReadableStream({
-        async start(controller) {
-          function onParse(event: any) {
-            console.log("DEBUG: event ->", event);
-            if (event.type === "event") {
-              const data = event.data;
-              try {
-                console.log("DEBUG: data ->", data);
-                const json = JSON.parse(data);
-                console.log("DEBUG: json ->", json);
-                const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
-                const queue = encoder.encode(text);
-                controller.enqueue(queue);
-              } catch (e) {
-                controller.error(e);
-              }
-            }
-          }
-    
-          const parser = createParser(onParse);
-          for await (const chunk of res.body as any) {
-            console.log("DEBUG: chunk ->", chunk);
-            parser.feed(decoder.decode(chunk, { stream: true }));
-          }
-          
-          controller.close();
-        },
-      });
-    return stream;
-}*/
+  const stream = new ReadableStream({
+    async start(controller) {
+      if (res.status !== 200) {
+        const data = {
+            status: res.status,
+            statusText: res.statusText,
+            body: await res.text(),
+        };
+        controller.error(`ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`);
+        return;
+      }
 
-export async function responseStreamGemini(res: any, encoder: TextEncoder, decoder: TextDecoder) {
-  // https://web.dev/articles/streams
-  const readableStream = new ReadableStream({
-      async start(controller) {
-          if (res.status !== 200) {
-              const data = {
-                  status: res.status,
-                  statusText: res.statusText,
-                  body: await res.text(),
-              }
-              console.error(`ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`);
-              controller.close();
-              return;
-          }
-
-          for await (const chunk of res.body as any) {
-              controller.enqueue(chunk);
-          }
-
-          controller.close();
-      },
-  });
-
-  const transformStream = new TransformStream({
-    async transform(chunk, controller) {
+      // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
+      // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
+      function onParse(event: any) {
+        if (event.type !== "event") return;
+        const dataString = event.data;
         try {
-          const data = decoder.decode(chunk, {stream: true});
-          const json = JSON.parse(data);
-          
-          const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
-
-          controller.enqueue(encoder.encode(text));
+          const msg = JSON.parse(dataString);
+          const text = msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
+          const queue = encoder.encode(text);
+          controller.enqueue(queue);
         } catch (e) {
-          controller.error(e);
+          controller.error(`ERROR: Parse stream data error, ${JSON.stringify(e)}`);
         }
-    },
-});
+      }
 
-  return readableStream.pipeThrough(transformStream);
+      const parser = createParser(onParse);
+      for await (const chunk of res.body as any) {
+        console.log("[DEBUG]: Chunk = ", chunk);
+        parser.feed(decoder.decode(chunk, { stream: true }));
+      }
+    },
+  });
+  return stream;
 }
 
 export const runtime = "edge";
