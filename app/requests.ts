@@ -25,7 +25,7 @@ const makeRequestParam = (
     model?: ModelType;
   },
 ) => {
-  let sendMessages: Message[] = [];
+  let sendMessages = [];
 
   let lastRole = "system";
   historyMessages.forEach((v) => {
