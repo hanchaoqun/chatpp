@@ -93,13 +93,15 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     }
   });
   const body = {
-    contents: msgs,
+    contents: [...msgs],
     generationConfig: {
       temperature: chatReq.temperature,
       topP: chatReq.top_p,
       maxOutputTokens: chatReq.max_tokens,
     },
   };
+
+  console.log("[DEBUG] SEND ->", body);
 
   const response = fetch(`${baseUrl}/${chatPath}/${model}:${chatOP}?key=${apiKey}`, {
     headers: {
@@ -141,7 +143,7 @@ export async function checkResponseStreamGemini(res: Response, stream: boolean) 
     const content = await (
         await res.text()
     ).replace(/provided:.*. You/, "provided: ***. You");
-    return "```json\nERROR: Stream error!\n" + content + "```";
+    return "```json\nERROR: Stream error!\n" + content + "\n```";
   }
 }
 

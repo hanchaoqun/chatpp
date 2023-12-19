@@ -68,7 +68,7 @@ export async function checkResponseStreamOpenAi(res: Response, stream: boolean) 
     const content = await (
         await res.text()
     ).replace(/provided:.*. You/, "provided: ***. You");
-    return "```json\nERROR: Stream error!\n" + content + "```";
+    return "```json\nERROR: Stream error!\n" + content + "\n```";
   }
 }
 
