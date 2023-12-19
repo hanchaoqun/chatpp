@@ -121,6 +121,8 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
             const dataString = decoder.decode(chunk, { stream: true });
             parser.feed(dataString);
           }
+
+          controller.close();
         },
       });
     return stream;

@@ -183,6 +183,8 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         console.log("[DEBUG] dataString, ", dataString);
         parser.feed(dataString);
       }
+
+      controller.close();
     },
   });
   return stream;
