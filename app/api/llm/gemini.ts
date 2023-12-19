@@ -134,6 +134,7 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     } catch(e) {
         console.log("[ERROR]", e);
     }
+    console.log("[DEBUG] msg ->", msg);
     return new Response(JSON.stringify(msg), {
         status: 200, 
         headers: {'Content-Type': 'application/json',},
