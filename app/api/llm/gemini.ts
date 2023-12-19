@@ -47,16 +47,16 @@ function getMimeData(img: ImageContent) {
 
 function convertImage(content: ImageContent[]) {
     return content.map((v) => {
-        (v.type === "image_url") 
-        ? {
-          inline_data: {
-            mime_type: getMimeType(v),
-            data: getMimeData(v),
+        return (v.type === "image_url") 
+          ? {
+            inline_data: {
+              mime_type: getMimeType(v),
+              data: getMimeData(v),
+            }
           }
-        }
-        : {
-          text: v.text,
-        }
+          : {
+            text: v.text,
+          }
     });
 }
 
