@@ -101,8 +101,6 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     },
   };
 
-  console.log("[DEBUG] SEND ->", body);
-
   const response = fetch(`${baseUrl}/${chatPath}/${model}:${chatOP}?key=${apiKey}`, {
     headers: {
       "Content-Type": "application/json",
@@ -173,13 +171,13 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
           controller.enqueue(queue);
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
+          controller.enqueue(errorMsg);
           controller.error(errorMsg);
         }
       }
 
       const parser = createParser(onParse);
       for await (const chunk of res.body as any) {
-        console.log("[DEBUG]: Chunk = ", chunk);
         parser.feed(decoder.decode(chunk, { stream: true }));
       }
     },

@@ -111,6 +111,7 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
               controller.enqueue(queue);
             } catch (e) {
               const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
+              controller.enqueue(errorMsg);
               controller.error(errorMsg);
             }
           }
