@@ -113,7 +113,7 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
             controller.close();
             return;
           }
-          const text = msg?.choices?.at(0)?.delta?.content??"";
+          const text = msg?.choices?.at(0)?.delta?.content??" ";
           const queue = encoder.encode(text);
           controller.enqueue(queue);
         } catch (e) {

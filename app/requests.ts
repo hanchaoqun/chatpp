@@ -49,7 +49,7 @@ const makeRequestParam = (
           ? m
           : {
             role: m.role,
-            content: "",
+            content: " ",
           };
     });
   }
