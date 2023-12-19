@@ -118,7 +118,8 @@ export async function responseStreamOpenAi(res: any, encoder: TextEncoder, decod
     
           const parser = createParser(onParse);
           for await (const chunk of res.body as any) {
-            parser.feed(decoder.decode(chunk, { stream: true }));
+            const dataString = decoder.decode(chunk, { stream: true });
+            parser.feed(dataString);
           }
         },
       });

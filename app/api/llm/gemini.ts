@@ -178,7 +178,9 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
 
       const parser = createParser(onParse);
       for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk, { stream: true }));
+        const dataString = decoder.decode(chunk, { stream: true });
+        console.log("[DEBUG] dataString, ", dataString);
+        parser.feed(dataString);
       }
     },
   });
