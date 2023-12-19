@@ -162,6 +162,7 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
       // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
       // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
       function onParse(event: any) {
+        console.log("[DEBUG] event, ", event);
         if (event.type !== "event") return;
         const dataString = event.data;
         try {
