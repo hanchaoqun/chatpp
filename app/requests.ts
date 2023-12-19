@@ -31,7 +31,14 @@ const makeRequestParam = (
   }));
 
   if (options?.filterBot) {
-    sendMessages = sendMessages.filter((m) => m.role !== "assistant");
+    sendMessages = sendMessages.filter((m) => (m.role !== "system")).map((m) => {
+      return (m.role !== "assistant")
+          ? m
+          : {
+            role: m.role,
+            content: "",
+          };
+    });
   }
 
   const modelConfig = {
