@@ -79,7 +79,7 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
   console.log("[GEMINI] Request:", baseUrl, chatPath, model, chatOP, stream);
 
   const chatReq = await req.json() as ChatRequest;
-  
+
   const msgs = chatReq.messages.map((v) => {
     return (isImage) 
             ? {
@@ -143,8 +143,8 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
 
 export async function checkResponseStreamGemini(res: Response, stream: boolean) {
   const contentType = res.headers.get("Content-Type") ?? "";
-  /* application/json */
-  if (stream && !contentType.includes("json")) {
+  /* text/event-stream */
+  if (stream && !contentType.includes("stream")) {
     const content = await (
         await res.text()
     ).replace(/provided:.*. You/, "provided: ***. You");
@@ -166,34 +166,34 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
         return;
       }
 
-      for await (const chunk of res.body as any) {
-        controller.enqueue(chunk);
-      }
-
-      controller.close();
-    },
-  });
-
-
-  const transformStream = new TransformStream({
-    async transform(chunk, controller) {
+      // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
+      // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
+      function onParse(event: any) {
+        if (event.type !== "event") return;
+        const dataString = event.data;
         try {
-          const data = decoder.decode(chunk, {stream: true});
-          console.log("[DEBUG] data ->", data);
-          const json = JSON.parse(data);
-          console.log("[DEBUG] json ->", json);
-          const text = json?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
-
-          controller.enqueue(encoder.encode(text));
+          const msg = JSON.parse(dataString);
+          const text = msg?.candidates?.at(0)?.content?.parts?.at(0)?.text ?? "";
+          const queue = encoder.encode(text);
+          controller.enqueue(queue);
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);
           controller.error(errorMsg);
         }
+      }
+
+      const parser = createParser(onParse);
+      for await (const chunk of res.body as any) {
+        const dataString = decoder.decode(chunk, { stream: true });
+        parser.feed(dataString);
+      }
+
+      controller.close();
     },
   });
-
-  return stream.pipeThrough(transformStream);
+  
+  return stream;
 }
 
 export const runtime = "edge";
