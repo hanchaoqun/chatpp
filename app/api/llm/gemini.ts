@@ -79,6 +79,7 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
   console.log("[GEMINI] Request:", baseUrl, chatPath, model, chatOP, stream);
 
   const chatReq = await req.json() as ChatRequest;
+  
   const msgs = chatReq.messages.map((v) => {
     return (isImage) 
             ? {
@@ -92,6 +93,7 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
                         }], 
               };
   });
+
   const body = {
     contents: [...msgs],
     generationConfig: {
@@ -101,7 +103,12 @@ export async function requestGemini(req: NextRequest, stream: boolean) {
     },
   };
 
-  const response = fetch(`${baseUrl}/${chatPath}/${model}:${chatOP}?key=${apiKey}`, {
+  let opts = "";
+  if (stream) {
+    opts = "&alt=sse";
+  }
+
+  const response = fetch(`${baseUrl}/${chatPath}/${model}:${chatOP}?key=${apiKey}${opts}`, {
     headers: {
       "Content-Type": "application/json",
     },
