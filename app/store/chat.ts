@@ -294,16 +294,21 @@ export const useChatStore = create<ChatStore>()(
               ...userMessage,
             });
         if (isImage) {
-          const userimgs = JSON.parse(userMessage.content) as ImageContent[];
-          let imgs  = getImagesInputMarkDown(userimgs.filter((m) => m.type === "image_url"));
-          let texts = userimgs.filter((m) => m.type === "text")
-                              .map((v) => v.text??'')
-                              .join('\n');
-          let saveimgs = '';
-          if (imgs.length > 0) {
-            saveimgs = `Images:\n---\n${imgs}\n---\n\n`;
+          try {
+            const userimgs = JSON.parse(userMessage.content) as ImageContent[];
+            let imgs  = getImagesInputMarkDown(userimgs.filter((m) => m.type === "image_url"));
+            let texts = userimgs.filter((m) => m.type === "text")
+                                .map((v) => v.text??'')
+                                .join('\n');
+            let saveimgs = '';
+            if (imgs.length > 0) {
+              saveimgs = `Images:\n---\n${imgs}\n---\n\n`;
+            }
+            saveUserMessage.contentImages = userMessage.content;
+            saveUserMessage.content = `${saveimgs}${texts}`;
+          } catch (e) {
+            saveUserMessage.content = `ERROR: Images is missing!`;
           }
-          saveUserMessage.content = `${saveimgs}${texts}`;
         }
         get().updateCurrentSession((session) => {
           session.messages.push(saveUserMessage);

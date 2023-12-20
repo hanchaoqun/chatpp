@@ -819,13 +819,18 @@ export function Chat() {
 
   const onResend = (botMessageId: number) => {
     // find last user input message and resend
+    const isImage = isVisionModel(currentModel);
     const userIndex = findLastUserIndex(botMessageId);
     if (userIndex === null) return;
     const currentModel = chatStore.currentSession().mask.modelConfig.model;
     setIsLoading(true);
-    const content = session.messages[userIndex].content;
+    let content = session.messages[userIndex].content;
+    const contentImages = (session.messages[userIndex].contentImages??'') as string;
+    if (isImage && contentImages.length > 0) {
+      content = contentImages;
+    }
     deleteMessage(userIndex);
-    chatStore.onUserInput(content??'', isVisionModel(currentModel)).then(() => setIsLoading(false));
+    chatStore.onUserInput(content??'', isImage).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
