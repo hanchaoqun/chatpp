@@ -76,30 +76,47 @@ const makeRequestParam = (
     modelConfig.model = options.model;
   }
 
-  if ((userMessage.isImage??false) === true) {
-      const userimgs = JSON.parse(userMessage.content) as ImageContent[];
-      let imgs = userimgs.filter((m) => m.type === "image_url").map((v) => ({
-        type: v.type,
-        image_url: {
-          url: v.image_url?.url,
-          detail: v.image_url?.detail,
-        },
-      }));
-      let texts = userimgs.filter((m) => m.type === "text").map((v) => ({
-        type: v.type,
-        text: v.text,
-      }));
-      return {
-        messages: [{
-          role: userMessage.role,
-          content: [...imgs, ...texts],
-        }],
-        stream: options?.stream,
-        model: modelConfig.model,
-        temperature: modelConfig.temperature,
-        presence_penalty: modelConfig.presence_penalty,
-        max_tokens: 1024,
-      } as ChatRequest;
+  if (userMessage.isImage) {
+      try {
+        const userimgs = JSON.parse(userMessage.content) as ImageContent[];
+        let imgs = userimgs.filter((m) => m.type === "image_url").map((v) => ({
+          type: v.type,
+          image_url: {
+            url: v.image_url?.url,
+            detail: v.image_url?.detail,
+          },
+        }));
+        let texts = userimgs.filter((m) => m.type === "text").map((v) => ({
+          type: v.type,
+          text: v.text,
+        }));
+        return {
+          messages: [{
+            role: userMessage.role,
+            content: [...imgs, ...texts],
+          }],
+          stream: options?.stream,
+          model: modelConfig.model,
+          temperature: modelConfig.temperature,
+          presence_penalty: modelConfig.presence_penalty,
+          max_tokens: 1024,
+        } as ChatRequest;
+      } catch (e) {
+        return {
+          messages: [{
+            role: userMessage.role,
+            content: [{
+              type: "text",
+              text: userMessage.content,
+            }],
+          }],
+          stream: options?.stream,
+          model: modelConfig.model,
+          temperature: modelConfig.temperature,
+          presence_penalty: modelConfig.presence_penalty,
+          max_tokens: 1024,
+        } as ChatRequest;
+      }
   }
   return {
     messages: [...sendMessages, {
