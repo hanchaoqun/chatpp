@@ -746,7 +746,7 @@ export function Chat() {
       if (userInput.length <= 0 && pdfInput.length <= 0) return;
       inputText = userInput;
       if (pdfInput.length > 0) {
-        inputText = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
+        inputText = "PDFs:\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
       }
       setPDFInput("");
     }

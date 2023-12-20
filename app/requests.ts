@@ -31,10 +31,22 @@ const makeRequestParam = (
   let lastRole = "system";
   historyMessages.forEach((v) => {
     if (v.role !== lastRole) {
-      sendMessages.push({
-        role: v.role,
-        content: v.content,
-      });
+      if (v.content.startsWith("Images:\n---\n")) {
+        sendMessages.push({
+          role: v.role,
+          content: "Images",
+        });
+      } else if (v.content.startsWith("PDFs:\n---\n")){
+        sendMessages.push({
+          role: v.role,
+          content: v.content,
+        });
+      } else {
+        sendMessages.push({
+          role: v.role,
+          content: v.content,
+        });
+      }
       lastRole = v.role;
     }
   });
