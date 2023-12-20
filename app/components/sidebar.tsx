@@ -107,7 +107,7 @@ export function SideBar(props: { className?: string }) {
         accessStore.updateUserCount(count);
       });
       */
-  }, [router]);
+  }, [router, accessStore]);
 
   const getAccessType = useMemo(
     () => accessStore.getAccessType(),
