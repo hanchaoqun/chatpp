@@ -819,10 +819,10 @@ export function Chat() {
 
   const onResend = (botMessageId: number) => {
     // find last user input message and resend
-    const isImage = isVisionModel(currentModel);
     const userIndex = findLastUserIndex(botMessageId);
     if (userIndex === null) return;
     const currentModel = chatStore.currentSession().mask.modelConfig.model;
+    const isImage = isVisionModel(currentModel);
     setIsLoading(true);
     let content = session.messages[userIndex].content;
     const contentImages = (session.messages[userIndex].contentImages??'') as string;
