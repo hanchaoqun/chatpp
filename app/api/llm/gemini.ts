@@ -37,22 +37,31 @@ function reverseRole(role: string) {
   return "";
 }
 
-function getMimeType(img: ImageContent) {
-  return "image/jpeg";
-}
+function getInlineData(img: ImageContent) {
+  const regExp = /^data:(.+?);base64,(.+)$/;
 
-function getMimeData(img: ImageContent) {
-  return "";
+  const match = img.image_url?.url.match(regExp);
+
+  if (match && match.length === 3) {
+    const mimeType = match[1];
+    const base64Data = match[2];
+    return {
+      mime_type: mimeType,
+      data: `base64,${base64Data}`,
+    };
+  } else {
+    return {
+      mime_type: 'image/png',
+      data: `base64,EMPTY`,
+    };
+  }
 }
 
 function convertImage(content: ImageContent[]) {
     return content.map((v) => {
         return (v.type === "image_url") 
           ? {
-            inline_data: {
-              mime_type: getMimeType(v),
-              data: getMimeData(v),
-            }
+            inline_data: getInlineData(v),
           }
           : {
             text: v.text,
@@ -193,7 +202,6 @@ export async function responseStreamGemini(res: any, encoder: TextEncoder, decod
       const parser = createParser(onParse);
       for await (const chunk of res.body as any) {
         const dataString = decoder.decode(chunk, { stream: true });
-        console.log("[DEBUG] dataString -> ", dataString);
         parser.feed(dataString);
       }
 
