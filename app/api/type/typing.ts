@@ -24,6 +24,7 @@ export type Message = ChatMessage & {
     isError?: boolean;
     model?: string;
     isImage?: boolean;
+    contentImages?: string;
 };
 
 
