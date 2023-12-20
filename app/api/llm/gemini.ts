@@ -47,12 +47,12 @@ function getInlineData(img: ImageContent) {
     const base64Data = match[2];
     return {
       mime_type: mimeType,
-      data: `base64,${base64Data}`,
+      data: `${base64Data}`,
     };
   } else {
     return {
       mime_type: 'image/png',
-      data: `base64,EMPTY`,
+      data: `EMPTY`,
     };
   }
 }
