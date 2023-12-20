@@ -1,13 +1,18 @@
 import {
-  Message,
-  ImageUrl,
-  ImageContent,
   ModelConfig,
   ModelType,
   useAccessStore,
   useAppConfig,
   useChatStore,
 } from "./store";
+import {
+  Message,
+  ImageUrl,
+  ImageContent,
+  ChatMessage,
+  ChatRequest,
+  ChatResponse,
+} from "./api/type/typing";
 import { showToast } from "./components/ui-lib";
 
 const TIME_OUT_MS = 60000;
@@ -21,13 +26,44 @@ const makeRequestParam = (
     model?: ModelType;
   },
 ) => {
-  let sendMessages = historyMessages.map((v) => ({
-    role: v.role,
-    content: v.content,
-  }));
+  let sendMessages : ChatMessage[] = [];
+
+  let lastRole = "system";
+  historyMessages.forEach((v) => {
+    if (v.role !== lastRole) {
+      if (v.content.startsWith("Images:\n---\n")) {
+        sendMessages.push({
+          role: v.role,
+          content: "Images",
+        });
+      } else if (v.content.startsWith("PDFs:\n---\n")){
+        sendMessages.push({
+          role: v.role,
+          content: v.content,
+        });
+      } else {
+        sendMessages.push({
+          role: v.role,
+          content: v.content,
+        });
+      }
+      lastRole = v.role;
+    }
+  });
+  
+  if (sendMessages.length > 0 && sendMessages[0].role !== 'user') {
+    sendMessages.shift();
+  }
 
   if (options?.filterBot) {
-    sendMessages = sendMessages.filter((m) => m.role !== "assistant");
+    sendMessages = sendMessages.filter((m) => (m.role !== "system")).map((m) => {
+      return (m.role !== "assistant")
+          ? m
+          : {
+            role: m.role,
+            content: " ",
+          };
+    });
   }
 
   const modelConfig = {
@@ -63,7 +99,7 @@ const makeRequestParam = (
         temperature: modelConfig.temperature,
         presence_penalty: modelConfig.presence_penalty,
         max_tokens: 1024,
-      };
+      } as ChatRequest;
   }
   return {
     messages: [...sendMessages, {
@@ -74,7 +110,7 @@ const makeRequestParam = (
     model: modelConfig.model,
     temperature: modelConfig.temperature,
     presence_penalty: modelConfig.presence_penalty,
-  };
+  } as ChatRequest;
 };
 
 function getHeaders() {
@@ -93,20 +129,6 @@ function getHeaders() {
   return headers;
 }
 
-export function requestOpenaiClient(path: string) {
-  return (body: any, method = "POST") =>
-    fetch("/api/openai", {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        path,
-        "model": (!body?.model)? "" : body.model,
-        ...getHeaders(),
-      },
-      body: body && JSON.stringify(body),
-    });
-}
-
 export async function requestChat(
   historyMessages: Message[],
   userMessage: Message,
@@ -119,64 +141,21 @@ export async function requestChat(
     model: options?.model,
   });
 
-  const res = await requestOpenaiClient("v1/chat/completions")(req);
-
   try {
+    const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "model": (!req?.model)? "" : req.model,
+          ...getHeaders(),
+        },
+        body: JSON.stringify(req),
+      });
     const response = await res.json();
     return response;
   } catch (error) {
-    console.error("[Request Chat] ", error, res.body);
+    console.error("[ERROR] ", error);
   }
-}
-
-export async function requestUsage() {
-  const formatDate = (d: Date) =>
-    `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d
-      .getDate()
-      .toString()
-      .padStart(2, "0")}`;
-  const ONE_DAY = 2 * 24 * 60 * 60 * 1000;
-  const now = new Date(Date.now() + ONE_DAY);
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startDate = formatDate(startOfMonth);
-  const endDate = formatDate(now);
-
-  const [used, subs] = await Promise.all([
-    requestOpenaiClient(
-      `dashboard/billing/usage?start_date=${startDate}&end_date=${endDate}`,
-    )(null, "GET"),
-    requestOpenaiClient("dashboard/billing/subscription")(null, "GET"),
-  ]);
-
-  const response = (await used.json()) as {
-    total_usage?: number;
-    error?: {
-      type: string;
-      message: string;
-    };
-  };
-
-  const total = (await subs.json()) as {
-    hard_limit_usd?: number;
-  };
-
-  if (response.error && response.error.type) {
-    showToast(response.error.message);
-    return;
-  }
-
-  if (response.total_usage) {
-    response.total_usage = Math.round(response.total_usage) / 100;
-  }
-
-  if (total.hard_limit_usd) {
-    total.hard_limit_usd = Math.round(total.hard_limit_usd * 100) / 100;
-  }
-
-  return {
-    used: response.total_usage,
-    subscription: total.hard_limit_usd,
-  };
 }
 
 export async function requestChatStream(
@@ -199,8 +178,6 @@ export async function requestChatStream(
     model: options?.model,
   });
 
-  console.log("[Request] ", req);
-
   const controller = new AbortController();
   const reqTimeoutId = setTimeout(() => controller.abort(), TIME_OUT_MS);
 
@@ -209,7 +186,6 @@ export async function requestChatStream(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        path: "v1/chat/completions",
         "model": (!req?.model)? "" : req.model,
         ...getHeaders(),
       },
@@ -273,6 +249,7 @@ export async function requestWithPrompt(
     model?: ModelType;
   },
 ) {
+
   const userMessage = {
       role: "user",
       content: prompt,
@@ -280,9 +257,8 @@ export async function requestWithPrompt(
       tokens: 0,
   };
 
-  const res = await requestChat(historyMessages, userMessage, options);
-
-  return res?.choices?.at(0)?.message?.content ?? "";
+  const res = await requestChat(historyMessages, userMessage, options) as ChatResponse;
+  return res?.content??"";
 }
 
 // To store message streaming controller

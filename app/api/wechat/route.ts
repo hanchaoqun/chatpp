@@ -56,7 +56,6 @@ export async function POST(req: NextRequest) {
         // 发送请求并解析响应
         const response = await fetch(url)
         const data: AccessTokenResponse = await response.json()
-        console.log(data);
         const { openid, access_token } = data
 
         // 构建获取用户信息的请求参数

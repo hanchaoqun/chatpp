@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ChatMessage } from "../api/openai/typing";
+import type { Message, ImageUrl, ImageContent } from "../api/type/typing";
 import {
   ControllerPool,
   requestChatStream,
@@ -16,16 +16,6 @@ import { StoreKey } from "../constant";
 import { countTokens } from "../tokens";
 
 import { useAccessStore, AccessType } from "./access";
-
-export type Message = ChatMessage & {
-  date: string;
-  tokens: number;
-  id?: number;
-  streaming?: boolean;
-  isError?: boolean;
-  model?: ModelType;
-  isImage?: boolean;
-};
 
 export function createMessage(override: Partial<Message>): Message {
   return {
@@ -57,19 +47,6 @@ export interface ChatSession {
   mask: Mask;
 }
 
-export interface ImageUrl {
-  url: string; 
-  detail?: "low" | "high" | "auto";
-  file_name?: string;
-  file_size?: number;
-}
-
-export interface ImageContent {
-  type: string;
-  text?: string;
-  image_url?: ImageUrl;
-}
-
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
 export const BOT_HELLO: Message = createMessage({
   role: "assistant",
@@ -96,6 +73,16 @@ export function getImagesInputMarkDown(imageInput: string | ImageContent[]) : st
     .map((v) => `![${v.image_url?.file_name??''}](${v.image_url?.url??''})`)
     .join('\n');
   return mdbase64;
+}
+
+function getSummaryModel(model: string): string {
+  if (model.startsWith("gpt")) {
+    return "gpt-3.5-turbo";
+  }
+  if(model.startsWith("gemini")) {
+    return "gemini-pro";
+  }
+  return "gpt-3.5-turbo";
 }
 
 function createEmptySession(): ChatSession {
@@ -324,8 +311,6 @@ export const useChatStore = create<ChatStore>()(
         });
 
         // make request
-        console.log("[History Input] ", historyMessages);
-        console.log("[User Input Save] ", saveUserMessage);
         requestChatStream(historyMessages, userMessage, {
           onMessage(content, done) {
             // stream response
@@ -498,7 +483,7 @@ export const useChatStore = create<ChatStore>()(
           countMessages(session.messages) >= SUMMARIZE_MIN_LEN
         ) {
           requestWithPrompt(session.messages, Locale.Store.Prompt.Topic, {
-            model: "gpt-3.5-turbo",
+            model: getSummaryModel(session.mask.modelConfig.model) as ModelType,
           }).then((res) => {
             get().updateCurrentSession(
               (session) =>
@@ -534,24 +519,16 @@ export const useChatStore = create<ChatStore>()(
 
         const lastSummarizeIndex = session.messages.length;
 
-        console.log(
-          "[Chat History] ",
-          toBeSummarizedMsgs,
-          historyMsgLength,
-          config.modelConfig.compressMessageLengthThreshold,
-        );
-
         if (
           historyMsgLength >
           config.modelConfig.compressMessageLengthThreshold &&
           session.mask.modelConfig.sendMemory
         ) {
           requestWithPrompt(toBeSummarizedMsgs, Locale.Store.Prompt.Summarize, {
-            model: "gpt-3.5-turbo",
+            model: getSummaryModel(session.mask.modelConfig.model) as ModelType,
           }).then((res) => {
             if (res && trimTopic(res).length > 0) {
               session.memoryPrompt = trimTopic(res);
-              console.log("[Memory] ", session.memoryPrompt);
               session.lastSummarizeIndex = lastSummarizeIndex;
             }
           });

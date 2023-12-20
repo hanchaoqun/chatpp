@@ -42,4 +42,3 @@ async function PDFParse(pdfFile) {
 
     return pdfDoc;
 }
-

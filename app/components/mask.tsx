@@ -2,15 +2,15 @@ import { IconButton } from "./button";
 import AddIcon from "../icons/add.svg";
 import DeleteIcon from "../icons/delete.svg";
 
-import { DEFAULT_MASK_AVATAR, Mask } from "../store/mask";
-import { Message, ModelConfig, ROLES } from "../store";
+import { DEFAULT_MASK_AVATAR, Mask, Updater } from "../store/mask";
+import { ModelConfig, ROLES } from "../store";
+import { Message } from "../api/type/typing";
 import { Input, List } from "./ui-lib";
 import { Avatar } from "./emoji";
 import Locale from "../locales";
 
 
 import chatStyle from "./chat.module.scss";
-import { Updater } from "../api/openai/typing";
 import { ModelConfigList } from "./model-config";
 
 export function MaskAvatar(props: { mask: Mask }) {

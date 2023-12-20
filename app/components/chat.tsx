@@ -21,9 +21,6 @@ import PdfIcon from "../icons/pdf.svg";
 import ImageIcon from "../icons/image.svg";
 import {
   ALL_MODELS,
-  Message,
-  ImageUrl,
-  ImageContent,
   getImagesInputMarkDown,
   SubmitKey,
   useChatStore,
@@ -37,6 +34,11 @@ import {
   ModelType,
   DEFAULT_TOPIC,
 } from "../store";
+import {
+  Message,
+  ImageUrl,
+  ImageContent,
+} from "../api/type/typing";
 import {
   copyToClipboard,
   downloadAs,
@@ -398,7 +400,8 @@ async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() 
 }
 
 function isVisionModel(model:string) {
-  return model.startsWith("gpt-4-vision");
+  /* gpt-4-vision && gemini-pro-vision */
+  return model.includes("vision");
 }
 
 async function uploadImage(
@@ -743,7 +746,7 @@ export function Chat() {
       if (userInput.length <= 0 && pdfInput.length <= 0) return;
       inputText = userInput;
       if (pdfInput.length > 0) {
-        inputText = "PDF\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
+        inputText = "PDFs:\n---\n".concat(pdfInput).concat("\n---\n\n").concat(userInput);
       }
       setPDFInput("");
     }
