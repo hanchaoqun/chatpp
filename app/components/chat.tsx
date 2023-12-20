@@ -309,7 +309,10 @@ const getParsedPdf = async(formData:FormData) => {
       method: "POST",
       body: formData
   })
-  .then(res => res.status === 400 ? {text:'PDF read error!'} : res.json())
+  .then(res => (res.status === 400 || res.status === 403) 
+               ? {text:'请勿在公司内网上传敏感信息!!!\nPlease do not upload sensitive information on the company intranet!\n'} 
+               : res.json()
+               )
   .catch(err => console.log(err))
 
   return response
