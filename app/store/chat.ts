@@ -321,7 +321,7 @@ export const useChatStore = create<ChatStore>()(
             // stream response
             if (done) {
               botMessage.streaming = false;
-              botMessage.content = content;
+              botMessage.content = (content.length > 0)? content : Locale.Store.Error;
               get().onNewMessage(botMessage);
               ControllerPool.remove(
                 sessionIndex,
