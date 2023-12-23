@@ -254,7 +254,7 @@ export async function requestChatStream(
       options?.onError(new Error("SensitiveInfo"), res.status);
     } else {
       console.error("Stream Error", res.body);
-      options?.onError(new Error(`Stream Error:\n\n${res.body}\n\n`), res.status);
+      options?.onError(new Error(`StreamError`), res.status);
     }
   } catch (err) {
     console.error("NetWork Error", err);
