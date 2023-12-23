@@ -249,9 +249,12 @@ export async function requestChatStream(
     } else if (res.status === 401) {
       console.error("Unauthorized");
       options?.onError(new Error("Unauthorized"), res.status);
+    } else if (res.status === 403) {
+      console.error("SensitiveInfo");
+      options?.onError(new Error("SensitiveInfo"), res.status);
     } else {
       console.error("Stream Error", res.body);
-      options?.onError(new Error("Stream Error"), res.status);
+      options?.onError(new Error(`Stream Error:\n\n${res.body}\n\n`), res.status);
     }
   } catch (err) {
     console.error("NetWork Error", err);

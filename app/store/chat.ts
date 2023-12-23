@@ -341,8 +341,10 @@ export const useChatStore = create<ChatStore>()(
               } else {
                 botMessage.content = Locale.Error.Unauthorized;
               }
+            } else if (statusCode === 403) {
+              botMessage.content += "\n\n" + '请勿在公司内网上传敏感信息!!!\nPlease do not upload sensitive information on the company intranet!\n';
             } else if (!error.message.includes("aborted")) {
-              botMessage.content += "\n\n" + Locale.Store.Error;
+              botMessage.content += "\n\n" + Locale.Store.Error + `\n\nERROR:${error.message}`;
             }
             botMessage.streaming = false;
             userMessage.isError = true;
