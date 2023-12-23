@@ -754,7 +754,9 @@ export function Chat() {
       setPDFInput("");
     }
     setIsLoading(true);
-    chatStore.onUserInput(inputText??'', isVisionModel(currentModel)).then(() => setIsLoading(false));
+    chatStore.onUserInput(inputText??'', isVisionModel(currentModel))
+             .then(() => setIsLoading(false))
+             .catch(() => {setIsLoading(false)});
     setBeforeInput(inputText);
     setUserInput("");
     setPromptHints([]);
@@ -826,14 +828,16 @@ export function Chat() {
     if (userIndex === null) return;
     const currentModel = chatStore.currentSession().mask.modelConfig.model;
     const isImage = isVisionModel(currentModel);
-    setIsLoading(true);
     let content = session.messages[userIndex].content;
     const contentImages = (session.messages[userIndex].contentImages??'') as string;
     if (isImage && contentImages.length > 0) {
       content = contentImages;
     }
     deleteMessage(userIndex);
-    chatStore.onUserInput(content??'', isImage).then(() => setIsLoading(false));
+    setIsLoading(true);
+    chatStore.onUserInput(content??'', isImage)
+             .then(() => setIsLoading(false))
+             .catch(() => {setIsLoading(false)});
     inputRef.current?.focus();
   };
 
