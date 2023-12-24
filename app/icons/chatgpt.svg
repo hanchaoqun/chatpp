@@ -3,7 +3,7 @@
   <defs>
     <rect id="path_0" x="0" y="0" width="43" height="43.580135196270106" />
   </defs>
-  <g opacity="1" transform="translate(0 0.000001981943071882597)  rotate(0 21.5 21.790067598135053)">
+  <g opacity="10" transform="translate(0 0.000001981943071882597)  rotate(0 21.5 21.790067598135053)">
     <mask id="bg-mask-0" fill="white">
       <use xlink:href="#path_0"></use>
     </mask>
