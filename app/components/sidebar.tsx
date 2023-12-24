@@ -149,7 +149,7 @@ export function SideBar(props: { className?: string }) {
       <div className={styles["sidebar-header"]}>
         <div className={styles["sidebar-title"]}>ChatGPT</div>
         <div className={styles["sidebar-sub-title"]}>
-          Powered by OpenAI. ©️hanchaoqun
+          ℗OpenAI ©HanChaoQun
         </div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
           <ChatGptIcon />
