@@ -18,9 +18,11 @@ async function makeRequest(req: NextRequest) {
         );
     }
     const newheaders = new Headers(req.headers);
-    newheaders.delete("ChatPP-PathName");
     const accessCode = newheaders.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
     const usercnt = await queryCountAndDays(accessCode);
+
+    console.log("[PROXY] Request:", OPENAI_API, pathname, accessCode, usercnt);
+
     if (usercnt.usertype < 3 || usercnt.points <= 0) {
       return NextResponse.json(
         {
@@ -34,6 +36,7 @@ async function makeRequest(req: NextRequest) {
     }
     await decCount(accessCode, 20);
 
+    newheaders.delete("ChatPP-PathName");
     newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
     newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
   
