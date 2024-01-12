@@ -69,7 +69,7 @@ async function proxy(req: NextRequest) {
   const headers = new Headers(req.headers);
   const accessCode = headers.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
   const usercnt = await queryCountAndDays(accessCode);
-  if (usercnt.userType < 3 && usercnt.points <= 0) {
+  if (usercnt.usertype < 3 && usercnt.points <= 0) {
     return NextResponse.json(
       {
         error: true,
