@@ -18,6 +18,9 @@ async function makeRequest(req: NextRequest) {
         );
     }
     const newheaders = new Headers(req.headers);
+
+    console.log("[PROXY] Request:", newheaders.get("Authorization"));
+
     const accessCode = newheaders.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
     const usercnt = await queryCountAndDays(accessCode);
 
@@ -40,7 +43,7 @@ async function makeRequest(req: NextRequest) {
     newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
     newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
   
-    const response = fetch(`${OPENAI_API}${pathname}`, {
+    const response = await fetch(`${OPENAI_API}${pathname}`, {
       headers: newheaders,
       method: req.method,
       body: req.body,

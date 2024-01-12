@@ -67,7 +67,7 @@ async function proxy(req: NextRequest) {
   const newheaders = new Headers(req.headers);
   newheaders.set("API-Name",`${req.nextUrl.pathname}`);
 
-  const response = fetch(`https://${hostname}/api/proxy`, {
+  const response = await fetch(`https://${hostname}/api/proxy`, {
     headers: newheaders,
     method: req.method,
     body: req.body,
