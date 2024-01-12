@@ -73,7 +73,7 @@ async function proxy(req: NextRequest) {
     body: req.body,
   });
 
-  return;
+  return response;
 }
 
 export async function middleware(req: NextRequest) {
