@@ -37,14 +37,6 @@ async function makeRequest(req: NextRequest) {
     newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
     newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
   
-    /*
-    return NextResponse.rewrite(`${hosturl}${pathname}`, {
-      request: {
-        headers: newheaders,
-      },
-    });
-    */
-  
     const response = fetch(`${OPENAI_API}${pathname}`, {
       headers: newheaders,
       method: req.method,
