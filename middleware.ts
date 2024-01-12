@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessType, getServerSideConfig } from "./app/config/server";
-import { UserCount, queryCountAndDays } from "./app/account/server";
+import { UserCount, queryCountAndDays, decCount } from "./app/account/server";
 import md5 from "spark-md5";
 
 export const config = {
-  matcher: ["/api/chat", "/api/chat-stream"],
+  matcher: ["/api/chat", "/api/chat-stream", "/api/proxy", "/v1/(.*)"],
 };
 
 const serverConfig = getServerSideConfig();
@@ -60,7 +60,43 @@ async function accountAuth(req: NextRequest, accessCode: string) {
   return false;
 }
 
+async function proxy(req: NextRequest) {
+  const hostname = req.headers.get('host');
+  const newheaders = new Headers(req.headers);
+
+  newheaders.set("API-Path",`${req.nextUrl.pathname}`);
+
+  const response = await fetch(`https://${hostname}/api/proxy`, {
+    headers: newheaders,
+    method: req.method,
+    body: req.body,
+  });
+
+  return response;
+}
+
 export async function middleware(req: NextRequest) {
+  const hostname = req.headers.get('host');
+  const pathname = req.nextUrl.pathname;
+
+  if (hostname === 'api.chatpp.org') {
+    if (pathname.startsWith('/v1/')) {
+      return proxy(req);
+    } else if (pathname.startsWith('/api/proxy')) {
+      return NextResponse.next();
+    } else {
+      return NextResponse.json(
+        {
+          error: true,
+          msg: "Page not found!",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+  }
+
   const accessCode = req.headers.get("access-code");
   const token = req.headers.get("token");
 
