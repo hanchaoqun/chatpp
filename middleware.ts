@@ -4,7 +4,7 @@ import { UserCount, queryCountAndDays, decCount } from "./app/account/server";
 import md5 from "spark-md5";
 
 export const config = {
-  matcher: ["/api/chat", "/api/chat-stream", "/v1/(.*)"],
+  matcher: ["/api/chat", "/api/chat-stream", "/api/proxy", "/v1/(.*)"],
 };
 
 const serverConfig = getServerSideConfig();
@@ -84,6 +84,8 @@ export async function middleware(req: NextRequest) {
   if (PROXY_API_DEBUG || hostname === 'api.chatpp.org') {
     if (pathname.startsWith('/v1/')) {
       return proxy(req);
+    } else if (pathname.startsWith('/api/proxy')) {
+      return NextResponse.next();
     }
   }
 
