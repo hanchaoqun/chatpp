@@ -75,7 +75,6 @@ async function proxy(req: NextRequest) {
     },
   });
 
-  return response;
 }
 
 export async function middleware(req: NextRequest) {
