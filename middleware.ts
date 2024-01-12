@@ -67,7 +67,7 @@ async function proxy(req: NextRequest) {
   const hosturl = OPENAI_API;
   const pathname = req.nextUrl.pathname;
   const headers = new Headers(req.headers);
-  const accessCode = headers.get("Authorization")?.replace(/^Bearer sk-/, '');
+  const accessCode = headers.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
   const usercnt = await queryCountAndDays(accessCode);
   if (usercnt.userType < 3 && usercnt.points <= 0) {
     return NextResponse.json(
@@ -84,6 +84,14 @@ async function proxy(req: NextRequest) {
 
   headers.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
   headers.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
+
+  /*
+  return NextResponse.rewrite(`${hosturl}${pathname}`, {
+    request: {
+      headers,
+    },
+  });
+  */
 
   const response = fetch(`${hosturl}${pathname}`, {
     headers: {
