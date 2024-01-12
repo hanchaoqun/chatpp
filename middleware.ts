@@ -60,40 +60,15 @@ async function accountAuth(req: NextRequest, accessCode: string) {
   return false;
 }
 
-const OPENAI_API = 'https://api.openai.com';
-const OPENAI_API_DEBUG = true;
+const PROXY_API_DEBUG = true;
 
 async function proxy(req: NextRequest) {
-  const hosturl = OPENAI_API;
   const pathname = req.nextUrl.pathname;
   const newheaders = new Headers(req.headers);
-  const accessCode = newheaders.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
-  const usercnt = await queryCountAndDays(accessCode);
-  if (usercnt.usertype < 3 && usercnt.points <= 0) {
-    return NextResponse.json(
-      {
-        error: true,
-        msg: "Auth failed!",
-      },
-      {
-        status: 401,
-      },
-    );
-  }
-  await decCount(accessCode, 20);
 
-  newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
-  newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
+  newheaders.set("API-Name",`${pathname}`);
 
-  /*
-  return NextResponse.rewrite(`${hosturl}${pathname}`, {
-    request: {
-      headers: newheaders,
-    },
-  });
-  */
-
-  const response = fetch(`${hosturl}${pathname}`, {
+  const response = fetch('/api/proxy', {
     headers: newheaders,
     method: req.method,
     body: req.body,
@@ -105,7 +80,8 @@ async function proxy(req: NextRequest) {
 export async function middleware(req: NextRequest) {
   const hostname = req.headers.get('host');
   const pathname = req.nextUrl.pathname;
-  if (OPENAI_API_DEBUG || hostname === 'api.chatpp.org') {
+
+  if (PROXY_API_DEBUG || hostname === 'api.chatpp.org') {
     if (pathname.startsWith('/v1/')) {
       return proxy(req);
     }
