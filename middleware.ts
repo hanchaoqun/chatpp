@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessType, getServerSideConfig } from "./app/config/server";
-import { UserCount, queryCountAndDays } from "./app/account/server";
+import { UserCount, queryCountAndDays, decCount } from "./app/account/server";
 import md5 from "spark-md5";
 
 export const config = {
-  matcher: ["/api/chat", "/api/chat-stream"],
+  matcher: ["/api/chat", "/api/chat-stream", "/v1/(.*)"],
 };
 
 const serverConfig = getServerSideConfig();
@@ -33,6 +33,7 @@ async function codeAuth(req: NextRequest, accessCode: string) {
 async function accountAuth(req: NextRequest, accessCode: string) {
   const model = req.headers.get("model") ?? "";
   let usercnt = await queryCountAndDays(accessCode);
+  await decAccountCount(model??"", accessCode??"");
   console.log("[Auth]:", getIP(req), accessCode, usercnt);
   if (model && model.startsWith("gpt-4")) {
     if (usercnt.daysplus > 0) {
@@ -60,7 +61,60 @@ async function accountAuth(req: NextRequest, accessCode: string) {
   return false;
 }
 
+const OPENAI_API = 'https://api.openai.com';
+const OPENAI_API_DEBUG = true;
+
+async function proxy(req: NextRequest) {
+  const hosturl = OPENAI_API;
+  const pathname = req.nextUrl.pathname;
+  const headers = new Headers(req.headers);
+  const accessCode = headers.get("Authorization")?.replace(/^Bearer sk-/, '');
+  const usercnt = await queryCountAndDays(accessCode);
+  if (usercnt.userType < 3 && usercnt.points <= 0) {
+    return NextResponse.json(
+      {
+        error: true,
+        msg: "Auth failed!",
+      },
+      {
+        status: 401,
+      },
+    );
+  }
+  await decCount(accessCode, 20);
+
+  headers.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
+  headers.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
+
+  const response = fetch(`${hosturl}${pathname}`, {
+    headers: {
+      ...headers,
+    },
+    method: req.method,
+    body: req.body,
+  });
+
+  return response;
+}
+
 export async function middleware(req: NextRequest) {
+  const hostname = req.headers.get('host');
+  const pathname = req.nextUrl.pathname;
+  if (OPENAI_API_DEBUG || hostname === 'api.chatpp.org') {
+    if (pathname.startsWith('/v1/')) {
+      return proxy(req);
+    }
+    return NextResponse.json(
+      {
+        error: true,
+        msg: "Error Request!",
+      },
+      {
+        status: 404,
+      },
+    );
+  }
+
   const accessCode = req.headers.get("access-code");
   const token = req.headers.get("token");
 
