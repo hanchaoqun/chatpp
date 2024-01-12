@@ -5,12 +5,12 @@ const OPENAI_API = 'https://api.openai.com';
 
 async function makeRequest(req: NextRequest) {
   try {
-    const pathname = req.headers.get("API-Name")??"";
+    const pathname = req.headers.get("API-Path")??"";
     if (pathname === "") {
         return NextResponse.json(
             {
               error: true,
-              msg: "API-Name not found!",
+              msg: "API-Path not found!",
             },
             {
               status: 404,
@@ -19,9 +19,18 @@ async function makeRequest(req: NextRequest) {
     }
     const newheaders = new Headers(req.headers);
 
-    console.log("[PROXY] 2:", newheaders.get("Authorization"));
-
-    const accessCode = newheaders.get("Authorization")?.trim().replace(/^Bearer sk-/, '')??"";
+    const accessCode = newheaders.get("API-Token")?.trim().replace(/^Bearer sk-/, '')??"";
+    if (accessCode === "") {
+        return NextResponse.json(
+            {
+              error: true,
+              msg: "API-Token not found!",
+            },
+            {
+              status: 404,
+            },
+        );
+    }
     const usercnt = await queryCountAndDays(accessCode);
 
     console.log("[PROXY] Request:", OPENAI_API, pathname, accessCode, usercnt);
