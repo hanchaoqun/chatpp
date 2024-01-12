@@ -65,16 +65,15 @@ const PROXY_API_DEBUG = true;
 async function proxy(req: NextRequest) {
   const newUrl = req.nextUrl.clone();
   const newheaders = new Headers(req.headers);
-
+  
   newheaders.set("API-Name",`${newUrl.pathname}`);
   newUrl.pathname = "/api/proxy";
 
-  return NextResponse.rewrite(newUrl, {
-    request: {
-      headers: newheaders,
-    },
+  const newResponse = new Response(null, {
+    headers: newheaders,
   });
 
+  return NextResponse.rewrite(newUrl, newResponse);
 }
 
 export async function middleware(req: NextRequest) {
