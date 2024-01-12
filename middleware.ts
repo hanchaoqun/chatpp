@@ -66,8 +66,8 @@ const OPENAI_API_DEBUG = true;
 async function proxy(req: NextRequest) {
   const hosturl = OPENAI_API;
   const pathname = req.nextUrl.pathname;
-  const headers = new Headers(req.headers);
-  const accessCode = headers.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
+  const newheaders = new Headers(req.headers);
+  const accessCode = newheaders.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
   const usercnt = await queryCountAndDays(accessCode);
   if (usercnt.usertype < 3 && usercnt.points <= 0) {
     return NextResponse.json(
@@ -82,21 +82,19 @@ async function proxy(req: NextRequest) {
   }
   await decCount(accessCode, 20);
 
-  headers.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
-  headers.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
+  newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
+  newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
 
   /*
   return NextResponse.rewrite(`${hosturl}${pathname}`, {
     request: {
-      headers,
+      headers: newheaders,
     },
   });
   */
 
   const response = fetch(`${hosturl}${pathname}`, {
-    headers: {
-      ...headers,
-    },
+    headers: newheaders,
     method: req.method,
     body: req.body,
   });
@@ -111,15 +109,6 @@ export async function middleware(req: NextRequest) {
     if (pathname.startsWith('/v1/')) {
       return proxy(req);
     }
-    return NextResponse.json(
-      {
-        error: true,
-        msg: "Error Request!",
-      },
-      {
-        status: 404,
-      },
-    );
   }
 
   const accessCode = req.headers.get("access-code");
