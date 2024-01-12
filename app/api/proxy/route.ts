@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { UserCount, queryCountAndDays, decCount } from "./app/account/server";
+import { UserCount, queryCountAndDays, decCount } from "../../account/server";
 
 const OPENAI_API = 'https://api.openai.com';
 
