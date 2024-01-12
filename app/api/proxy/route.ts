@@ -17,7 +17,10 @@ async function makeRequest(req: NextRequest) {
             },
         );
     }
-    const accessCode = req.headers.get("API-Token")?.trim().replace(/^Bearer sk-/, '')??"";
+    let accessCode = req.headers.get("API-Token")?.trim().replace(/^Bearer sk-/, '')??"";
+    if (accessCode === "") {
+        accessCode = req.headers.get("Authorization")?.trim().replace(/^Bearer sk-/, '')??"";
+    }
     if (accessCode === "") {
         return NextResponse.json(
             {
