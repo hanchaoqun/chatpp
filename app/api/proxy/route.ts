@@ -17,9 +17,7 @@ async function makeRequest(req: NextRequest) {
             },
         );
     }
-    const newheaders = new Headers(req.headers);
-
-    const accessCode = newheaders.get("API-Token")?.trim().replace(/^Bearer sk-/, '')??"";
+    const accessCode = req.headers.get("API-Token")?.trim().replace(/^Bearer sk-/, '')??"";
     if (accessCode === "") {
         return NextResponse.json(
             {
@@ -31,6 +29,8 @@ async function makeRequest(req: NextRequest) {
             },
         );
     }
+
+    const newheaders = new Headers(req.headers);
     const usercnt = await queryCountAndDays(accessCode);
 
     console.log("[PROXY] Request:", OPENAI_API, pathname, accessCode, usercnt);
@@ -48,7 +48,8 @@ async function makeRequest(req: NextRequest) {
     }
     await decCount(accessCode, 20);
 
-    newheaders.delete("ChatPP-PathName");
+    newheaders.delete("API-Path");
+    newheaders.delete("API-Token");
     newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
     newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
   
