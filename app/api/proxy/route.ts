@@ -19,9 +19,9 @@ async function makeRequest(req: NextRequest) {
     }
     const newheaders = new Headers(req.headers);
 
-    console.log("[PROXY] Request:", newheaders.get("Authorization"));
+    console.log("[PROXY] 2:", newheaders.get("Authorization"));
 
-    const accessCode = newheaders.get("Authorization")?.replace(/^Bearer sk-/, '')??"";
+    const accessCode = newheaders.get("Authorization")?.trim().replace(/^Bearer sk-/, '')??"";
     const usercnt = await queryCountAndDays(accessCode);
 
     console.log("[PROXY] Request:", OPENAI_API, pathname, accessCode, usercnt);

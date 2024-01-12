@@ -65,7 +65,10 @@ const PROXY_API_DEBUG = true;
 async function proxy(req: NextRequest) {
   const hostname = req.headers.get('host');
   const newheaders = new Headers(req.headers);
+
   newheaders.set("API-Name",`${req.nextUrl.pathname}`);
+
+  console.log("[PROXY] 1:", newheaders.get("Authorization"));
 
   const response = await fetch(`https://${hostname}/api/proxy`, {
     headers: newheaders,
