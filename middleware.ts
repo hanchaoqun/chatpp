@@ -63,17 +63,17 @@ async function accountAuth(req: NextRequest, accessCode: string) {
 const PROXY_API_DEBUG = true;
 
 async function proxy(req: NextRequest) {
-  const newUrl = req.nextUrl.clone();
+  const hostname = req.headers.get('host');
   const newheaders = new Headers(req.headers);
-  
-  newheaders.set("API-Name",`${newUrl.pathname}`);
-  newUrl.pathname = "/api/proxy";
+  newheaders.set("API-Name",`${req.nextUrl.pathname}`);
 
-  const newResponse = new Response(null, {
+  const response = fetch(`https://${hostname}/api/proxy`, {
     headers: newheaders,
+    method: req.method,
+    body: req.body,
   });
 
-  return NextResponse.rewrite(newUrl, newResponse);
+  return;
 }
 
 export async function middleware(req: NextRequest) {
