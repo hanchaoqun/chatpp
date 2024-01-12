@@ -60,8 +60,6 @@ async function accountAuth(req: NextRequest, accessCode: string) {
   return false;
 }
 
-const PROXY_API_DEBUG = true;
-
 async function proxy(req: NextRequest) {
   const hostname = req.headers.get('host');
   const newheaders = new Headers(req.headers);
@@ -81,11 +79,21 @@ export async function middleware(req: NextRequest) {
   const hostname = req.headers.get('host');
   const pathname = req.nextUrl.pathname;
 
-  if (PROXY_API_DEBUG || hostname === 'api.chatpp.org') {
+  if (hostname === 'api.chatpp.org') {
     if (pathname.startsWith('/v1/')) {
       return proxy(req);
     } else if (pathname.startsWith('/api/proxy')) {
       return NextResponse.next();
+    } else {
+      return NextResponse.json(
+        {
+          error: true,
+          msg: "Page not found!",
+        },
+        {
+          status: 404,
+        },
+      );
     }
   }
 
