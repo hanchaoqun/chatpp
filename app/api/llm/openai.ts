@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createParser } from "eventsource-parser";
-import { ChatResponse } from "../type/typing";
+import { ChatResponse, ChatRequest, ImageContent } from "../type/typing";
 
 const OPENAI_URL = "api.openai.com";
 const OPENAI_CHAT_PATH = "v1/chat/completions";
