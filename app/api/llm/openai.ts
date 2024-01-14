@@ -26,6 +26,9 @@ export async function requestOpenAi(req: NextRequest, stream: boolean) {
 
   console.log("[OPENAI] Request:", baseUrl, chatPath, model, stream);
 
+  const chatReq = await req.json() as ChatRequest;
+  console.log("[CHAG-LOG]:", JSON.stringify(chatReq));
+
   const response = fetch(`${baseUrl}/${chatPath}`, {
     headers: {
       "Content-Type": "application/json",
