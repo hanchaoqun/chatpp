@@ -3,7 +3,6 @@ import { requestOpenAi, responseStreamOpenAi, checkResponseStreamOpenAi } from "
 import { requestGemini, responseStreamGemini, checkResponseStreamGemini } from "./gemini";
 
 export async function request(model: string, req: NextRequest, stream: boolean) {
-    console.log("[CHAT_BODY]:", req.body);
     if (model.startsWith("gpt")) {
         return await requestOpenAi(req, stream);
     }
