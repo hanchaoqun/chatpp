@@ -66,13 +66,20 @@ async function proxy(req: NextRequest) {
 
   newheaders.set("API-Path",`${req.nextUrl.pathname}`);
 
+  return NextResponse.rewrite(`https://${hostname}/api/proxy`, {
+      request: {
+        headers: newheaders,
+      },
+  });
+
+  /*
   const response = await fetch(`https://${hostname}/api/proxy`, {
     headers: newheaders,
     method: req.method,
     body: req.body,
   });
-
   return response;
+  */
 }
 
 export async function middleware(req: NextRequest) {
