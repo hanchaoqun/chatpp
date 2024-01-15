@@ -66,11 +66,10 @@ async function proxy(req: NextRequest) {
 
   newheaders.set("API-Path",`${req.nextUrl.pathname}`);
 
-  return NextResponse.rewrite(`https://${hostname}/api/proxy`, {
-      request: {
-        headers: newheaders,
-      },
+  const newResponse = new Response(null, {
+    headers: newheaders,
   });
+  return NextResponse.rewrite(`https://${hostname}/api/proxy`, newResponse);
 
   /*
   const response = await fetch(`https://${hostname}/api/proxy`, {
