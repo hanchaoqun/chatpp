@@ -9,6 +9,81 @@ export const config = {
 
 const serverConfig = getServerSideConfig();
 
+const OPENAI_API = 'https://api.openai.com';
+
+async function direct(req: NextRequest) {
+  try {
+    let accessCode = req.headers.get("Authorization")?.trim().replace(/^Bearer sk-/, '')??"";
+    if (accessCode === "") {
+        return NextResponse.json(
+            {
+              error: true,
+              msg: "Authorization not found!",
+            },
+            {
+              status: 404,
+            },
+        );
+    }
+
+    const newheaders = new Headers(req.headers);
+    const usercnt = await queryCountAndDays(accessCode);
+
+    console.log("[DIRECT-PROXY] Request:", OPENAI_API, pathname, accessCode, usercnt);
+
+    if (usercnt.usertype < 3 || usercnt.points <= 0) {
+      return NextResponse.json(
+        {
+          error: true,
+          msg: "Auth failed!",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+    await decCount(accessCode, 20);
+
+    newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
+    newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
+  
+    const response = await fetch(`${OPENAI_API}${pathname}`, {
+      headers: newheaders,
+      method: req.method,
+      body: req.body,
+    });
+
+    return response;
+
+  } catch (e) {
+    return NextResponse.json(
+      {
+        error: true,
+        msg: "ERROR: Fetch error!\n" + JSON.stringify(e),
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+
+async function proxy(req: NextRequest) {
+  const hostname = req.headers.get('host');
+  const newheaders = new Headers(req.headers);
+
+  newheaders.set("API-Path",`${req.nextUrl.pathname}`);
+
+  const response = fetch(`https://${hostname}/api/proxy`, {
+    headers: newheaders,
+    method: req.method,
+    body: req.body,
+  });
+  
+  return response;
+}
+
+
 function getIP(req: NextRequest) {
   let ip = req.ip ?? req.headers.get("x-real-ip");
   const forwardedFor = req.headers.get("x-forwarded-for");
@@ -60,20 +135,6 @@ async function accountAuth(req: NextRequest, accessCode: string) {
   return false;
 }
 
-async function proxy(req: NextRequest) {
-  const hostname = req.headers.get('host');
-  const newheaders = new Headers(req.headers);
-
-  newheaders.set("API-Path",`${req.nextUrl.pathname}`);
-
-  const response = fetch(`https://${hostname}/api/proxy`, {
-    headers: newheaders,
-    method: req.method,
-    body: req.body,
-  });
-  
-  return response;
-}
 
 export async function middleware(req: NextRequest) {
   const hostname = req.headers.get('host');
@@ -81,7 +142,7 @@ export async function middleware(req: NextRequest) {
 
   if (hostname === 'api.chatpp.org') {
     if (pathname.startsWith('/v1/')) {
-      return proxy(req);
+      return direct(req);
     } else if (pathname.startsWith('/api/proxy')) {
       return NextResponse.next();
     } else {
