@@ -141,7 +141,7 @@ export async function middleware(req: NextRequest) {
   });
 }
 
-export const runtime = "edge";
+export const runtime = "experimental-edge";
 
 /**
  * https://vercel.com/docs/concepts/edge-network/regions#region-list
