@@ -71,7 +71,11 @@ async function proxy(req: NextRequest) {
     method: req.method,
     body: req.body,
   });
-  return response;
+  
+  const res = new NextResponse(response.body);
+  res.headers.set("Content-Type", "application/json");
+  res.headers.set("Cache-Control", "no-cache");
+  return res;
 }
 
 export async function middleware(req: NextRequest) {
