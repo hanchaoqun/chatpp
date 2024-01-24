@@ -25,9 +25,9 @@ async function direct(req: NextRequest) {
             },
         );
     }
-
+    const pathname   = req.nextUrl.pathname;
     const newheaders = new Headers(req.headers);
-    const usercnt = await queryCountAndDays(accessCode);
+    const usercnt    = await queryCountAndDays(accessCode);
 
     console.log("[DIRECT-PROXY] Request:", OPENAI_API, pathname, accessCode, usercnt);
 
