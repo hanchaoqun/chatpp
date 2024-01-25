@@ -98,8 +98,9 @@ async function rewite(req: NextRequest) {
     body: req.body,
     credentials: req.credentials,
   });
-  
-  return NextResponse.rewrite(newReq);
+
+  return fetch(newReq)
+  //return NextResponse.rewrite(newReq);
 }
 
 function getIP(req: NextRequest) {
