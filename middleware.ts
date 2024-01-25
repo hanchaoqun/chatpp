@@ -83,6 +83,24 @@ async function proxy(req: NextRequest) {
   return response;
 }
 
+async function rewite(req: NextRequest) {
+  const hostname = req.headers.get('host');
+  const newheaders = new Headers(req.headers);
+
+  newheaders.set("API-Path",`${req.nextUrl.pathname}`);
+
+  const newUrl = req.nextUrl.clone();
+  newUrl.pathname = '/api/proxy';
+  
+  const newReq = new Request(newUrl.toString(), {
+    method: req.method,
+    headers: newheaders,
+    body: req.body,
+    credentials: req.credentials,
+  });
+  
+  return NextResponse.rewrite(newReq);
+}
 
 function getIP(req: NextRequest) {
   let ip = req.ip ?? req.headers.get("x-real-ip");
@@ -142,7 +160,7 @@ export async function middleware(req: NextRequest) {
 
   if (hostname === 'api.chatpp.org') {
     if (pathname.startsWith('/v1/')) {
-      return direct(req);
+      return rewite(req);
     } else if (pathname.startsWith('/api/proxy')) {
       return NextResponse.next();
     } else {
