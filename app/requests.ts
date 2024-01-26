@@ -24,6 +24,7 @@ const makeRequestParam = (
     filterBot?: boolean;
     stream?: boolean;
     model?: ModelType;
+    user?:string;
   },
 ) => {
   let sendMessages : ChatMessage[] = [];
@@ -100,6 +101,7 @@ const makeRequestParam = (
           temperature: modelConfig.temperature,
           presence_penalty: modelConfig.presence_penalty,
           max_tokens: 1024,
+          user: options?.user,
         } as ChatRequest;
       } catch (e) {
         return {
@@ -115,6 +117,7 @@ const makeRequestParam = (
           temperature: modelConfig.temperature,
           presence_penalty: modelConfig.presence_penalty,
           max_tokens: 1024,
+          user: options?.user,
         } as ChatRequest;
       }
   }
@@ -127,6 +130,7 @@ const makeRequestParam = (
     model: modelConfig.model,
     temperature: modelConfig.temperature,
     presence_penalty: modelConfig.presence_penalty,
+    user: options?.user,
   } as ChatRequest;
 };
 
@@ -153,9 +157,13 @@ export async function requestChat(
     model?: ModelType;
   },
 ) {
+  const accessStore = useAccessStore.getState();
+  const accessCode = accessStore.accessCode;
+
   const req = makeRequestParam(historyMessages, userMessage, {
     filterBot: true,
     model: options?.model,
+    user: accessCode,
   });
 
   try {
@@ -188,11 +196,19 @@ export async function requestChatStream(
   },
 ) {
   const accessStore = useAccessStore.getState();
+  const accessCode = accessStore.accessCode;
+
+  let headers: Record<string, string> = {};
+
+  if (accessStore.isNeedAccessCode()) {
+    headers["access-code"] = accessStore.accessCode;
+  }
 
   const req = makeRequestParam(historyMessages, userMessage, {
     stream: true,
     filterBot: options?.filterBot,
     model: options?.model,
+    user: accessCode,
   });
 
   const controller = new AbortController();

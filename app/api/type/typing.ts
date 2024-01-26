@@ -47,5 +47,6 @@ export interface ChatRequest {
     presence_penalty?: number;
     frequency_penalty?: number;
     max_tokens?: number;
+    user?: string;
 }
 
