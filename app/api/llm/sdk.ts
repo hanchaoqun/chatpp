@@ -21,9 +21,7 @@ export async function checkResponseStream(model: string, res: Response, stream: 
     if (model.startsWith("gemini")) {
         return await checkResponseStreamGemini(res, stream);
     }
-    return new Response(
-        ["```json\nERROR: Model : ", model, " not support!\n```"].join(""),
-    );
+    return ["```json\nERROR: Model : ", model, " not support!\n```"].join("")
 }
 
 export async function responseStream(model: string, res: any, encoder: TextEncoder, decoder: TextDecoder) {
@@ -33,8 +31,6 @@ export async function responseStream(model: string, res: any, encoder: TextEncod
     if (model.startsWith("gemini")) {
         return await responseStreamGemini(res, encoder, decoder);
     }
-    return new Response(
-        ["```json\nERROR: Model : ", model, " not support!\n```"].join(""),
-    );
+    return ["```json\nERROR: Model : ", model, " not support!\n```"].join("")
 }
 
