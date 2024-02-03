@@ -47,7 +47,7 @@ async function direct(req: NextRequest) {
     newheaders.set("Authorization",`Bearer ${process.env.OPENAI_API_KEY}`);
     newheaders.set("OpenAI-Organization", `${process.env.OPENAI_ORG_ID}`);
   
-    const response = await fetch(`${OPENAI_API}${pathname}`, {
+    const response = fetch(`${OPENAI_API}${pathname}`, {
       headers: newheaders,
       method: req.method,
       body: req.body,
@@ -161,7 +161,7 @@ export async function middleware(req: NextRequest) {
 
   if (hostname === 'api.chatpp.org') {
     if (pathname.startsWith('/v1/')) {
-      return rewite(req);
+      return direct(req);
     } else if (pathname.startsWith('/api/proxy')) {
       return NextResponse.next();
     } else {
