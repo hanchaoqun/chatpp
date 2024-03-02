@@ -590,7 +590,7 @@ export function ChatActions(props: {
                   return
                 }
                 props.onPDFsLoad("Pemium User Only! Send an email to hanssccv@gmail.com to apply for permission, please include your account number.\n"
-                               + "仅供高级用户使用! 发邮件到hanssccv@gmail.com申请权限，请附上您的账号。");
+                               + "仅供高级用户使用!");
                 props.scrollToBottom();
               }}
               text={"LoadPDFs"}
@@ -606,7 +606,7 @@ export function ChatActions(props: {
                   return
                 }
                 props.onImagesLoad("Pemium User Only! Send an email to hanssccv@gmail.com to apply for permission, please include your account number.\n"
-                                 + "仅供高级用户使用! 发邮件到hanssccv@gmail.com申请权限，请附上您的账号。");
+                                 + "仅供高级用户使用!");
                 props.scrollToBottom();
               }}
               text={"LoadImages"}
