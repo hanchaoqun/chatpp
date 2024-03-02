@@ -7,7 +7,7 @@ const en: LocaleType = {
     Unauthorized:
       "Unauthorized state, please refresh the page or re-login. If the problem persists, try clearing the browser cache.",
     NoFee:
-      "Your remaining number of free conversation times is not enough. Please **recharge** and try again. To get help, please scan the following QR code using WeChat:\n![gzh](/gzh.png)",
+      "Your remaining number of free conversation times is not enough. Please **recharge** and try again.",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messages`,
