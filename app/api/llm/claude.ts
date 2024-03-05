@@ -117,8 +117,6 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
     messages : [...msgs],
   };
 
-  console.log("[Claude] Request convert body:", body);
-
   const response = fetch(`${baseUrl}/${chatPath}`, {
     headers: {
       "content-type": "application/json",
@@ -129,14 +127,9 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
     body : JSON.stringify(body),
   });
 
-  console.log("[Claude] Request fetch sent:", baseUrl, chatPath, model, stream);
-
   if (stream) {
-    console.log("[Claude] Request fetch get stream:", baseUrl, chatPath, model, stream);
     return response;
   }
-
-  console.log("[Claude] Request fetch get res test:", baseUrl, chatPath, model, stream);
 
   return response.then( async(res) => {
     let msg: ChatResponse = {
