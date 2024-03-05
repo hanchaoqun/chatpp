@@ -162,6 +162,8 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
 }
 
 export async function checkResponseStreamClaude(res: Response, stream: boolean) {
+  console.log("[Claude] Check response before : ", stream);
+
   const contentType = res.headers.get("Content-Type") ?? "";
   /* text/event-stream */
   if (stream && !contentType.includes("stream")) {
@@ -171,7 +173,7 @@ export async function checkResponseStreamClaude(res: Response, stream: boolean) 
     return "```json\nERROR: Stream error!\n" + content + "\n```";
   }
 
-  console.log("[Claude] Check response : ", stream);
+  console.log("[Claude] Check response after : ", stream);
 }
 
 export async function responseStreamClaude(res: any, encoder: TextEncoder, decoder: TextDecoder) {
