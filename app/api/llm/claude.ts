@@ -169,6 +169,7 @@ export async function checkResponseStreamClaude(res: Response, stream: boolean) 
 }
 
 export async function responseStreamClaude(res: any, encoder: TextEncoder, decoder: TextDecoder) {
+  let out_error = ""
   const stream = new ReadableStream({
     async start(controller) {
       if (res.status !== 200) {
@@ -178,9 +179,7 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
             body: await res.text(),
         };
         const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
-
-        console.log("[responseStreamClaude start]", errorMsg);
-
+        out_error = errorMsg
         const queue = encoder.encode(errorMsg);
         controller.enqueue(queue);
         controller.close();
@@ -210,8 +209,10 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
           if ((msg?.type??"") === "error") {
             const text = msg?.error?.message??" ";
             const errorMsg = `ERROR: ${text}`;
-            console.log("[responseStreamClaude error]", errorMsg);
+            out_error = errorMsg
             controller.enqueue(errorMsg);
+            controller.close();
+            return;
           }
 
           if ((msg?.type??"") === "content_block_start") {
@@ -226,6 +227,7 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
 
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
+          out_error = errorMsg
           controller.enqueue(errorMsg);
           controller.close();
         }
@@ -235,6 +237,10 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
       for await (const chunk of res.body as any) {
         const dataString = decoder.decode(chunk, { stream: true });
         parser.feed(dataString);
+      }
+
+      if (out_error.length > 0) {
+        parser.feed(out_error);
       }
 
       controller.close();
