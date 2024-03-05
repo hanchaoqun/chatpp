@@ -105,6 +105,8 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
             };
   });
 
+  console.log("[Claude] Request convert msg:", baseUrl, chatPath, model, stream);
+
   // TODO: support system message
   const body = {
     model,
@@ -115,15 +117,19 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
     messages : [...msgs],
   };
 
+  console.log("[Claude] Request convert body:", body);
+
   const response = fetch(`${baseUrl}/${chatPath}`, {
     headers: {
-      "Content-Type": "application/json",
+      "content-type": "application/json",
       "x-api-key": `${apiKey}`,
       "anthropic-version": `${VERSION}`,
       ...(stream && { "anthropic-beta": "messages-2023-12-15" }),
     },
     body : JSON.stringify(body),
   });
+
+  console.log("[Claude] Request fetch sent:", baseUrl, chatPath, model, stream);
 
   if (stream) {
     return response;
