@@ -26,7 +26,7 @@ export async function checkResponseStream(model: string, res: Response, stream: 
         return await checkResponseStreamGemini(res, stream);
     }
     if (model.startsWith("claude")) {
-        return await checkResponseStreamClaude(req, stream);
+        return await checkResponseStreamClaude(res, stream);
     }
     return ["```json\nERROR: Model : ", model, " not support!\n```"].join("")
 }
