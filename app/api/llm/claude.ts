@@ -14,7 +14,8 @@ const API_KEY  = process.env.CLAUDE_API_KEY ?? "";
 
 function isVisionModel(model:string) {
     /* claude-3 */
-    return model.includes("claude-3");
+    return false;
+    // return model.includes("claude-3");
 }
 
 function convertRole(role: string) {
