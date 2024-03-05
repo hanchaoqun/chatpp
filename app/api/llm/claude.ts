@@ -188,8 +188,6 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
       // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
       function onParse(event: any) {
 
-        console.log("[Claude] responseStreamClaude: onParse");
-
         if (event.type !== "event") return;
         const dataString = event.data;
         // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
@@ -200,12 +198,19 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
         try {
           const msg = JSON.parse(dataString);
 
-          console.log("[Claude] responseStreamClaude:", msg);
-
           if ((msg?.type??"") === "message_stop") {
             controller.close();
             return;
           }
+
+          if ((msg?.type??"") === "error") {
+            const text = msg?.error?.message??" ";
+            const errorMsg = `ERROR: ${text}`;
+            controller.enqueue(errorMsg);
+            controller.close();
+            return;
+          }
+
           if ((msg?.type??"") === "content_block_start") {
             const text = msg?.content_block?.text??" ";
             const queue = encoder.encode(text);
