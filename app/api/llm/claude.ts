@@ -164,9 +164,14 @@ export async function checkResponseStreamClaude(res: Response, stream: boolean) 
     ).replace(/provided:.*. You/, "provided: ***. You");
     return "```json\nERROR: Stream error!\n" + content + "\n```";
   }
+
+  console.log("[Claude] Check response : ", stream);
 }
 
 export async function responseStreamClaude(res: any, encoder: TextEncoder, decoder: TextDecoder) {
+
+  console.log("[Claude] Response stream = true");
+
   const stream = new ReadableStream({
     async start(controller) {
       if (res.status !== 200) {

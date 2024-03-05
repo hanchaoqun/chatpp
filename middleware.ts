@@ -128,7 +128,7 @@ async function accountAuth(req: NextRequest, accessCode: string) {
   const model = req.headers.get("model") ?? "";
   let usercnt = await queryCountAndDays(accessCode);
   console.log("[Auth]:", getIP(req), accessCode, usercnt);
-  if (model && model.startsWith("gpt-4")) {
+  if (model && (model.startsWith("gpt-4") || model.startsWith("claude"))) {
     if (usercnt.daysplus > 0) {
       req.headers.set("calctype", "daysplus");
       return true;
