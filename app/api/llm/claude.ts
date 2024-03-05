@@ -106,7 +106,7 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
   });
 
   // TODO: support system message
-  const data = {
+  const body = {
     model,
     stream,
     max_tokens: chatReq.max_tokens,
@@ -122,7 +122,7 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
       "anthropic-version": `${VERSION}`,
       ...(stream && { "anthropic-beta": "messages-2023-12-15" }),
     },
-    data : JSON.stringify(data),
+    body : JSON.stringify(body),
   });
 
   if (stream) {

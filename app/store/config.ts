@@ -65,6 +65,18 @@ export const ALL_MODELS = [
     available: true,
   },
   {
+    name: "claude-3-opus-20240229",
+    available: ENABLE_GPT4,
+  },
+  {
+    name: "------------------",
+    available: true,
+  },
+  {
+    name: "gpt-4-vision-preview",
+    available: ENABLE_GPT4,
+  },
+  {
     name: "gemini-pro",
     available: true,
   },
@@ -73,36 +85,8 @@ export const ALL_MODELS = [
     available: true,
   },
   {
-    name: "------------------",
-    available: true,
-  },
-  {
-    name: "gpt-4-0125-preview",
+    name: "claude-3-sonnet-20240229",
     available: ENABLE_GPT4,
-  },
-  {
-    name: "gpt-4-1106-preview",
-    available: ENABLE_GPT4,
-  },
-  {
-    name: "gpt-4-vision-preview",
-    available: ENABLE_GPT4,
-  },
-  {
-    name: "gpt-4-32k",
-    available: ENABLE_GPT4,
-  },
-  {
-    name: "gpt-3.5-turbo-1106",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-16k",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-instruct",
-    available: true,
   },
 ] as const;
 
