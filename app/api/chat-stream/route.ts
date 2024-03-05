@@ -23,9 +23,7 @@ async function createStream(req: NextRequest) {
 
   const res = await request(model??"", req, true);
 
-  console.log("[createStream] checkResponseStream : ", model??"");
   const errorMsg = await checkResponseStream(model??"", res, true);
-  console.log("[createStream] after checkResponseStream : ", model??"");
 
   if (errorMsg) {
     return errorMsg;
@@ -33,9 +31,7 @@ async function createStream(req: NextRequest) {
 
   await decAccountCount(model??"", accessCode??"");
 
-  console.log("[createStream] responseStream : ", model??"");
   const stream = await responseStream(model??"", res, encoder, decoder);
-  console.log("[createStream] after responseStream : ", model??"");
   return stream;
 }
 

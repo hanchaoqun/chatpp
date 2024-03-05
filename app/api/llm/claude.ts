@@ -128,6 +128,7 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
   });
 
   if (stream) {
+    console.log("[Claude] Request to stream response:", response);
     return response;
   }
 
