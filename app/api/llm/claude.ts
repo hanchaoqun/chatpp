@@ -179,7 +179,7 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
         };
         const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
 
-        console.log("[responseStreamClaude start]", msg);
+        console.log("[responseStreamClaude start]", errorMsg);
 
         const queue = encoder.encode(errorMsg);
         controller.enqueue(queue);
@@ -190,7 +190,6 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
       // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
       // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
       function onParse(event: any) {
-
         if (event.type !== "event") return;
         const dataString = event.data;
         // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
