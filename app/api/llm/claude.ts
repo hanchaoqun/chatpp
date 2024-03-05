@@ -210,6 +210,7 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
           if ((msg?.type??"") === "error") {
             const text = msg?.error?.message??" ";
             const errorMsg = `ERROR: ${text}`;
+            console.log("[responseStreamClaude error]", errorMsg);
             controller.enqueue(errorMsg);
           }
 
