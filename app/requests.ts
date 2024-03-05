@@ -130,6 +130,7 @@ const makeRequestParam = (
     model: modelConfig.model,
     temperature: modelConfig.temperature,
     presence_penalty: modelConfig.presence_penalty,
+    max_tokens: modelConfig.max_tokens,
     user: options?.user,
   } as ChatRequest;
 };
