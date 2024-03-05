@@ -105,8 +105,6 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
             };
   });
 
-  console.log("[Claude] Request convert msg:", baseUrl, chatPath, model, stream);
-
   // TODO: support system message
   const body = {
     model,
@@ -129,7 +127,6 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
   });
 
   if (stream) {
-    console.log("[Claude] Request to stream response:", response);
     return response;
   }
 
@@ -160,9 +157,7 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
 }
 
 export async function checkResponseStreamClaude(res: Response, stream: boolean) {
-  console.log("[Claude] Check response before : ", stream);
-
-  const contentType = res.headers.get("Content-Type") ?? "";
+  const contentType = res.headers.get("Content-Type") ?? (res.headers.get("content-type") ?? "");
   /* text/event-stream */
   if (stream && !contentType.includes("stream")) {
     const content = await (
@@ -171,13 +166,9 @@ export async function checkResponseStreamClaude(res: Response, stream: boolean) 
     return "```json\nERROR: Stream error!\n" + content + "\n```";
   }
 
-  console.log("[Claude] Check response after : ", stream);
 }
 
 export async function responseStreamClaude(res: any, encoder: TextEncoder, decoder: TextDecoder) {
-
-  console.log("[Claude] Response stream = true");
-
   const stream = new ReadableStream({
     async start(controller) {
       if (res.status !== 200) {
@@ -196,6 +187,9 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
       // Chunks might get fragmented so we use eventsource-parse to ensure the chunks are complete
       // See: https://vercel.com/docs/concepts/functions/edge-functions/streaming#caveats
       function onParse(event: any) {
+
+        console.log("[Claude] responseStreamClaude: onParse");
+
         if (event.type !== "event") return;
         const dataString = event.data;
         // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
@@ -205,6 +199,9 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
         }
         try {
           const msg = JSON.parse(dataString);
+
+          console.log("[Claude] responseStreamClaude:", msg);
+
           if ((msg?.type??"") === "message_stop") {
             controller.close();
             return;
