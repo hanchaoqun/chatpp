@@ -124,6 +124,7 @@ export async function requestClaude(req: NextRequest, stream: boolean) {
       "anthropic-version": `${VERSION}`,
       ...(stream && { "anthropic-beta": "messages-2023-12-15" }),
     },
+    method: req.method,
     body : JSON.stringify(body),
   });
 
