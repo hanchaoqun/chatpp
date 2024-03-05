@@ -178,6 +178,9 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
             body: await res.text(),
         };
         const errorMsg = `ERROR: Recieved non-200 status code, ${JSON.stringify(data)}`;
+
+        console.log("[responseStreamClaude start]", msg);
+
         const queue = encoder.encode(errorMsg);
         controller.enqueue(queue);
         controller.close();
@@ -197,6 +200,8 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
         }
         try {
           const msg = JSON.parse(dataString);
+
+          console.log("[responseStreamClaude onParse]", msg);
 
           if ((msg?.type??"") === "message_stop") {
             controller.close();
@@ -218,7 +223,7 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           }
-          
+
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);
