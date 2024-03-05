@@ -403,8 +403,8 @@ async function uploadPDF(onPDFsLoad: (value: string) => void, scrollToBottom:() 
 }
 
 function isVisionModel(model:string) {
-  /* gpt-4-vision && gemini-pro-vision */
-  return model.includes("vision");
+  /* gpt-4-vision && gemini-pro-vision && claude-3 */
+  return model.includes("vision") || model.includes("claude-3");
 }
 
 async function uploadImage(
