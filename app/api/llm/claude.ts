@@ -207,8 +207,6 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
             const text = msg?.error?.message??" ";
             const errorMsg = `ERROR: ${text}`;
             controller.enqueue(errorMsg);
-            controller.close();
-            return;
           }
 
           if ((msg?.type??"") === "content_block_start") {
@@ -220,6 +218,7 @@ export async function responseStreamClaude(res: any, encoder: TextEncoder, decod
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           }
+          
         } catch (e) {
           const errorMsg = `ERROR: Failed to parse stream data, ${JSON.stringify(e)}`;
           controller.enqueue(errorMsg);
