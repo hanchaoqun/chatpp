@@ -57,6 +57,18 @@ export const ALL_MODELS = [
     available: ENABLE_GPT4,
   },
   {
+    name: "gpt-4o-mini",
+    available: ENABLE_GPT4,
+  },
+  {
+    name: "o1-preview",
+    available: ENABLE_GPT4,
+  },
+  {
+    name: "o1-mini",
+    available: ENABLE_GPT4,
+  },
+  {
     name: "gpt-4-turbo",
     available: ENABLE_GPT4,
   },

@@ -4,7 +4,7 @@ import { requestGemini, responseStreamGemini, checkResponseStreamGemini } from "
 import { requestClaude, responseStreamClaude, checkResponseStreamClaude } from "./claude";
 
 export async function request(model: string, req: NextRequest, stream: boolean) {
-    if (model.startsWith("gpt")) {
+    if (model.startsWith("gpt") || model.startsWith("o1")) {
         return await requestOpenAi(req, stream);
     }
     if (model.startsWith("gemini")) {
@@ -19,7 +19,7 @@ export async function request(model: string, req: NextRequest, stream: boolean) 
 }
 
 export async function checkResponseStream(model: string, res: Response, stream: boolean) {
-    if (model.startsWith("gpt")) {
+    if (model.startsWith("gpt") || model.startsWith("o1")) {
         return await checkResponseStreamOpenAi(res, stream);
     }
     if (model.startsWith("gemini")) {
@@ -32,7 +32,7 @@ export async function checkResponseStream(model: string, res: Response, stream: 
 }
 
 export async function responseStream(model: string, res: any, encoder: TextEncoder, decoder: TextDecoder) {
-    if (model.startsWith("gpt")) {
+    if (model.startsWith("gpt") || model.startsWith("o1")) {
         return await responseStreamOpenAi(res, encoder, decoder);
     }
     if (model.startsWith("gemini")) {

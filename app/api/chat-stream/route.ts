@@ -7,7 +7,7 @@ const serverConfig = getServerSideConfig();
 
 async function decAccountCount(model: string, accessCode: string) {
   let count = 0;
-  if (model && (model.startsWith("gpt-4") || model.startsWith("claude"))) {
+  if (model && (model.startsWith("gpt-4") || model.startsWith("o1") || model.startsWith("claude"))) {
     count = await decCount(accessCode, serverConfig.decGpt4UserCount)??0;
   } else {
     count = await decCount(accessCode)??0;

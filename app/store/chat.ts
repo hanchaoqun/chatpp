@@ -76,7 +76,7 @@ export function getImagesInputMarkDown(imageInput: string | ImageContent[]) : st
 }
 
 function getSummaryModel(model: string): string {
-  if (model.startsWith("gpt")) {
+  if (model.startsWith("gpt") || model.startsWith("o1")) {
     return "gpt-3.5-turbo";
   }
   if(model.startsWith("gemini")) {
