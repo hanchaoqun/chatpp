@@ -315,54 +315,64 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        // make request
-        requestChatStream(historyMessages, userMessage, {
-          onMessage(content, done) {
-            // stream response
-            if (done) {
+        if (useAppConfig.getState().modelConfig.model.startsWith("o1")) {
+          requestWithPrompt(historyMessages, userMessage.content, {
+            model: useAppConfig.getState().modelConfig.model as ModelType,
+          }).then((res) => {
+            botMessage.streaming = false;
+            botMessage.content = (res.length > 0)? res : Locale.Store.Error;
+            get().onNewMessage(botMessage);
+          });
+        } else {
+          // make request
+          requestChatStream(historyMessages, userMessage, {
+            onMessage(content, done) {
+              // stream response
+              if (done) {
+                botMessage.streaming = false;
+                botMessage.content = (content.length > 0)? content : Locale.Store.Error;
+                get().onNewMessage(botMessage);
+                ControllerPool.remove(
+                  sessionIndex,
+                  botMessage.id ?? messageIndex,
+                );
+              } else {
+                botMessage.content = content;
+                set(() => ({}));
+              }
+            },
+            async onError(error, statusCode) {
+              if (statusCode === 401) {
+                const accessStore = useAccessStore.getState();
+                await accessStore.fetchUserCount();
+                if (accessStore.isAuthorized() && accessStore.isNoFee()) {
+                  botMessage.content = Locale.Error.NoFee;
+                } else {
+                  botMessage.content = Locale.Error.Unauthorized;
+                }
+              } else if (statusCode === 403) {
+                botMessage.content += "\n\n" + '请勿在公司内网上传敏感信息!!!\nPlease do not upload sensitive information on the company intranet!\n';
+              } else if (!error.message.includes("aborted")) {
+                botMessage.content += "\n\n" + Locale.Store.Error;
+              }
               botMessage.streaming = false;
-              botMessage.content = (content.length > 0)? content : Locale.Store.Error;
-              get().onNewMessage(botMessage);
-              ControllerPool.remove(
+              userMessage.isError = true;
+              botMessage.isError = true;
+              set(() => ({}));
+              ControllerPool.remove(sessionIndex, botMessage.id ?? messageIndex);
+            },
+            onController(controller) {
+              // collect controller for stop/retry
+              ControllerPool.addController(
                 sessionIndex,
                 botMessage.id ?? messageIndex,
+                controller,
               );
-            } else {
-              botMessage.content = content;
-              set(() => ({}));
-            }
-          },
-          async onError(error, statusCode) {
-            if (statusCode === 401) {
-              const accessStore = useAccessStore.getState();
-              await accessStore.fetchUserCount();
-              if (accessStore.isAuthorized() && accessStore.isNoFee()) {
-                botMessage.content = Locale.Error.NoFee;
-              } else {
-                botMessage.content = Locale.Error.Unauthorized;
-              }
-            } else if (statusCode === 403) {
-              botMessage.content += "\n\n" + '请勿在公司内网上传敏感信息!!!\nPlease do not upload sensitive information on the company intranet!\n';
-            } else if (!error.message.includes("aborted")) {
-              botMessage.content += "\n\n" + Locale.Store.Error;
-            }
-            botMessage.streaming = false;
-            userMessage.isError = true;
-            botMessage.isError = true;
-            set(() => ({}));
-            ControllerPool.remove(sessionIndex, botMessage.id ?? messageIndex);
-          },
-          onController(controller) {
-            // collect controller for stop/retry
-            ControllerPool.addController(
-              sessionIndex,
-              botMessage.id ?? messageIndex,
-              controller,
-            );
-          },
-          filterBot: !useAppConfig.getState().sendBotMessages,
-          modelConfig: useAppConfig.getState().modelConfig,
-        });
+            },
+            filterBot: !useAppConfig.getState().sendBotMessages,
+            modelConfig: useAppConfig.getState().modelConfig,
+          });
+        }
       },
 
       getMessagesTokens(message: Message) {
