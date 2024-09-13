@@ -315,9 +315,9 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        if (session.mask.modelConfig.model.startsWith("o1")) {
+        if (get().currentSession().mask.modelConfig.model.startsWith("o1")) {
           requestWithPrompt(historyMessages, userMessage.content, {
-            model: session.mask.modelConfig.model as ModelType,
+            model: get().currentSession().mask.modelConfig.model as ModelType,
           }).then((res) => {
             botMessage.streaming = false;
             botMessage.content = (res.length > 0)? res : Locale.Store.Error;
