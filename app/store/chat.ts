@@ -316,13 +316,22 @@ export const useChatStore = create<ChatStore>()(
         });
 
         if (get().currentSession().mask.modelConfig.model.startsWith("o1")) {
-          requestWithPrompt(historyMessages, userMessage.content, {
-            model: get().currentSession().mask.modelConfig.model as ModelType,
-          }).then((res) => {
+          const accessStore = useAccessStore.getState();
+          const userType = accessStore.userCount.usertype;
+          if (userType < 1) {
             botMessage.streaming = false;
-            botMessage.content = (res.length > 0)? res : Locale.Store.Error;
+            botMessage.content = "Pemium User Only! Send an email to hanssccv@gmail.com to apply for permission, please include your account number.\n"
+                               + "仅供高级用户使用!";
             get().onNewMessage(botMessage);
-          });
+          } else {
+            requestWithPrompt(historyMessages, userMessage.content, {
+              model: get().currentSession().mask.modelConfig.model as ModelType,
+            }).then((res) => {
+              botMessage.streaming = false;
+              botMessage.content = (res.length > 0)? res : Locale.Store.Error;
+              get().onNewMessage(botMessage);
+            });
+          }
         } else {
           // make request
           requestChatStream(historyMessages, userMessage, {
